@@ -37,7 +37,7 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 .app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(260px,24vw,340px) minmax(0,1fr) clamp(280px,24vw,340px);grid-template-rows:minmax(0,1fr)}
 .post-side{grid-column:1}.workspace{grid-column:2}.props{grid-column:3;border-right:0;border-left:1px solid var(--line)}
 .tabs.chips{display:none}
-.tab{font:inherit;background:none;padding:0}
+.tab{font:inherit;background:none;padding:0;border:0;color:inherit;cursor:pointer}
 .tab[aria-pressed="true"] span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 /* Narrow window: one sidebar slot, «Пост» and «Картинка» swap in it */
 @media (max-width:1100px){
