@@ -14,6 +14,10 @@ https://claude.ai/artifact/VPVrM77jsDNwbu7d2LZzGV
 
 Не править артефакт в обход репозитория. Шрифты в `fonts/` генерируются через `tools/make_fonts.py`, руками их не трогать.
 
+## Figma
+
+Внешний вид — в Figma-файле [Evrone Post Builder](https://www.figma.com/design/b98SroxNlvHXWPNKJLfUZ6) (key `b98SroxNlvHXWPNKJLfUZ6`). На слово «синхронизируй» — процесс из `docs/figma-sync.md`: прочитать Figma скриптом `tools/figma-read.js`, сравнить с `design/figma-baseline.json`, показать список изменений, перенести в код, собрать, опубликовать, обновить снимок, закоммитить. Меняя внешний вид по текстовой просьбе, обновлять и Figma.
+
 ## Контекст
 
 - Два режима: «Статья» (`state`, `drawArticle()`) и «Кейс» (`caseState`, `drawCase()`); `draw()` выбирает по `mode`. Кейс — только картинка + опциональный логотип клиента, без текста; один пост, без карусели.

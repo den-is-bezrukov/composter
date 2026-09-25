@@ -10,6 +10,10 @@
 - инструкция;
 - правила хорошего поста.
 
+## Дизайн в Figma
+
+Внешний вид конструктора и геометрия постов лежат в Figma: [Evrone Post Builder](https://www.figma.com/design/b98SroxNlvHXWPNKJLfUZ6). Как устроена связка и синхронизация — [docs/figma-sync.md](docs/figma-sync.md).
+
 ## Структура
 
 ```
@@ -21,6 +25,9 @@ assets/sample.webp   иллюстрация-пример (прозрачный �
 assets/case-sample.jpg  пример картинки для режима «Кейс» (more.tv)
 build.py             собирает страницу в один файл
 tools/make_fonts.py  пересобирает шрифты из вариативного Roboto Flex
+tools/figma-read.js  читает дизайн из Figma для синхронизации
+design/figma-baseline.json  снимок Figma на момент последней синхронизации
+docs/figma-sync.md   как устроена связка с Figma
 index.html           собранная страница для GitHub Pages
 ```
 
