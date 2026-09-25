@@ -551,15 +551,15 @@ function blurBackdrop() {
   if (!c.blurCache) {
     const out = document.createElement('canvas'); out.width = W; out.height = H;
     const ox = out.getContext('2d');
-    const k = coverScale(c.img) * 1.1, w = c.img.naturalWidth * k, h = c.img.naturalHeight * k;
+    const k = coverScale(c.img) * 1.4, w = c.img.naturalWidth * k, h = c.img.naturalHeight * k;
     if ('filter' in ox) {
-      ox.filter = 'blur(60px)';
+      ox.filter = 'blur(140px)';
       ox.drawImage(c.img, (W - w) / 2, (H - h) / 2, w, h);
     } else {
-      let src = document.createElement('canvas'); src.width = 34; src.height = 45;
-      const sx = 34 / W, sy = 45 / H;
-      src.getContext('2d').drawImage(c.img, (34 - w * sx) / 2, (45 - h * sy) / 2, w * sx, h * sy);
-      for (let f = 3; src.width * f < W; ) {
+      let src = document.createElement('canvas'); src.width = 12; src.height = 16;
+      const sx = 12 / W, sy = 16 / H;
+      src.getContext('2d').drawImage(c.img, (12 - w * sx) / 2, (16 - h * sy) / 2, w * sx, h * sy);
+      for (let f = 2; src.width * f < W; ) {
         const nx = document.createElement('canvas'); nx.width = src.width * f; nx.height = src.height * f;
         const nctx = nx.getContext('2d'); nctx.imageSmoothingQuality = 'high';
         nctx.drawImage(src, 0, 0, nx.width, nx.height); src = nx;
