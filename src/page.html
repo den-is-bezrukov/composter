@@ -26,11 +26,13 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;overflow:hidden}
 /* Editor: controls in a sidebar, the post centred in the remaining space */
-.app{display:grid;grid-template-columns:380px minmax(0,1fr);height:100%}
+.app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(280px,34vw,380px) minmax(0,1fr)}
 .sidebar{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:var(--space-card);display:flex;flex-direction:column;gap:var(--space-fields)}
-.side-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.workspace{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 32px;min-width:0;min-height:0}
-.stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.side-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.side-head .btn{white-space:nowrap}
+.workspace{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;min-width:0;min-height:0;overflow:hidden}
+.stage{flex:none;display:flex;align-items:center;justify-content:center}
+#dl{white-space:nowrap;flex:none}
 .frame{position:relative}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
 dialog.save{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);color:var(--ink);padding:var(--space-card);width:min(440px,calc(100vw - 32px))}
@@ -889,11 +891,16 @@ $('fname').addEventListener('input', e => { customName[mode] = e.target.value.tr
 
 // ---- Fit the 3:4 preview into the workspace ----
 function fitFrame() {
-  const r = $('stage').getBoundingClientRect();
-  const w = Math.max(120, Math.min(r.width, r.height * 3 / 4));
-  $('frame').style.width = w + 'px'; $('frame').style.height = w * 4 / 3 + 'px';
+  const ws = document.querySelector('.workspace'), cs = getComputedStyle(ws);
+  const gap = parseFloat(cs.rowGap) || 0;
+  const warn = $('warn').hidden ? 0 : $('warn').offsetHeight + gap;
+  const availW = ws.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const availH = ws.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - $('dl').offsetHeight - gap - warn;
+  const w = Math.max(120, Math.floor(Math.min(availW, availH * 3 / 4)));
+  $('frame').style.width = w + 'px'; $('frame').style.height = Math.round(w * 4 / 3) + 'px';
 }
-new ResizeObserver(fitFrame).observe($('stage'));
+new ResizeObserver(fitFrame).observe(document.querySelector('.workspace'));
+new MutationObserver(fitFrame).observe($('warn'), { attributes: true, childList: true });
 fitFrame();
 
 const caseSample = new Image();
