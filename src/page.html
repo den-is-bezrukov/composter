@@ -26,8 +26,8 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;overflow:hidden}
 /* Editor: controls in a sidebar, the post centred in the remaining space */
-.app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(260px,24vw,340px) minmax(0,1fr) clamp(280px,24vw,340px);grid-template-rows:minmax(0,1fr)}
-.post-side{grid-column:1}.workspace{grid-column:2}.props{grid-column:3;border-right:0;border-left:1px solid var(--line)}
+.app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(260px,24vw,340px) minmax(0,1fr) clamp(280px,24vw,340px);grid-template-rows:minmax(0,1fr) auto}
+.post-side{grid-column:1;grid-row:1}.workspace{grid-column:2;grid-row:1 / 3}.props{grid-column:3;grid-row:1 / 3;border-right:0;border-left:1px solid var(--line)}
 .tabs.chips{display:none}
 .tab{font:inherit;background:none;padding:0;border:0;color:inherit;cursor:pointer}
 .tab[aria-pressed="true"] span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -35,7 +35,7 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 @media (max-width:1100px){
   .app{grid-template-columns:clamp(260px,34vw,340px) minmax(0,1fr)}
   .post-side,.props{grid-column:1;grid-row:1;border-left:0;border-right:1px solid var(--line)}
-  .workspace{grid-column:2}
+  .workspace{grid-column:2;grid-row:1 / 3}
   .tabs.chips{display:flex}
   .app.show-props .post-side,.app:not(.show-props) .props{display:none}
 }
@@ -47,8 +47,9 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 #dl{white-space:nowrap;flex:none}
 .frame{position:relative}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
-.savebar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;flex:none}
-.savebar .fname{width:280px;max-width:100%}
+.savebar{grid-column:1;grid-row:2;display:flex;flex-wrap:wrap;gap:8px;padding:14px var(--space-card);background:var(--surface);border-right:1px solid var(--line);border-top:1px solid var(--line)}
+.savebar .fname{flex:1 1 150px;min-width:0}
+.savebar .warn{flex:1 1 100%}
 .fname{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface)}
 .fname:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 .fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;flex:1;min-width:0;outline:none}
@@ -92,7 +93,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .slider output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
 .drop{border:1.5px dashed var(--line);border-radius:var(--radius-drop);padding:14px;text-align:center;cursor:pointer;color:var(--muted)}
 .drop.over{border-color:var(--accent);color:var(--ink)}
-.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius-control);padding:10px 14px;font-size:14px;max-width:640px;width:100%}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius-control);padding:10px 14px;font-size:14px}
 .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 32px;margin:0;padding:0;list-style:none}
 .rules li{border-top:1px solid var(--line);padding-top:10px}
 .rules b{display:block}
@@ -143,6 +144,8 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
           <span class="hint">Просто пишите текст: строки переносятся сами. Хорошо, когда заголовок укладывается в две строки.</span>
         </div>
 
+        <div class="warn" id="warnText" hidden></div>
+
         <div class="field" id="t2field" hidden>
           <label class="label" for="t2">Вторая часть (снизу)</label>
           <textarea id="t2" rows="3" spellcheck="false"></textarea>
@@ -166,18 +169,19 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
   </aside>
 
   <main class="workspace">
-    <div class="warn" id="warn" hidden></div>
     <div class="stage" id="stage">
       <div class="frame" id="frame">
         <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
         <div class="grid" id="grid" hidden></div>
       </div>
     </div>
-    <form class="savebar" id="saveForm">
-      <div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div>
-      <button class="btn primary" type="submit" id="dl">Скачать PNG</button>
-    </form>
   </main>
+
+  <form class="savebar" id="saveForm">
+    <div class="warn" id="warnSave" hidden></div>
+    <div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div>
+    <button class="btn primary" type="submit" id="dl">Скачать PNG</button>
+  </form>
 
   <aside class="sidebar props">
     <div class="tabs chips" role="group" aria-label="Панель">
@@ -230,6 +234,7 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
           <span class="label">Картинка</span>
           <label class="drop" id="caseDrop" for="caseFile">Перетащите готовую картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
           <input type="file" id="caseFile" accept="image/*" hidden>
+          <div class="warn" id="warnPic" hidden></div>
         </div>
 
         <div class="field">
@@ -469,7 +474,7 @@ function drawArticle() {
   if ([f1, f2].some(f => f && f.overflow)) warns.push('Слово не помещается в ширину, поэтому оно разбито посередине. Выберите «Узкая» и сузьте шрифт или замените слово на более короткое.');
   if ([f1, f2].some(f => f && f.rows.length > 2)) warns.push('Заголовок не влезает в две строки. Сократите текст или выберите «Сэндвич» и поделите его на две части.');
   if (!a.length) warns.push('Добавьте заголовок.');
-  $('warn').hidden = !warns.length; $('warn').textContent = warns.join(' ');
+  $('warnText').hidden = !warns.length; $('warnText').textContent = warns.join(' ');
   $('sizeOut').textContent = state.size; $('dxOut').textContent = state.dx; $('dyOut').textContent = state.dy;
 }
 
@@ -537,7 +542,8 @@ document.querySelectorAll('input[name=z]').forEach(r => r.addEventListener('chan
 $('reset').addEventListener('click', () => { resetPos(); draw(); });
 
 let downloads = null;
-const saveError = msg => { $('warn').textContent = msg; $('warn').hidden = false; };
+const saveError = msg => { $('warnSave').textContent = msg; $('warnSave').hidden = false; };
+$('fname').addEventListener('focus', () => { $('warnSave').hidden = true; });
 $('saveForm').addEventListener('submit', e => {
   e.preventDefault();
   const name = fileName();
@@ -676,7 +682,7 @@ function drawCase() {
     $('caseZoomOut').textContent = zoom.value + '%';
   } else warns.push('Загрузите картинку.');
   if (c.logo) drawLogo();
-  $('warn').hidden = !warns.length; $('warn').textContent = warns.join(' ');
+  $('warnPic').hidden = !warns.length; $('warnPic').textContent = warns.join(' ');
   $('lSizeOut').textContent = c.lSize; $('lDxOut').textContent = c.lDx; $('lDyOut').textContent = c.lDy;
 }
 
@@ -912,15 +918,12 @@ $('fname').addEventListener('blur', syncName);
 // ---- Fit the 3:4 preview into the workspace ----
 function fitFrame() {
   const ws = document.querySelector('.workspace'), cs = getComputedStyle(ws);
-  const gap = parseFloat(cs.rowGap) || 0;
-  const warn = $('warn').hidden ? 0 : $('warn').offsetHeight + gap;
   const availW = ws.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  const availH = ws.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - document.querySelector('.savebar').offsetHeight - gap - warn;
+  const availH = ws.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const w = Math.max(120, Math.floor(Math.min(availW, availH * 3 / 4)));
   $('frame').style.width = w + 'px'; $('frame').style.height = Math.round(w * 4 / 3) + 'px';
 }
 new ResizeObserver(fitFrame).observe(document.querySelector('.workspace'));
-new MutationObserver(fitFrame).observe($('warn'), { attributes: true, childList: true });
 fitFrame();
 
 const caseSample = new Image();
