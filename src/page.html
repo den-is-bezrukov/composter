@@ -35,6 +35,9 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 .seg input:checked+span{--cut:var(--ink);background:var(--ink);color:var(--bg)}
 .seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:1px}
 .panel-tabs{display:none}
+.seg{flex-wrap:wrap}
+.seg.grid2 label{flex:1 1 calc(50% - 3px)}
+.seg span > svg{flex:none}
 /* Narrow window: one sidebar slot, «Пост» and «Картинка» swap in it */
 @media (max-width:1100px){
   .app{grid-template-columns:clamp(260px,34vw,340px) minmax(0,1fr)}
@@ -58,8 +61,7 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 .savebar .fname{flex:1 1 150px;min-width:0}
 .savebar .warn{flex:1 1 100%}
 .fname{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface)}
-.fname:focus-within{outline:2px solid var(--accent);outline-offset:2px}
-.fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;flex:1;min-width:0;outline:none}
+.fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;flex:1;min-width:0}
 .fname .ext{padding:10px 12px 10px 1px;color:var(--muted);user-select:none}
 .linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 #colorBox .inner{display:flex;flex-direction:column;gap:10px}
@@ -80,7 +82,7 @@ h2{font-size:32px}
 .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--radius-control);padding:10px 16px;cursor:pointer}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn:focus-visible,.chip input:focus-visible+span,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn:focus-visible,.chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
 pre{background:var(--code);border:1px solid var(--line);border-radius:var(--radius-control);padding:16px;overflow-x:auto;white-space:pre-wrap;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0;max-height:360px;overflow-y:auto}
 .field{display:flex;flex-direction:column;gap:var(--space-field)}
 .label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
@@ -160,10 +162,10 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
         </div>
 
         <div class="field">
-          <span class="label">Ширина шрифта</span>
-          <div class="chips">
-            <label class="chip"><input type="radio" name="wd" id="wd-auto" value="auto" checked><span>Авто (60)</span></label>
-            <label class="chip"><input type="radio" name="wd" id="wd-narrow" value="narrow"><span>Узкая</span></label>
+          <span class="label">Шрифт</span>
+          <div class="seg" role="radiogroup" aria-label="Шрифт">
+            <label><input type="radio" name="wd" id="wd-auto" value="auto" checked><span>Авто</span></label>
+            <label><input type="radio" name="wd" id="wd-narrow" value="narrow"><span>Настроить</span></label>
           </div>
           <div class="slider" id="narrowRow" hidden><label for="narrow">Ширина</label><input type="range" id="narrow" min="25" max="60" step="1" value="52"><output id="narrowOut">52</output></div>
           <span class="hint">Сужайте, если длинное слово не помещается или заголовок не укладывается в две строки. Меньше всего шрифт сужается на 25.</span>
@@ -210,7 +212,7 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
 
         <div class="field">
           <span class="label">Слой картинки</span>
-          <div class="seg" role="radiogroup" aria-label="Слой картинки">
+          <div class="seg grid2" role="radiogroup" aria-label="Слой картинки">
             <label id="zc-under"><input type="radio" name="z" id="z-under" value="under" checked><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Под текстом</span></label>
             <label id="zc-overTop" hidden><input type="radio" name="z" id="z-overTop" value="overTop"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Над верхним</span></label>
             <label id="zc-overBottom" hidden><input type="radio" name="z" id="z-overBottom" value="overBottom"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/></svg>Над нижним</span></label>
