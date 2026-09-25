@@ -27,6 +27,7 @@ def main():
     page = (
         page.replace("__RF60__", b64(ROOT / "fonts/rf60.woff2"))
         .replace("__LIPS__", b64(ROOT / "assets/sample.webp"))
+        .replace("__CASE__", b64(ROOT / "assets/case-sample.jpg"))
         .replace("__WIDTHS__", json.dumps(widths))
     )
 

@@ -64,6 +64,22 @@ canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px
 .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 32px;margin:16px 0 0;padding:0;list-style:none}
 .rules li{border-top:1px solid var(--line);padding-top:10px}
 .rules b{display:block}
+.pane{display:flex;flex-direction:column;gap:20px}
+.mode{margin-top:16px}
+.stage{position:relative;width:100%;max-width:520px}
+.stage canvas{display:block}
+canvas.pannable{cursor:grab;touch-action:none}
+canvas.pannable.dragging{cursor:grabbing}
+.grid{position:absolute;inset:0;pointer-events:none;border-radius:6px;
+  --g:rgba(255,255,255,.6);
+  background:
+    linear-gradient(to right,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px)),
+    linear-gradient(to bottom,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.check input{width:16px;height:16px;accent-color:var(--accent)}
+.colorrow{display:flex;gap:10px;align-items:center;font-size:14px}
+input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:2px;cursor:pointer}
 .status{font-size:14px;color:var(--muted);min-height:1.5em;text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -71,8 +87,13 @@ canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px
 <div class="wrap">
   <section class="card">
     <h2>Конструктор</h2>
+    <div class="chips mode" role="radiogroup" aria-label="Тип поста">
+      <label class="chip"><input type="radio" name="mode" id="mode-article" value="article" checked><span>Статья</span></label>
+      <label class="chip"><input type="radio" name="mode" id="mode-case" value="case"><span>Кейс</span></label>
+    </div>
     <div class="builder">
       <div class="controls">
+      <div class="pane" id="articleControls">
         <div class="field">
           <span class="label">Иллюстрация</span>
           <label class="drop" id="drop" for="file">Перетащите картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
@@ -133,9 +154,65 @@ canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px
         </div>
       </div>
 
+      <div class="pane" id="caseControls" hidden>
+        <div class="field">
+          <span class="label">Картинка</span>
+          <label class="drop" id="caseDrop" for="caseFile">Перетащите готовую картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
+          <input type="file" id="caseFile" accept="image/*" hidden>
+        </div>
+
+        <div class="field">
+          <span class="label">Кадр</span>
+          <span class="hint">Двигайте картинку мышью или пальцем прямо на превью. Колёсиком мыши или щипком меняйте масштаб.</span>
+          <div class="slider"><label for="caseZoom">Масштаб</label><input type="range" id="caseZoom" min="50" max="400" step="1" value="100"><output id="caseZoomOut"></output></div>
+          <div class="btns">
+            <button class="btn" type="button" id="caseFill">Заполнить</button>
+            <button class="btn" type="button" id="caseFit">Вписать целиком</button>
+            <button class="btn" type="button" id="caseCenter">По центру</button>
+          </div>
+          <label class="check"><input type="checkbox" id="noGaps" checked>Без пустых краёв</label>
+        </div>
+
+        <div class="field">
+          <span class="label">Фон под пустыми краями</span>
+          <div class="chips" role="radiogroup">
+            <label class="chip"><input type="radio" name="bg" id="bg-color" value="color" checked><span>Цвет</span></label>
+            <label class="chip"><input type="radio" name="bg" id="bg-blur" value="blur"><span>Размытая картинка</span></label>
+          </div>
+          <div class="colorrow" id="bgColorRow"><input type="color" id="bgColor" value="#000000"><label for="bgColor">Цвет подбирается по краям картинки, его можно поменять</label></div>
+          <span class="hint">Фон виден, только если выключить «Без пустых краёв» или нажать «Вписать целиком».</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Логотип клиента</span>
+          <label class="drop" id="logoDrop" for="logoFile">Перетащите логотип сюда (SVG или PNG с прозрачным фоном) или нажмите, чтобы выбрать файл</label>
+          <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
+          <div id="logoControls" class="pane" hidden>
+            <div class="chips" role="radiogroup">
+              <label class="chip"><input type="radio" name="tint" id="tint-orig" value="orig" checked><span>Как есть</span></label>
+              <label class="chip"><input type="radio" name="tint" id="tint-white" value="#FFFFFF"><span>Белый</span></label>
+              <label class="chip"><input type="radio" name="tint" id="tint-black" value="#000000"><span>Чёрный</span></label>
+            </div>
+            <div>
+              <div class="slider"><label for="lSize">Размер</label><input type="range" id="lSize" min="100" max="1020" step="10" value="540"><output id="lSizeOut"></output></div>
+              <div class="slider"><label for="lDy">Вверх/вниз</label><input type="range" id="lDy" min="-700" max="700" step="5" value="0"><output id="lDyOut"></output></div>
+              <div class="slider"><label for="lDx">Влево/вправо</label><input type="range" id="lDx" min="-500" max="500" step="5" value="0"><output id="lDxOut"></output></div>
+            </div>
+            <div class="btns">
+              <button class="btn" type="button" id="logoReset">По центру</button>
+              <button class="btn" type="button" id="logoRemove">Убрать логотип</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
       <div class="preview">
         <div class="warn" id="warn" hidden></div>
-        <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
+        <div class="stage">
+          <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
+          <div class="grid" id="grid" hidden></div>
+        </div>
         <button class="btn primary" type="button" id="dl">Скачать PNG</button>
         <div class="status" id="dlStatus"></div>
       </div>
@@ -169,9 +246,11 @@ canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px
     <ul class="rules">
       <li><b>Заголовок в две строки</b>По 2–3 слова в строке, разбивать по смыслу: «MIGRATING / TO RUST». Если текст длинный, выберите «Сэндвич» и поделите его на верх и низ.</li>
       <li><b>Один объект</b>Метафора темы, один предмет или персонаж. Не нужно коллажей, нескольких сцен или надписей на самой картинке.</li>
-      <li><b>Ничего лишнего</b>На посте только заголовок и иллюстрация: без логотипа, подписей и рамок.</li>
+      <li><b>Ничего лишнего</b>В статье только заголовок и иллюстрация: без логотипа, подписей и рамок.</li>
       <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку или сдвиньте её ползунком.</li>
       <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
+      <li><b>Кейс: важное ближе к центру</b>Лицо, продукт или логотип на картинке держите подальше от краёв. В ленте и сетке Instagram края поста могут обрезаться.</li>
+      <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
       <li><b>Сложные случаи</b>Если объект должен перекрывать буквы или картинка должна выходить за край, передайте пост дизайнеру.</li>
     </ul>
   </section>
@@ -300,7 +379,7 @@ function drawImage() {
   ctx.drawImage(state.img, W / 2 - w / 2 + state.dx, cy - h / 2, w, h);
 }
 
-function draw() {
+function drawArticle() {
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
   const a = lines($('t1').value), b = lines($('t2').value);
   const warns = [];
@@ -328,6 +407,7 @@ function draw() {
 
 function loadFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
+  if (mode === 'case') return loadCaseFile(file);
   const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = () => { state.img = img; resetPos(); draw(); $('drop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
@@ -335,10 +415,17 @@ function loadFile(file) {
 }
 
 $('file').addEventListener('change', e => loadFile(e.target.files[0]));
-const drop = $('drop');
-['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-document.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+const activeDrop = e => e.target.closest?.('#logoDrop') ? $('logoDrop') : $(mode === 'case' ? 'caseDrop' : 'drop');
+['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => {
+  e.preventDefault();
+  document.querySelectorAll('.drop.over').forEach(d => d.classList.remove('over'));
+  activeDrop(e).classList.add('over');
+}));
+['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); document.querySelectorAll('.drop.over').forEach(d => d.classList.remove('over')); }));
+document.addEventListener('drop', e => {
+  const f = e.dataTransfer.files[0];
+  if (e.target.closest?.('#logoDrop')) loadLogoFile(f); else loadFile(f);
+});
 document.addEventListener('paste', e => {
   const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
   if (item) loadFile(item.getAsFile());
@@ -389,7 +476,7 @@ $('dl').addEventListener('click', () => {
       // Outside claude.ai (e.g. GitHub Pages) a plain download link works
       if (!window.claude) {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = `evrone-${state.name}.png`;
+        a.href = URL.createObjectURL(blob); a.download = fileName();
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
         st.textContent = 'Готово, файл сохранён.';
@@ -397,7 +484,7 @@ $('dl').addEventListener('click', () => {
       }
       st.textContent = 'Кнопка скачивания здесь недоступна. Нажмите правой кнопкой мыши на превью и выберите «Сохранить изображение как…».'; return;
     }
-    try { await downloads.save({ filename: `evrone-${state.name}.png`, data: blob }); st.textContent = 'Готово, файл сохранён.'; }
+    try { await downloads.save({ filename: fileName(), data: blob }); st.textContent = 'Готово, файл сохранён.'; }
     catch (e) {
       if (e && e.code === 'declined') st.textContent = 'Скачивание отменено.';
       else if (e && e.code === 'rate_limited') st.textContent = 'Окно сохранения уже открыто. Попробуйте ещё раз через пару секунд.';
@@ -406,6 +493,241 @@ $('dl').addEventListener('click', () => {
   }, 'image/png');
 });
 (async () => { try { downloads = await window.claude?.use?.('downloads'); } catch (e) { downloads = null; } })();
+
+// ---- Case: a ready-made picture cropped to 3:4, optional client logo ----
+let mode = 'article';
+const caseState = {
+  img: null, scale: 1, x: W / 2, y: H / 2, noGaps: true,
+  bg: 'color', bgColor: '#000000', blurCache: null,
+  logo: null, tint: 'orig', lSize: 540, lDx: 0, lDy: 0, name: 'case',
+};
+const slugify = s => s.toLowerCase().replace(/\.[a-z0-9]+$/i, '').replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '') || 'case';
+const fileName = () => mode === 'case' ? `evrone-case-${caseState.name}.png` : `evrone-${state.name}.png`;
+
+function draw() { mode === 'case' ? drawCase() : drawArticle(); }
+
+const coverScale = img => Math.max(W / img.naturalWidth, H / img.naturalHeight);
+const containScale = img => Math.min(W / img.naturalWidth, H / img.naturalHeight);
+
+// Keep scale in range and, with "no gaps", keep the picture covering the whole frame
+function clampCase() {
+  const c = caseState;
+  if (!c.img) return;
+  const cover = coverScale(c.img);
+  const min = c.noGaps ? cover : containScale(c.img) * 0.5;
+  c.scale = Math.min(Math.max(c.scale, min), cover * 4);
+  if (c.noGaps) {
+    const hw = c.img.naturalWidth * c.scale / 2, hh = c.img.naturalHeight * c.scale / 2;
+    c.x = Math.min(Math.max(c.x, W - hw), hw);
+    c.y = Math.min(Math.max(c.y, H - hh), hh);
+  }
+}
+
+// Zoom around a point on the canvas so that point stays under the cursor
+function zoomAt(factor, p) {
+  const c = caseState, before = c.scale;
+  c.scale *= factor; clampCase();
+  const k = c.scale / before;
+  c.x = p.x - (p.x - c.x) * k; c.y = p.y - (p.y - c.y) * k;
+  clampCase();
+}
+
+// Average colour of the picture's outer edge, used to fill gaps
+function edgeColor(img) {
+  const n = 32, t = document.createElement('canvas'); t.width = t.height = n;
+  const x = t.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, n, n);
+  const d = x.getImageData(0, 0, n, n).data; let r = 0, g = 0, b = 0, k = 0;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    if (i && j && i < n - 1 && j < n - 1) continue;
+    const o = (j * n + i) * 4; r += d[o]; g += d[o + 1]; b += d[o + 2]; k++;
+  }
+  return '#' + [r, g, b].map(v => Math.round(v / k).toString(16).padStart(2, '0')).join('');
+}
+
+// Blurred cover copy of the picture, built once per image.
+// ctx.filter where supported; otherwise shrink hard and scale back up in steps (older Safari)
+function blurBackdrop() {
+  const c = caseState;
+  if (!c.blurCache) {
+    const out = document.createElement('canvas'); out.width = W; out.height = H;
+    const ox = out.getContext('2d');
+    const k = coverScale(c.img) * 1.1, w = c.img.naturalWidth * k, h = c.img.naturalHeight * k;
+    if ('filter' in ox) {
+      ox.filter = 'blur(60px)';
+      ox.drawImage(c.img, (W - w) / 2, (H - h) / 2, w, h);
+    } else {
+      let src = document.createElement('canvas'); src.width = 34; src.height = 45;
+      const sx = 34 / W, sy = 45 / H;
+      src.getContext('2d').drawImage(c.img, (34 - w * sx) / 2, (45 - h * sy) / 2, w * sx, h * sy);
+      for (let f = 3; src.width * f < W; ) {
+        const nx = document.createElement('canvas'); nx.width = src.width * f; nx.height = src.height * f;
+        const nctx = nx.getContext('2d'); nctx.imageSmoothingQuality = 'high';
+        nctx.drawImage(src, 0, 0, nx.width, nx.height); src = nx;
+      }
+      ox.imageSmoothingQuality = 'high'; ox.drawImage(src, 0, 0, W, H);
+    }
+    ox.filter = 'none'; ox.fillStyle = 'rgba(0,0,0,.25)'; ox.fillRect(0, 0, W, H);
+    c.blurCache = out;
+  }
+  ctx.drawImage(c.blurCache, 0, 0);
+}
+
+function drawLogo() {
+  const c = caseState, w = c.lSize, h = w * c.logo.height / c.logo.width;
+  const x = W / 2 - w / 2 + c.lDx, y = H / 2 - h / 2 + c.lDy;
+  if (c.tint === 'orig') { ctx.drawImage(c.logo.img, x, y, w, h); return; }
+  // Recolour on an offscreen canvas at the final size so SVGs stay sharp
+  const o = document.createElement('canvas'); o.width = Math.ceil(w); o.height = Math.ceil(h);
+  const ox = o.getContext('2d'); ox.drawImage(c.logo.img, 0, 0, w, h);
+  ox.globalCompositeOperation = 'source-in'; ox.fillStyle = c.tint; ox.fillRect(0, 0, o.width, o.height);
+  ctx.drawImage(o, x, y);
+}
+
+function drawCase() {
+  const c = caseState, warns = [];
+  ctx.fillStyle = c.bgColor; ctx.fillRect(0, 0, W, H);
+  if (c.img) {
+    if (c.bg === 'blur') blurBackdrop();
+    const iw = c.img.naturalWidth * c.scale, ih = c.img.naturalHeight * c.scale;
+    ctx.drawImage(c.img, c.x - iw / 2, c.y - ih / 2, iw, ih);
+    if (c.scale > 1.25) warns.push(`Картинка маленькая для поста и растянута в ${c.scale.toFixed(1).replace('.', ',')} раза, поэтому будет мыльной. Найдите исходник побольше (от 1080×1440) или уменьшите масштаб.`);
+    const cover = coverScale(c.img), zoom = $('caseZoom');
+    zoom.min = Math.floor((c.noGaps ? 1 : containScale(c.img) * 0.5 / cover) * 100);
+    zoom.value = Math.round(c.scale / cover * 100);
+    $('caseZoomOut').textContent = zoom.value + '%';
+  } else warns.push('Загрузите картинку.');
+  if (c.logo) drawLogo();
+  $('warn').hidden = !warns.length; $('warn').textContent = warns.join(' ');
+  $('lSizeOut').textContent = c.lSize; $('lDxOut').textContent = c.lDx; $('lDyOut').textContent = c.lDy;
+}
+
+function setCaseImage(img, name) {
+  const c = caseState;
+  c.img = img; c.name = slugify(name); c.blurCache = null;
+  c.bgColor = edgeColor(img); $('bgColor').value = c.bgColor;
+  c.scale = coverScale(img); c.x = W / 2; c.y = H / 2; clampCase();
+  draw();
+}
+
+function loadCaseFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const img = new Image();
+  img.onload = () => { setCaseImage(img, file.name); $('caseDrop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
+  img.src = URL.createObjectURL(file);
+}
+
+// SVGs without width/height get them from the viewBox, otherwise they load at 0×0 or 300×150
+async function loadLogoFile(file) {
+  if (!file) return;
+  const isSvg = file.type === 'image/svg+xml' || /\.svg$/i.test(file.name);
+  if (!isSvg && !file.type.startsWith('image/')) return;
+  let blob = file, w = 0, h = 0;
+  if (isSvg) {
+    const doc = new DOMParser().parseFromString(await file.text(), 'image/svg+xml');
+    const svg = doc.documentElement;
+    const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+    const aw = parseFloat(svg.getAttribute('width')), ah = parseFloat(svg.getAttribute('height'));
+    const pct = /%/.test(svg.getAttribute('width') || '') || /%/.test(svg.getAttribute('height') || '');
+    if (vb.length === 4 && vb[2] > 0 && vb[3] > 0 && (pct || !aw || !ah)) { w = vb[2]; h = vb[3]; }
+    else { w = aw; h = ah; }
+    if (!w || !h) { $('logoDrop').textContent = 'В этом SVG не указан размер. Экспортируйте логотип заново или возьмите PNG.'; return; }
+    svg.setAttribute('width', w); svg.setAttribute('height', h);
+    blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+  }
+  const img = new Image();
+  img.onload = () => {
+    const c = caseState;
+    c.logo = { img, width: w || img.naturalWidth, height: h || img.naturalHeight };
+    c.lSize = 540; c.lDx = 0; c.lDy = 0; syncLogoInputs();
+    $('logoControls').hidden = false;
+    $('logoDrop').textContent = 'Логотип: ' + file.name + '. Можно заменить.';
+    if (!caseState.img || caseState.name === 'more-tv') caseState.name = slugify(file.name);
+    draw();
+  };
+  img.onerror = () => { $('logoDrop').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; };
+  img.src = URL.createObjectURL(blob);
+}
+
+function syncLogoInputs() {
+  const c = caseState;
+  $('lSize').value = c.lSize; $('lDx').value = c.lDx; $('lDy').value = c.lDy;
+}
+
+function setMode(m) {
+  mode = m;
+  $('articleControls').hidden = m !== 'article';
+  $('caseControls').hidden = m !== 'case';
+  cv.classList.toggle('pannable', m === 'case');
+  draw();
+}
+document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => setMode(r.value)));
+
+$('caseFile').addEventListener('change', e => loadCaseFile(e.target.files[0]));
+$('logoFile').addEventListener('change', e => loadLogoFile(e.target.files[0]));
+$('caseZoom').addEventListener('input', e => {
+  if (!caseState.img) return;
+  zoomAt(coverScale(caseState.img) * e.target.value / 100 / caseState.scale, { x: W / 2, y: H / 2 }); draw();
+});
+$('caseFill').addEventListener('click', () => {
+  const c = caseState; if (!c.img) return;
+  c.scale = coverScale(c.img); c.x = W / 2; c.y = H / 2; draw();
+});
+$('caseFit').addEventListener('click', () => {
+  const c = caseState; if (!c.img) return;
+  c.noGaps = false; $('noGaps').checked = false;
+  c.scale = containScale(c.img); c.x = W / 2; c.y = H / 2; draw();
+});
+$('caseCenter').addEventListener('click', () => { caseState.x = W / 2; caseState.y = H / 2; clampCase(); draw(); });
+$('noGaps').addEventListener('change', e => { caseState.noGaps = e.target.checked; clampCase(); draw(); });
+document.querySelectorAll('input[name=bg]').forEach(r => r.addEventListener('change', () => {
+  caseState.bg = r.value; $('bgColorRow').hidden = r.value !== 'color'; draw();
+}));
+$('bgColor').addEventListener('input', e => { caseState.bgColor = e.target.value; draw(); });
+document.querySelectorAll('input[name=tint]').forEach(r => r.addEventListener('change', () => { caseState.tint = r.value; draw(); }));
+['lSize', 'lDx', 'lDy'].forEach(k => $(k).addEventListener('input', e => { caseState[k] = +e.target.value; draw(); }));
+$('logoReset').addEventListener('click', () => { const c = caseState; c.lDx = 0; c.lDy = 0; syncLogoInputs(); draw(); });
+$('logoRemove').addEventListener('click', () => {
+  caseState.logo = null; $('logoControls').hidden = true; $('logoFile').value = '';
+  $('logoDrop').textContent = 'Перетащите логотип сюда (SVG или PNG с прозрачным фоном) или нажмите, чтобы выбрать файл';
+  draw();
+});
+
+// Direct manipulation on the preview: drag to pan, wheel or pinch to zoom
+const pointers = new Map();
+function toCanvas(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
+}
+cv.addEventListener('pointerdown', e => {
+  if (mode !== 'case' || !caseState.img) return;
+  cv.setPointerCapture(e.pointerId); pointers.set(e.pointerId, toCanvas(e));
+  cv.classList.add('dragging'); $('grid').hidden = false;
+});
+cv.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId)) return;
+  const c = caseState, p = toCanvas(e), prev = pointers.get(e.pointerId);
+  if (pointers.size === 1) { c.x += p.x - prev.x; c.y += p.y - prev.y; clampCase(); }
+  else {
+    const other = [...pointers].find(([id]) => id !== e.pointerId)[1];
+    const d0 = Math.hypot(prev.x - other.x, prev.y - other.y), d1 = Math.hypot(p.x - other.x, p.y - other.y);
+    const m0 = { x: (prev.x + other.x) / 2, y: (prev.y + other.y) / 2 }, m1 = { x: (p.x + other.x) / 2, y: (p.y + other.y) / 2 };
+    c.x += m1.x - m0.x; c.y += m1.y - m0.y;
+    if (d0 > 0) zoomAt(d1 / d0, m1); else clampCase();
+  }
+  pointers.set(e.pointerId, p); draw();
+});
+['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, e => {
+  pointers.delete(e.pointerId);
+  if (!pointers.size) { cv.classList.remove('dragging'); $('grid').hidden = true; }
+}));
+cv.addEventListener('wheel', e => {
+  if (mode !== 'case' || !caseState.img) return;
+  e.preventDefault(); zoomAt(Math.exp(-e.deltaY * 0.0015), toCanvas(e)); draw();
+}, { passive: false });
+
+const caseSample = new Image();
+caseSample.onload = () => { if (!caseState.img) setCaseImage(caseSample, 'more-tv'); };
+caseSample.src = 'data:image/jpeg;base64,__CASE__';
 
 const sample = new Image();
 sample.onload = () => { state.img = sample; draw(); };
