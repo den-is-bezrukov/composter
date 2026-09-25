@@ -41,10 +41,14 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 .stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
 .frame{position:relative}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
-.savebar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;align-items:center}
+dialog.save{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);color:var(--ink);padding:var(--space-card);width:min(440px,calc(100vw - 32px))}
+dialog.save::backdrop{background:rgba(0,0,0,.5)}
+dialog.save form{display:flex;flex-direction:column;gap:12px}
+dialog.save h2{margin-bottom:8px}
+.btns.end{justify-content:flex-end;margin-top:8px}
 .fname{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface)}
 .fname:focus-within{outline:2px solid var(--accent);outline-offset:2px}
-.fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;width:280px;outline:none}
+.fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;flex:1;min-width:0;outline:none}
 .fname .ext{padding:10px 12px 10px 1px;color:var(--muted);user-select:none}
 .linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .disclosure summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer}
@@ -133,8 +137,10 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
         <details class="field disclosure" id="colorBox">
           <summary><span class="label">Цвет иллюстрации</span><span class="tag" id="colorTag" hidden>изменён</span></summary>
           <div class="inner">
-            <div class="slider wide"><label for="cSoft">Мягче красный</label><input type="range" id="cSoft" min="0" max="100" step="1" value="0"><output id="cSoftOut">0%</output></div>
-            <div class="slider wide"><label for="cClean">Убрать желтизну</label><input type="range" id="cClean" min="0" max="100" step="1" value="0"><output id="cCleanOut">0%</output></div>
+            <div class="slider wide"><label for="cHue">Оттенок красных</label><input type="range" id="cHue" min="0" max="15" step="0.5" value="0"><output id="cHueOut"></output></div>
+            <div class="slider wide"><label for="cSat">Насыщенность</label><input type="range" id="cSat" min="50" max="120" step="1" value="100"><output id="cSatOut"></output></div>
+            <div class="slider wide"><label for="cVal">Яркость</label><input type="range" id="cVal" min="80" max="150" step="1" value="100"><output id="cValOut"></output></div>
+            <div class="slider wide"><label for="cCast">Убрать желтизну</label><input type="range" id="cCast" min="0" max="100" step="1" value="0"><output id="cCastOut"></output></div>
             <span class="hint">Меняются только яркие красные и тёплый налёт на стекле и металле. Зажмите превью, чтобы увидеть оригинал. <button class="linkbtn" type="button" id="colorReset">Сбросить</button></span>
           </div>
         </details>
@@ -254,14 +260,22 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
         <div class="grid" id="grid" hidden></div>
       </div>
     </div>
-    <div class="savebar">
-      <label class="fname" for="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></label>
-      <button class="btn primary" type="button" id="dl">Скачать PNG</button>
-    </div>
-    <div class="status" id="nameInfo"></div>
-    <div class="status" id="dlStatus"></div>
+    <button class="btn primary" type="button" id="dl">Скачать PNG</button>
   </main>
 </div>
+
+<dialog class="save" id="save" aria-labelledby="saveTitle">
+  <form method="dialog" id="saveForm">
+    <h2 id="saveTitle">Скачать пост</h2>
+    <label class="label" for="fname">Имя файла</label>
+    <div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off"><span class="ext">.png</span></div>
+    <p class="hint" id="saveError" hidden></p>
+    <div class="btns end">
+      <button class="btn" type="button" id="saveCancel">Отмена</button>
+      <button class="btn primary" type="submit" id="saveGo">Скачать</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog class="help" id="help" aria-labelledby="helpTitle">
   <div class="help-head">
@@ -521,26 +535,35 @@ document.querySelectorAll('input[name=z]').forEach(r => r.addEventListener('chan
 $('reset').addEventListener('click', () => { resetPos(); draw(); });
 
 let downloads = null;
+const saveDlg = $('save');
 $('dl').addEventListener('click', () => {
-  const st = $('dlStatus');
+  $('fname').value = customName[mode] ?? autoName();
+  $('saveError').hidden = true;
+  saveDlg.showModal(); $('fname').select();
+});
+$('saveCancel').addEventListener('click', () => saveDlg.close());
+saveDlg.addEventListener('click', e => { if (e.target === saveDlg) saveDlg.close(); });
+const saveError = msg => { $('saveError').textContent = msg; $('saveError').hidden = false; };
+$('saveForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = fileName();
   cv.toBlob(async blob => {
     if (!downloads) {
       // Outside claude.ai (e.g. GitHub Pages) a plain download link works
       if (!window.claude) {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = fileName();
+        a.href = URL.createObjectURL(blob); a.download = name;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        st.textContent = 'Готово, файл сохранён.';
-        return;
+        saveDlg.close(); return;
       }
-      st.textContent = 'Кнопка скачивания здесь недоступна. Нажмите правой кнопкой мыши на превью и выберите «Сохранить изображение как…».'; return;
+      return saveError('Скачивание здесь недоступно. Закройте окно, нажмите правой кнопкой на превью и выберите «Сохранить изображение как…».');
     }
-    try { await downloads.save({ filename: fileName(), data: blob }); st.textContent = 'Готово, файл сохранён.'; }
-    catch (e) {
-      if (e && e.code === 'declined') st.textContent = 'Скачивание отменено.';
-      else if (e && e.code === 'rate_limited') st.textContent = 'Окно сохранения уже открыто. Попробуйте ещё раз через пару секунд.';
-      else st.textContent = 'Не получилось сохранить. Нажмите правой кнопкой на превью и выберите «Сохранить изображение как…».';
+    try { await downloads.save({ filename: name, data: blob }); saveDlg.close(); }
+    catch (err) {
+      if (err && err.code === 'declined') return;
+      if (err && err.code === 'rate_limited') return saveError('Окно сохранения уже открыто. Попробуйте ещё раз через пару секунд.');
+      saveError('Не получилось сохранить. Закройте окно, нажмите правой кнопкой на превью и выберите «Сохранить изображение как…».');
     }
   }, 'image/png');
 });
@@ -565,18 +588,7 @@ const autoName = () => mode === 'case'
   ? 'evrone-case-' + (safeName(caseState.name) || 'case')
   : 'evrone-' + (safeName(lines($('t1').value).join(' ')) || 'post');
 const fileName = () => (safeName(customName[mode] || '') || autoName()) + '.png';
-function updateName() {
-  const input = $('fname'), custom = customName[mode];
-  if (custom === null && document.activeElement !== input) input.value = autoName();
-  $('nameInfo').replaceChildren('Сохранится как: ' + fileName());
-  if (custom !== null) {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'linkbtn'; b.textContent = 'вернуть автоимя';
-    b.addEventListener('click', () => { customName[mode] = null; input.value = autoName(); updateName(); });
-    $('nameInfo').append(' · ', b);
-  }
-}
-
-function draw() { mode === 'case' ? drawCase() : drawArticle(); updateName(); }
+function draw() { mode === 'case' ? drawCase() : drawArticle(); }
 
 const coverScale = img => Math.max(W / img.naturalWidth, H / img.naturalHeight);
 const containScale = img => Math.min(W / img.naturalWidth, H / img.naturalHeight);
@@ -727,7 +739,6 @@ function syncLogoInputs() {
 
 function setMode(m) {
   mode = m;
-  $('fname').value = customName[m] ?? autoName();
   $('articleControls').hidden = m !== 'article';
   $('caseControls').hidden = m !== 'case';
   cv.classList.toggle('pannable', m === 'case');
@@ -799,7 +810,9 @@ cv.addEventListener('wheel', e => {
 }, { passive: false });
 
 // ---- Illustration colour: selective correction of bright reds and warm cast (tuned in the colour lab) ----
-const color = { soft: 0, clean: 0, cache: null, out: null, showOriginal: false, raf: 0 };
+const COLOR0 = { hue: 0, sat: 100, val: 100, cast: 0 };
+const color = { ...COLOR0, cache: null, out: null, showOriginal: false, raf: 0 };
+const colorChanged = () => Object.keys(COLOR0).some(k => color[k] !== COLOR0[k]);
 const sm = (e0, e1, x) => { let t = (x - e0) / (e1 - e0); t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
 const angDist = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
 
@@ -844,12 +857,11 @@ function colorAnalyse(img) {
 
 function applyColor() {
   color.raf = 0;
-  $('colorTag').hidden = !(color.soft || color.clean);
-  if (!state.img || (!color.soft && !color.clean)) { color.out = null; draw(); return; }
+  $('colorTag').hidden = !colorChanged();
+  if (!state.img || !colorChanged()) { color.out = null; draw(); return; }
   if (!color.cache) colorAnalyse(state.img);
-  const k = color.cache, t = color.soft / 100, cast = color.clean / 100;
-  // "Мягче красный" at 70% ≈ the lab recipe: +5°, saturation ×0.85, brightness ×1.22
-  const dh = 7 * t, ds = 1 - 0.21 * t, dv = 1 + 0.31 * t;
+  // Lab recipe for a softer coral: hue +5°, saturation 85%, brightness 122%, cast 70%
+  const k = color.cache, dh = color.hue, ds = color.sat / 100, dv = color.val / 100, cast = color.cast / 100;
   const out = k.ctx.createImageData(k.w, k.h), d = k.src.data, o = out.data;
   for (let j = 0, i = 0; j < k.R.length; j++, i += 4) {
     o[i + 3] = d[i + 3];
@@ -871,21 +883,17 @@ function applyColor() {
   draw();
 }
 const scheduleColor = () => { if (!color.raf) color.raf = requestAnimationFrame(applyColor); };
-[['cSoft', 'soft'], ['cClean', 'clean']].forEach(([id, key]) => $(id).addEventListener('input', e => {
-  color[key] = +e.target.value; $(id + 'Out').textContent = e.target.value + '%'; scheduleColor();
-}));
-$('colorReset').addEventListener('click', () => {
-  color.soft = color.clean = 0;
-  for (const id of ['cSoft', 'cClean']) { $(id).value = 0; $(id + 'Out').textContent = '0%'; }
-  applyColor();
-});
+const COLOR_UI = { hue: ['cHue', v => '+' + v + '°'], sat: ['cSat', v => '×' + (v / 100).toFixed(2)], val: ['cVal', v => '×' + (v / 100).toFixed(2)], cast: ['cCast', v => v + '%'] };
+function syncColorUI() { for (const [k, [id, fmt]] of Object.entries(COLOR_UI)) { $(id).value = color[k]; $(id + 'Out').textContent = fmt(color[k]); } }
+for (const [k, [id]] of Object.entries(COLOR_UI)) $(id).addEventListener('input', e => { color[k] = +e.target.value; syncColorUI(); scheduleColor(); });
+$('colorReset').addEventListener('click', () => { Object.assign(color, COLOR0); syncColorUI(); applyColor(); });
+syncColorUI();
 // Hold the preview to see the original illustration (article mode; in case mode the preview pans)
 cv.addEventListener('pointerdown', () => { if (mode === 'article' && color.out) { color.showOriginal = true; draw(); } });
 ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => { if (color.showOriginal) { color.showOriginal = false; draw(); } }));
 
 // ---- File name input ----
-$('fname').addEventListener('input', e => { customName[mode] = e.target.value.trim() ? e.target.value : null; updateName(); });
-$('fname').addEventListener('blur', () => updateName());
+$('fname').addEventListener('input', e => { customName[mode] = e.target.value.trim() ? e.target.value : null; });
 
 // ---- Fit the 3:4 preview into the workspace ----
 function fitFrame() {
