@@ -23,8 +23,35 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:16px;padding-block:56px 64px}
-.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:var(--space-section)}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;overflow:hidden}
+/* Editor: controls in a sidebar, the post centred in the remaining space */
+.app{display:grid;grid-template-columns:380px minmax(0,1fr);height:100%}
+.sidebar{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:var(--space-card);display:flex;flex-direction:column;gap:var(--space-fields)}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.workspace{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 32px;min-width:0;min-height:0}
+.stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.frame{position:relative}
+.frame canvas{display:block;width:100%;height:100%;background:#000}
+.savebar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;align-items:center}
+.fname{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface)}
+.fname:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;width:280px;outline:none}
+.fname .ext{padding:10px 12px 10px 1px;color:var(--muted);user-select:none}
+.linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.disclosure summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer}
+.disclosure summary::-webkit-details-marker{display:none}
+.disclosure summary::before{content:"";width:0;height:0;border-left:5px solid var(--muted);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
+.disclosure[open] summary::before{transform:rotate(90deg)}
+.disclosure .inner{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.tag{font-size:12px;color:var(--accent);font-weight:600}
+.slider.wide{grid-template-columns:118px 1fr 44px}
+dialog.help{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);color:var(--ink);padding:0;width:min(880px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
+dialog.help::backdrop{background:rgba(0,0,0,.5)}
+.help-head{position:sticky;top:0;background:var(--surface);display:flex;justify-content:space-between;align-items:center;padding:20px var(--space-card);border-bottom:1px solid var(--line)}
+.help-body{padding:var(--space-card);display:flex;flex-direction:column;gap:32px}
+.help-body section{display:flex;flex-direction:column;gap:12px}
+.help-body h3{font:800 22px/1 "RF60","Roboto Flex",sans-serif;text-transform:uppercase;letter-spacing:.01em;margin:0}
 h1,h2{font-family:"RF60","Roboto Flex",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1;margin:0;text-wrap:balance}
 h1{font-size:clamp(44px,8vw,84px)}
 h2{font-size:32px}
@@ -37,12 +64,7 @@ h2{font-size:32px}
 .btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--radius-control);padding:10px 16px;cursor:pointer}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn:focus-visible,.chip input:focus-visible+span,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-details{margin-top:16px}
-summary{cursor:pointer;color:var(--muted)}
-pre{background:var(--code);border:1px solid var(--line);border-radius:var(--radius-control);padding:16px;overflow-x:auto;white-space:pre-wrap;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:12px 0 0;max-height:420px;overflow-y:auto}
-.builder{margin-top:20px;display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:var(--space-columns);align-items:start}
-@media (max-width:820px){.builder{grid-template-columns:1fr}}
-.controls{display:flex;flex-direction:column;gap:var(--space-fields)}
+pre{background:var(--code);border:1px solid var(--line);border-radius:var(--radius-control);padding:16px;overflow-x:auto;white-space:pre-wrap;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0;max-height:360px;overflow-y:auto}
 .field{display:flex;flex-direction:column;gap:var(--space-field)}
 .label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .hint{font-size:13px;color:var(--muted)}
@@ -60,16 +82,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .slider output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
 .drop{border:1.5px dashed var(--line);border-radius:var(--radius-drop);padding:14px;text-align:center;cursor:pointer;color:var(--muted)}
 .drop.over{border-color:var(--accent);color:var(--ink)}
-.preview{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:14px;align-items:center}
-canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;background:#000}
-.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius-control);padding:10px 14px;font-size:14px;max-width:520px;width:100%}
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 32px;margin:16px 0 0;padding:0;list-style:none}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius-control);padding:10px 14px;font-size:14px;max-width:640px;width:100%}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 32px;margin:0;padding:0;list-style:none}
 .rules li{border-top:1px solid var(--line);padding-top:10px}
 .rules b{display:block}
 .pane{display:flex;flex-direction:column;gap:var(--space-fields)}
-.mode{margin-top:16px}
-.stage{position:relative;width:100%;max-width:520px}
-.stage canvas{display:block}
 canvas.pannable{cursor:grab;touch-action:none}
 canvas.pannable.dragging{cursor:grabbing}
 .grid{position:absolute;inset:0;pointer-events:none;
@@ -86,21 +103,33 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<div class="wrap">
-  <section class="card">
-    <h2>Конструктор</h2>
-    <div class="chips mode" role="radiogroup" aria-label="Тип поста">
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-head">
+      <h2>Конструктор</h2>
+      <button class="btn" type="button" id="helpOpen">Инструкция</button>
+    </div>
+    <div class="chips" role="radiogroup" aria-label="Тип поста">
       <label class="chip"><input type="radio" name="mode" id="mode-article" value="article" checked><span>Статья</span></label>
       <label class="chip"><input type="radio" name="mode" id="mode-case" value="case"><span>Кейс</span></label>
     </div>
-    <div class="builder">
-      <div class="controls">
       <div class="pane" id="articleControls">
         <div class="field">
           <span class="label">Иллюстрация</span>
           <label class="drop" id="drop" for="file">Перетащите картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
           <input type="file" id="file" accept="image/*" hidden>
+          <div class="btns"><button class="btn" type="button" id="copyPromptSide">Скопировать промпт для ChatGPT</button></div>
+          <span class="hint" id="copyStatusSide">Промпт рисует иллюстрацию в стиле Evrone. Подробнее — в «Инструкции».</span>
         </div>
+
+        <details class="field disclosure" id="colorBox">
+          <summary><span class="label">Цвет иллюстрации</span><span class="tag" id="colorTag" hidden>изменён</span></summary>
+          <div class="inner">
+            <div class="slider wide"><label for="cSoft">Мягче красный</label><input type="range" id="cSoft" min="0" max="100" step="1" value="0"><output id="cSoftOut">0%</output></div>
+            <div class="slider wide"><label for="cClean">Убрать желтизну</label><input type="range" id="cClean" min="0" max="100" step="1" value="0"><output id="cCleanOut">0%</output></div>
+            <span class="hint">Меняются только яркие красные и тёплый налёт на стекле и металле. Зажмите превью, чтобы увидеть оригинал. <button class="linkbtn" type="button" id="colorReset">Сбросить</button></span>
+          </div>
+        </details>
 
         <div class="field">
           <span class="label">Раскладка</span>
@@ -207,44 +236,50 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
           </div>
         </div>
       </div>
-      </div>
+  </aside>
 
-      <div class="preview">
-        <div class="warn" id="warn" hidden></div>
-        <div class="stage">
-          <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
-          <div class="grid" id="grid" hidden></div>
-        </div>
-        <button class="btn primary" type="button" id="dl">Скачать PNG</button>
-        <div class="status" id="dlStatus"></div>
+  <main class="workspace">
+    <div class="warn" id="warn" hidden></div>
+    <div class="stage" id="stage">
+      <div class="frame" id="frame">
+        <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
+        <div class="grid" id="grid" hidden></div>
       </div>
     </div>
-  </section>
-
-  <section class="card">
-    <div class="row">
-      <h2>Промпт для иллюстрации</h2>
-      <button class="btn primary" id="copyPrompt" type="button">Скопировать промпт</button>
+    <div class="savebar">
+      <label class="fname" for="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></label>
+      <button class="btn primary" type="button" id="dl">Скачать PNG</button>
     </div>
-    <p class="hint" id="copyStatus">Вставьте промпт в ChatGPT и в первой строке после «НАРИСУЙ» опишите, что нарисовать. Если нужно перерисовать готовую картинку в этом стиле, приложите её к сообщению. ChatGPT вернёт квадратный PNG с прозрачным фоном.</p>
-    <details>
-      <summary>Показать текст промпта</summary>
-      <pre id="promptText"></pre>
-    </details>
-  </section>
+    <div class="status" id="nameInfo"></div>
+    <div class="status" id="dlStatus"></div>
+  </main>
+</div>
 
-  <section class="card">
-    <h2>Как сделать пост</h2>
-    <ol class="steps" style="margin-top:16px">
+<dialog class="help" id="help" aria-labelledby="helpTitle">
+  <div class="help-head">
+    <h2 id="helpTitle">Инструкция</h2>
+    <button class="btn" type="button" id="helpClose">Закрыть</button>
+  </div>
+  <div class="help-body">
+    <section>
+      <h3>Как сделать пост</h3>
+    <ol class="steps">
     <li><div>Придумайте объект: метафору темы статьи. Например, мозг из микросхем для статьи про AI-ассистента.</div></li>
-    <li><div>Скопируйте промпт выше, вставьте его в ChatGPT и впишите объект в строку «НАРИСУЙ». Чтобы перерисовать готовую картинку, приложите её к сообщению.</div></li>
+    <li><div>Нажмите «Скопировать промпт для ChatGPT» в конструкторе, вставьте промпт в ChatGPT и впишите объект в строку «НАРИСУЙ». Чтобы перерисовать готовую картинку, приложите её к сообщению.</div></li>
     <li><div>Скачайте картинку и перетащите её в конструктор. Впишите заголовок и выберите раскладку.</div></li>
     <li><div>Нажмите «Скачать PNG» и получите готовый пост 1080×1440.</div></li>
     </ol>
-  </section>
-
-  <section class="card">
-    <h2>Правила хорошего поста</h2>
+    </section>
+    <section>
+      <div class="row">
+        <h3>Промпт для иллюстрации</h3>
+        <button class="btn primary" id="copyPrompt" type="button">Скопировать промпт</button>
+      </div>
+      <p class="hint" id="copyStatus" style="margin:0">Вставьте промпт в ChatGPT и в первой строке после «НАРИСУЙ» опишите, что нарисовать. Если нужно перерисовать готовую картинку в этом стиле, приложите её к сообщению. ChatGPT вернёт квадратный PNG с прозрачным фоном.</p>
+      <pre id="promptText"></pre>
+    </section>
+    <section>
+      <h3>Правила хорошего поста</h3>
     <ul class="rules">
       <li><b>Заголовок в две строки</b>По 2–3 слова в строке, разбивать по смыслу: «MIGRATING / TO RUST». Если текст длинный, выберите «Сэндвич» и поделите его на верх и низ.</li>
       <li><b>Один объект</b>Метафора темы, один предмет или персонаж. Не нужно коллажей, нескольких сцен или надписей на самой картинке.</li>
@@ -255,8 +290,9 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
       <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
       <li><b>Сложные случаи</b>Если объект должен перекрывать буквы или картинка должна выходить за край, передайте пост дизайнеру.</li>
     </ul>
-  </section>
-</div>
+    </section>
+  </div>
+</dialog>
 
 <script type="application/json" id="widths">__WIDTHS__</script>
 <script>
@@ -277,22 +313,29 @@ Hyper-realistic 3D render with a surreal, conceptual pop-surrealist idea. The ob
 Tags: hyper-realistic 3D, pop-surrealism, macro-level detail, commercial studio lighting, extreme organic texture, glossy reflections, isolated object, dark studio reflections, high contrast, symmetrical composition, conceptual editorial, sleek finish, metallic highlights, uncanny realism, material juxtaposition.
 
 COLORS
-Main accent: vibrant coral red (#FF5533) with deep crimson shadows (#8A2B1F). Supporting: glossy off-white (#F2F2F2) and reflective silver/chrome (#E0E0E0). Keep the palette restrained: mostly coral red, white and chrome. Other colors only where the object needs them to stay recognizable.
+Main accent: warm coral-orange (#FF5533), soft and slightly muted, never crimson or pure red; shadows deep warm brown-red (#8A2B1F). Supporting: glossy off-white (#F2F2F2) and reflective silver/chrome (#E0E0E0). Keep the palette restrained: mostly coral-orange, white and chrome. Other colors only where the object needs them to stay recognizable.
 
 AVOID
-Any background or backdrop, flat or vector illustration, cartoon outlines, comic-book halftone dots, printed pop-art look, cropping the object, several separate objects, white or light environment reflections, text of any kind.`;
+Any background or backdrop, flat or vector illustration, cartoon outlines, comic-book halftone dots, printed pop-art look, cropping the object, several separate objects, white or light environment reflections, saturated pure red or crimson, yellow or brown tint on glass and metal, text of any kind.`;
 
 document.getElementById('promptText').textContent = PROMPT;
-document.getElementById('copyPrompt').addEventListener('click', async () => {
-  const s = document.getElementById('copyStatus');
+async function copyPrompt(statusId) {
+  const s = document.getElementById(statusId);
   try { await navigator.clipboard.writeText(PROMPT); s.textContent = 'Промпт скопирован. Вставьте его в ChatGPT.'; }
   catch (e) {
-    const d = document.querySelector('details'); d.open = true;
+    // Clipboard refused: show the text in the instructions and select it
+    const help = document.getElementById('help'); if (!help.open) help.showModal();
     const r = document.createRange(); r.selectNodeContents(document.getElementById('promptText'));
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-    s.textContent = 'Текст выделен. Нажмите Ctrl/⌘+C, чтобы скопировать.';
+    document.getElementById('copyStatus').textContent = 'Текст выделен. Нажмите Ctrl/⌘+C, чтобы скопировать.';
   }
-});
+}
+document.getElementById('copyPrompt').addEventListener('click', () => copyPrompt('copyStatus'));
+document.getElementById('copyPromptSide').addEventListener('click', () => copyPrompt('copyStatusSide'));
+const help = document.getElementById('help');
+document.getElementById('helpOpen').addEventListener('click', () => help.showModal());
+document.getElementById('helpClose').addEventListener('click', () => help.close());
+help.addEventListener('click', e => { if (e.target === help) help.close(); });
 
 // ---- Builder ----
 const W = 1080, H = 1440, FS = 180, LH = 180;
@@ -378,7 +421,8 @@ function drawImage() {
   if (!state.img) return;
   const w = state.size, h = w * state.img.naturalHeight / state.img.naturalWidth;
   const cy = LAYOUTS[state.layout].cy + state.dy;
-  ctx.drawImage(state.img, W / 2 - w / 2 + state.dx, cy - h / 2, w, h);
+  const pic = (!color.showOriginal && color.out) || state.img;
+  ctx.drawImage(pic, W / 2 - w / 2 + state.dx, cy - h / 2, w, h);
 }
 
 function drawArticle() {
@@ -403,8 +447,6 @@ function drawArticle() {
   if (!a.length) warns.push('Добавьте заголовок.');
   $('warn').hidden = !warns.length; $('warn').textContent = warns.join(' ');
   $('sizeOut').textContent = state.size; $('dxOut').textContent = state.dx; $('dyOut').textContent = state.dy;
-  const slug = a.join(' ').toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '');
-  state.name = slug || 'post';
 }
 
 function loadFile(file) {
@@ -412,7 +454,7 @@ function loadFile(file) {
   if (mode === 'case') return loadCaseFile(file);
   const url = URL.createObjectURL(file);
   const img = new Image();
-  img.onload = () => { state.img = img; resetPos(); draw(); $('drop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
+  img.onload = () => { state.img = img; color.cache = null; applyColor(); resetPos(); draw(); $('drop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
   img.src = url;
 }
 
@@ -504,9 +546,29 @@ const caseState = {
   logo: null, tint: 'orig', lSize: 540, lDx: 0, lDy: 0, name: 'case',
 };
 const slugify = s => s.toLowerCase().replace(/\.[a-z0-9]+$/i, '').replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '') || 'case';
-const fileName = () => mode === 'case' ? `evrone-case-${caseState.name}.png` : `evrone-${state.name}.png`;
+// File names: Latin only (transliterated), the .png extension can't be edited
+const TR = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'yo', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' };
+const safeName = s => s.toLowerCase().trim()
+  .replace(/[а-яё]/g, ch => TR[ch])
+  .replace(/\.(png|jpe?g|webp|gif|svg)$/, '')
+  .replace(/[^a-z0-9_-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-_]+|[-_]+$/g, '');
+const customName = { article: null, case: null };
+const autoName = () => mode === 'case'
+  ? 'evrone-case-' + (safeName(caseState.name) || 'case')
+  : 'evrone-' + (safeName(lines($('t1').value).join(' ')) || 'post');
+const fileName = () => (safeName(customName[mode] || '') || autoName()) + '.png';
+function updateName() {
+  const input = $('fname'), custom = customName[mode];
+  if (custom === null && document.activeElement !== input) input.value = autoName();
+  $('nameInfo').replaceChildren('Сохранится как: ' + fileName());
+  if (custom !== null) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'linkbtn'; b.textContent = 'вернуть автоимя';
+    b.addEventListener('click', () => { customName[mode] = null; input.value = autoName(); updateName(); });
+    $('nameInfo').append(' · ', b);
+  }
+}
 
-function draw() { mode === 'case' ? drawCase() : drawArticle(); }
+function draw() { mode === 'case' ? drawCase() : drawArticle(); updateName(); }
 
 const coverScale = img => Math.max(W / img.naturalWidth, H / img.naturalHeight);
 const containScale = img => Math.min(W / img.naturalWidth, H / img.naturalHeight);
@@ -657,6 +719,7 @@ function syncLogoInputs() {
 
 function setMode(m) {
   mode = m;
+  $('fname').value = customName[m] ?? autoName();
   $('articleControls').hidden = m !== 'article';
   $('caseControls').hidden = m !== 'case';
   cv.classList.toggle('pannable', m === 'case');
@@ -726,6 +789,104 @@ cv.addEventListener('wheel', e => {
   if (mode !== 'case' || !caseState.img) return;
   e.preventDefault(); zoomAt(Math.exp(-e.deltaY * 0.0015), toCanvas(e)); draw();
 }, { passive: false });
+
+// ---- Illustration colour: selective correction of bright reds and warm cast (tuned in the colour lab) ----
+const color = { soft: 0, clean: 0, cache: null, out: null, showOriginal: false, raf: 0 };
+const sm = (e0, e1, x) => { let t = (x - e0) / (e1 - e0); t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
+const angDist = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
+
+function boxBlur(m, w, h, r) {
+  const tmp = new Float32Array(m.length), win = 2 * r + 1;
+  for (let pass = 0; pass < 2; pass++) {
+    for (let y = 0; y < h; y++) {
+      let acc = 0; const row = y * w;
+      for (let x = -r; x <= r; x++) acc += m[row + Math.min(w - 1, Math.max(0, x))];
+      for (let x = 0; x < w; x++) { tmp[row + x] = acc / win; acc += m[row + Math.min(w - 1, x + r + 1)] - m[row + Math.max(0, x - r)]; }
+    }
+    for (let x = 0; x < w; x++) {
+      let acc = 0;
+      for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+      for (let y = 0; y < h; y++) { m[y * w + x] = acc / win; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; }
+    }
+  }
+}
+
+// HSV channels and masks are built once per picture; the sliders only re-run the cheap part
+function colorAnalyse(img) {
+  const w = img.naturalWidth, h = img.naturalHeight;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0);
+  const src = x.getImageData(0, 0, w, h), d = src.data, n = w * h;
+  const H = new Float32Array(n), S = new Float32Array(n), V = new Float32Array(n), R = new Float32Array(n), C = new Float32Array(n);
+  for (let j = 0, i = 0; j < n; j++, i += 4) {
+    const r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), dl = mx - mn;
+    let hu = 0;
+    if (dl > 1e-6) { if (mx === r) hu = ((g - b) / dl) % 6; else if (mx === g) hu = (b - r) / dl + 2; else hu = (r - g) / dl + 4; hu *= 60; if (hu < 0) hu += 360; }
+    const s = mx > 1e-6 ? dl / mx : 0;
+    H[j] = hu; S[j] = s; V[j] = mx;
+    const red = sm(45, 25, angDist(hu, 0)) * sm(0.45, 0.6, s) * sm(0.3, 0.45, mx);
+    R[j] = red;
+    C[j] = sm(70, 45, angDist(hu, 25)) * (1 - red) * sm(0.04, 0.12, s) * (1 - sm(0.75, 0.9, mx));
+  }
+  const radius = Math.max(1, Math.round(Math.max(w, h) / 500));
+  boxBlur(R, w, h, radius); boxBlur(C, w, h, radius);
+  color.cache = { w, h, src, H, S, V, R, C, canvas: c, ctx: x };
+}
+
+function applyColor() {
+  color.raf = 0;
+  $('colorTag').hidden = !(color.soft || color.clean);
+  if (!state.img || (!color.soft && !color.clean)) { color.out = null; draw(); return; }
+  if (!color.cache) colorAnalyse(state.img);
+  const k = color.cache, t = color.soft / 100, cast = color.clean / 100;
+  // "Мягче красный" at 70% ≈ the lab recipe: +5°, saturation ×0.85, brightness ×1.22
+  const dh = 7 * t, ds = 1 - 0.21 * t, dv = 1 + 0.31 * t;
+  const out = k.ctx.createImageData(k.w, k.h), d = k.src.data, o = out.data;
+  for (let j = 0, i = 0; j < k.R.length; j++, i += 4) {
+    o[i + 3] = d[i + 3];
+    const red = k.R[j], cm = k.C[j];
+    if (red < 0.002 && cm < 0.002) { o[i] = d[i]; o[i + 1] = d[i + 1]; o[i + 2] = d[i + 2]; continue; }
+    const h = k.H[j] + dh * red;
+    let s = k.S[j] * (1 + (ds - 1) * red) * (1 - cast * cm), v = k.V[j] * (1 + (dv - 1) * red);
+    s = s > 1 ? 1 : s; v = v > 1 ? 1 : v;
+    const hh = ((h % 360) + 360) % 360 / 60, q6 = Math.floor(hh) % 6, f = hh - Math.floor(hh);
+    const p = v * (1 - s), q = v * (1 - s * f), tt = v * (1 - s * (1 - f));
+    let r, g, b;
+    if (q6 === 0) { r = v; g = tt; b = p; } else if (q6 === 1) { r = q; g = v; b = p; } else if (q6 === 2) { r = p; g = v; b = tt; }
+    else if (q6 === 3) { r = p; g = q; b = v; } else if (q6 === 4) { r = tt; g = p; b = v; } else { r = v; g = p; b = q; }
+    o[i] = r * 255 + 0.5; o[i + 1] = g * 255 + 0.5; o[i + 2] = b * 255 + 0.5;
+  }
+  if (!color.out) { color.out = document.createElement('canvas'); }
+  color.out.width = k.w; color.out.height = k.h;
+  color.out.getContext('2d').putImageData(out, 0, 0);
+  draw();
+}
+const scheduleColor = () => { if (!color.raf) color.raf = requestAnimationFrame(applyColor); };
+[['cSoft', 'soft'], ['cClean', 'clean']].forEach(([id, key]) => $(id).addEventListener('input', e => {
+  color[key] = +e.target.value; $(id + 'Out').textContent = e.target.value + '%'; scheduleColor();
+}));
+$('colorReset').addEventListener('click', () => {
+  color.soft = color.clean = 0;
+  for (const id of ['cSoft', 'cClean']) { $(id).value = 0; $(id + 'Out').textContent = '0%'; }
+  applyColor();
+});
+// Hold the preview to see the original illustration (article mode; in case mode the preview pans)
+cv.addEventListener('pointerdown', () => { if (mode === 'article' && color.out) { color.showOriginal = true; draw(); } });
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => { if (color.showOriginal) { color.showOriginal = false; draw(); } }));
+
+// ---- File name input ----
+$('fname').addEventListener('input', e => { customName[mode] = e.target.value.trim() ? e.target.value : null; updateName(); });
+$('fname').addEventListener('blur', () => updateName());
+
+// ---- Fit the 3:4 preview into the workspace ----
+function fitFrame() {
+  const r = $('stage').getBoundingClientRect();
+  const w = Math.max(120, Math.min(r.width, r.height * 3 / 4));
+  $('frame').style.width = w + 'px'; $('frame').style.height = w * 4 / 3 + 'px';
+}
+new ResizeObserver(fitFrame).observe($('stage'));
+fitFrame();
 
 const caseSample = new Image();
 caseSample.onload = () => { if (!caseState.img) setCaseImage(caseSample, 'more-tv'); };
