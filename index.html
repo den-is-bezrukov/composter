@@ -67,7 +67,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .drop{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;color:var(--muted)}
 .drop.over{border-color:var(--accent);color:var(--ink)}
 .preview{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:14px;align-items:center}
-canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px;background:#000;box-shadow:0 1px 0 var(--line),0 12px 40px rgba(0,0,0,.18)}
+canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;background:#000}
 .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 14px;font-size:14px;max-width:520px;width:100%}
 .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 32px;margin:16px 0 0;padding:0;list-style:none}
 .rules li{border-top:1px solid var(--line);padding-top:10px}
@@ -78,7 +78,7 @@ canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px
 .stage canvas{display:block}
 canvas.pannable{cursor:grab;touch-action:none}
 canvas.pannable.dragging{cursor:grabbing}
-.grid{position:absolute;inset:0;pointer-events:none;border-radius:6px;
+.grid{position:absolute;inset:0;pointer-events:none;
   --g:rgba(255,255,255,.6);
   background:
     linear-gradient(to right,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px)),
