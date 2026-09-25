@@ -1,0 +1,417 @@
+<title>Evrone Article Posts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400..700&display=swap">
+<style>
+@font-face{font-family:"RF60";src:url(data:font/woff2;base64,__RF60__) format("woff2");font-display:block}
+:root{
+  --bg:#F2F2F3; --surface:#FFFFFF; --ink:#141415; --muted:#66666C; --line:#DEDEE2;
+  --accent:#FF5533; --accent-ink:#FFFFFF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12; --code:#F7F7F8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C0C0D; --surface:#17171A; --ink:#EEEEEE; --muted:#9C9CA3; --line:#2B2B30;
+    --accent:#FF6A4D; --accent-ink:#0C0C0D; --warn-bg:#2A1510; --warn-ink:#FFB39F; --code:#111113;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C0C0D; --surface:#17171A; --ink:#EEEEEE; --muted:#9C9CA3; --line:#2B2B30;
+  --accent:#FF6A4D; --accent-ink:#0C0C0D; --warn-bg:#2A1510; --warn-ink:#FFB39F; --code:#111113;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:16px;padding-block:56px 64px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:"RF60","Roboto Flex",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1;margin:0;text-wrap:balance}
+h1{font-size:clamp(44px,8vw,84px)}
+h2{font-size:32px}
+.lead{color:var(--muted);max-width:62ch;margin:12px 0 0}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;gap:12px}
+.steps li::before{content:counter(s);font:800 28px/1 "RF60",sans-serif;color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:10px 16px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible,.chip input:focus-visible+span,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details{margin-top:16px}
+summary{cursor:pointer;color:var(--muted)}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;white-space:pre-wrap;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:12px 0 0;max-height:420px;overflow-y:auto}
+.builder{margin-top:20px;display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:820px){.builder{grid-template-columns:1fr}}
+.controls{display:flex;flex-direction:column;gap:20px}
+.field{display:flex;flex-direction:column;gap:6px}
+.label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted)}
+textarea{font:800 22px/1.05 "RF60",sans-serif;text-transform:uppercase;letter-spacing:.01em;background:var(--code);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;resize:vertical;min-height:70px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{--cut:var(--surface);display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:500}
+.zicon{width:18px;height:24px;flex:none}
+.zicon .t{fill:currentColor}
+.zicon .o{fill:var(--accent)}
+.zicon *{stroke:var(--cut);stroke-width:1.6px;paint-order:stroke}
+.chip input:checked+span{--cut:var(--ink);background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.slider{display:grid;grid-template-columns:90px 1fr 48px;gap:10px;align-items:center;font-size:14px}
+.slider output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;color:var(--muted)}
+.drop.over{border-color:var(--accent);color:var(--ink)}
+.preview{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:14px;align-items:center}
+canvas{width:100%;max-width:520px;aspect-ratio:3/4;height:auto;border-radius:6px;background:#000;box-shadow:0 1px 0 var(--line),0 12px 40px rgba(0,0,0,.18)}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 14px;font-size:14px;max-width:520px;width:100%}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 32px;margin:16px 0 0;padding:0;list-style:none}
+.rules li{border-top:1px solid var(--line);padding-top:10px}
+.rules b{display:block}
+.status{font-size:14px;color:var(--muted);min-height:1.5em;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <section class="card">
+    <h2>Конструктор</h2>
+    <div class="builder">
+      <div class="controls">
+        <div class="field">
+          <span class="label">Иллюстрация</span>
+          <label class="drop" id="drop" for="file">Перетащите картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+
+        <div class="field">
+          <span class="label">Раскладка</span>
+          <div class="chips" role="radiogroup">
+            <label class="chip"><input type="radio" name="layout" id="lay-top" value="top" checked><span>Текст сверху</span></label>
+            <label class="chip"><input type="radio" name="layout" id="lay-bottom" value="bottom"><span>Текст снизу</span></label>
+            <label class="chip"><input type="radio" name="layout" id="lay-sandwich" value="sandwich"><span>Сэндвич</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="t1" id="t1label">Заголовок</label>
+          <textarea id="t1" rows="3" spellcheck="false">Новый пост Evrone</textarea>
+          <span class="hint">Просто пишите текст: строки переносятся сами. Хорошо, когда заголовок укладывается в две строки.</span>
+        </div>
+
+        <div class="field" id="t2field" hidden>
+          <label class="label" for="t2">Вторая часть (снизу)</label>
+          <textarea id="t2" rows="3" spellcheck="false"></textarea>
+        </div>
+
+        <div class="field">
+          <div><button class="btn" type="button" id="nbsp">Вставить неразрывный пробел</button></div>
+          <span class="hint">Неразрывный пробел не даёт разорвать слова по разным строкам, например «AI&nbsp;AGENT». Поставьте курсор между словами вместо обычного пробела и нажмите кнопку. На Mac то же самое делает ⌥+Пробел, на Windows Alt+0160.</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Ширина шрифта</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="wd" id="wd-auto" value="auto" checked><span>Авто (60)</span></label>
+            <label class="chip"><input type="radio" name="wd" id="wd-narrow" value="narrow"><span>Узкая</span></label>
+          </div>
+          <div class="slider" id="narrowRow" hidden><label for="narrow">Ширина</label><input type="range" id="narrow" min="25" max="60" step="1" value="52"><output id="narrowOut">52</output></div>
+          <span class="hint">Сужайте, если длинное слово не помещается или заголовок не укладывается в две строки. Меньше всего шрифт сужается на 25.</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Слой картинки</span>
+          <div class="chips" role="radiogroup">
+            <label class="chip" id="zc-under"><input type="radio" name="z" id="z-under" value="under" checked><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Под текстом</span></label>
+            <label class="chip" id="zc-overTop" hidden><input type="radio" name="z" id="z-overTop" value="overTop"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Над верхним</span></label>
+            <label class="chip" id="zc-overBottom" hidden><input type="radio" name="z" id="z-overBottom" value="overBottom"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/></svg>Над нижним</span></label>
+            <label class="chip" id="zc-over"><input type="radio" name="z" id="z-over" value="over"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/></svg>Над текстом</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Положение картинки</span>
+          <div class="slider"><label for="size">Размер</label><input type="range" id="size" min="400" max="1800" step="10"><output id="sizeOut"></output></div>
+          <div class="slider"><label for="dy">Вверх/вниз</label><input type="range" id="dy" min="-500" max="500" step="5"><output id="dyOut"></output></div>
+          <div class="slider"><label for="dx">Влево/вправо</label><input type="range" id="dx" min="-400" max="400" step="5"><output id="dxOut"></output></div>
+          <button class="btn" type="button" id="reset">Сбросить положение</button>
+        </div>
+      </div>
+
+      <div class="preview">
+        <div class="warn" id="warn" hidden></div>
+        <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
+        <button class="btn primary" type="button" id="dl">Скачать PNG</button>
+        <div class="status" id="dlStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <h2>Промпт для иллюстрации</h2>
+      <button class="btn primary" id="copyPrompt" type="button">Скопировать промпт</button>
+    </div>
+    <p class="hint" id="copyStatus">Вставьте промпт в ChatGPT и в первой строке после «НАРИСУЙ» опишите, что нарисовать. Если нужно перерисовать готовую картинку в этом стиле, приложите её к сообщению. ChatGPT вернёт квадратный PNG с прозрачным фоном.</p>
+    <details>
+      <summary>Показать текст промпта</summary>
+      <pre id="promptText"></pre>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>Как сделать пост</h2>
+    <ol class="steps" style="margin-top:16px">
+    <li><div>Придумайте объект: метафору темы статьи. Например, мозг из микросхем для статьи про AI-ассистента.</div></li>
+    <li><div>Скопируйте промпт выше, вставьте его в ChatGPT и впишите объект в строку «НАРИСУЙ». Чтобы перерисовать готовую картинку, приложите её к сообщению.</div></li>
+    <li><div>Скачайте картинку и перетащите её в конструктор. Впишите заголовок и выберите раскладку.</div></li>
+    <li><div>Нажмите «Скачать PNG» и получите готовый пост 1080×1440.</div></li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Правила хорошего поста</h2>
+    <ul class="rules">
+      <li><b>Заголовок в две строки</b>По 2–3 слова в строке, разбивать по смыслу: «MIGRATING / TO RUST». Если текст длинный, выберите «Сэндвич» и поделите его на верх и низ.</li>
+      <li><b>Один объект</b>Метафора темы, один предмет или персонаж. Не нужно коллажей, нескольких сцен или надписей на самой картинке.</li>
+      <li><b>Ничего лишнего</b>На посте только заголовок и иллюстрация: без логотипа, подписей и рамок.</li>
+      <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку или сдвиньте её ползунком.</li>
+      <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
+      <li><b>Сложные случаи</b>Если объект должен перекрывать буквы или картинка должна выходить за край, передайте пост дизайнеру.</li>
+    </ul>
+  </section>
+</div>
+
+<script type="application/json" id="widths">__WIDTHS__</script>
+<script>
+const PROMPT = `НАРИСУЙ: [опишите объект. Если приложили картинку, напишите «приложенная картинка»]
+
+ЗАДАЧА
+- Картинка не приложена: нарисуй объект из строки НАРИСУЙ.
+- Картинка приложена: перерисуй её главный объект в стиле ниже. Объект должен остаться узнаваемым: сохрани силуэт, позу, пропорции, характерные детали и фирменные цвета (например, у маскотов и персонажей брендов). Меняй только материалы, свет и отрисовку. Если на картинке несколько объектов или сложный фон, оставь только главный объект, остальное убери.
+
+ФОРМАТ
+- Квадрат 1:1 (1024×1024), PNG с полностью прозрачным фоном.
+- Один объект, целиком, без обрезки, по центру. Занимает около 80% кадра, с небольшим ровным отступом со всех сторон.
+- Кроме объекта ничего: ни фона, ни пола, ни тени на полу, ни рамки, ни подложки.
+- Никакого текста, букв, цифр, логотипов и водяных знаков.
+
+STYLE
+Hyper-realistic 3D render with a surreal, conceptual pop-surrealist idea. The object is lit as if it stood alone in a pure black void studio (dark reflections, crisp rim light, no bright environment reflections), because it will be placed on a black poster, but the output background itself stays transparent. Rich, highly detailed textures visible at macro level, deliberately juxtaposing micro-textured organic surfaces with flawless, glossy, reflective manufactured materials. High-end commercial studio lighting: sharp specular highlights on wet or metallic finishes, soft gradients revealing minute surface depth and patterns. Stylized symmetry and flawless, exaggerated curves, with forms defined entirely by light, shadow and material, never by drawn outlines. Mood: striking, sleek, modern; uncanny hyper-detail with high-fashion commercial polish.
+Tags: hyper-realistic 3D, pop-surrealism, macro-level detail, commercial studio lighting, extreme organic texture, glossy reflections, isolated object, dark studio reflections, high contrast, symmetrical composition, conceptual editorial, sleek finish, metallic highlights, uncanny realism, material juxtaposition.
+
+COLORS
+Main accent: vibrant coral red (#FF5533) with deep crimson shadows (#8A2B1F). Supporting: glossy off-white (#F2F2F2) and reflective silver/chrome (#E0E0E0). Keep the palette restrained: mostly coral red, white and chrome. Other colors only where the object needs them to stay recognizable.
+
+AVOID
+Any background or backdrop, flat or vector illustration, cartoon outlines, comic-book halftone dots, printed pop-art look, cropping the object, several separate objects, white or light environment reflections, text of any kind.`;
+
+document.getElementById('promptText').textContent = PROMPT;
+document.getElementById('copyPrompt').addEventListener('click', async () => {
+  const s = document.getElementById('copyStatus');
+  try { await navigator.clipboard.writeText(PROMPT); s.textContent = 'Промпт скопирован. Вставьте его в ChatGPT.'; }
+  catch (e) {
+    const d = document.querySelector('details'); d.open = true;
+    const r = document.createRange(); r.selectNodeContents(document.getElementById('promptText'));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    s.textContent = 'Текст выделен. Нажмите Ctrl/⌘+C, чтобы скопировать.';
+  }
+});
+
+// ---- Builder ----
+const W = 1080, H = 1440, FS = 180, LH = 180;
+// Roboto Flex hhea: ascent 1900, descent 500, upm 2048 — baseline inside a 180px line box
+const BASE = (LH - (2400 / 2048) * FS) / 2 + (1900 / 2048) * FS;
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+const LAYOUTS = {
+  top:      { size: 960,  cy: 930 },
+  bottom:   { size: 1200, cy: 525 },
+  sandwich: { size: 900,  cy: 720 },
+};
+const state = { img: null, layout: 'top', wd: 'auto', narrow: 52, size: 960, dx: 0, dy: 0, name: 'новый-пост-evrone', z: 'under' };
+
+function resetPos() {
+  const L = LAYOUTS[state.layout];
+  state.size = L.size; state.dx = 0; state.dy = 0;
+  $('size').value = state.size; $('dx').value = 0; $('dy').value = 0;
+}
+
+// Regular spaces are break points; U+00A0 keeps words together
+function lines(txt) {
+  return txt.split('\n').map(s => s.replace(/[ \t]+/g, ' ').replace(/ ?\u00A0+ ?/g, '\u00A0').replace(/^[ \u00A0]+|[ \u00A0]+$/g, '').toUpperCase()).filter(Boolean);
+}
+
+function setFont(family, size) {
+  ctx.font = `${size}px "${family}"`;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = (size * 0.01) + 'px';
+}
+
+// Greedy word wrap inside the text box, like a fixed-width text layer in Figma
+function wrap(ls, boxW) {
+  const fits = s => ctx.measureText(s).width <= boxW;
+  const out = [];
+  for (const l of ls) {
+    let cur = '';
+    for (let word of l.split(' ')) {
+      // A word wider than the box is split by letters so nothing gets clipped
+      while (!fits(word)) {
+        if (cur) { out.push(cur); cur = ''; }
+        let n = word.length - 1;
+        while (n > 1 && !fits(word.slice(0, n))) n--;
+        out.push(word.slice(0, n)); word = word.slice(n);
+      }
+      const next = cur ? cur + ' ' + word : word;
+      if (cur && !fits(next)) { out.push(cur); cur = word; }
+      else cur = next;
+    }
+    if (cur) out.push(cur);
+  }
+  return out;
+}
+
+// Size is always 180. Auto width uses 52 only when a single word doesn't fit at 60
+function layoutBlock(ls, boxW) {
+  const fam = state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
+  setFont(fam, FS);
+  const overflow = ls.join(' ').split(' ').some(w => ctx.measureText(w).width > boxW);
+  return { fam, rows: wrap(ls, boxW), overflow };
+}
+
+// Static wdth instances 25–60 (canvas can't set variation axes), registered on first use
+const WIDTHS = JSON.parse(document.getElementById('widths').textContent);
+const loadedW = new Set([60]);
+async function ensureWidth(w) {
+  if (loadedW.has(w)) return;
+  const face = new FontFace('RF' + w, `url(data:font/woff2;base64,${WIDTHS[w]}) format("woff2")`);
+  document.fonts.add(await face.load());
+  loadedW.add(w);
+}
+
+function drawBlock(ls, boxX, boxW, topY, anchorBottom) {
+  if (!ls.length) return null;
+  const f = layoutBlock(ls, boxW);
+  setFont(f.fam, FS);
+  ctx.fillStyle = '#EEEEEE'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  const y0 = anchorBottom ? (H - 30 - f.rows.length * LH) : topY;
+  f.rows.forEach((l, i) => ctx.fillText(l, boxX + boxW / 2, y0 + i * LH + BASE));
+  return f;
+}
+
+function drawImage() {
+  if (!state.img) return;
+  const w = state.size, h = w * state.img.naturalHeight / state.img.naturalWidth;
+  const cy = LAYOUTS[state.layout].cy + state.dy;
+  ctx.drawImage(state.img, W / 2 - w / 2 + state.dx, cy - h / 2, w, h);
+}
+
+function draw() {
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  const a = lines($('t1').value), b = lines($('t2').value);
+  const warns = [];
+  let f1, f2;
+  const top = () => { if (state.layout !== 'bottom') f1 = drawBlock(a, 30, 1020, 30, false); };
+  const bottom = () => {
+    if (state.layout === 'bottom') f1 = drawBlock(a, 60, 960, 1050, true);
+    if (state.layout === 'sandwich') f2 = drawBlock(b, 30, 1020, 1050, true);
+  };
+  const order = {
+    under:      [drawImage, top, bottom],
+    overTop:    [top, drawImage, bottom],
+    overBottom: [bottom, drawImage, top],
+    over:       [top, bottom, drawImage],
+  }[state.z];
+  order.forEach(fn => fn());
+  if ([f1, f2].some(f => f && f.overflow)) warns.push('Слово не помещается в ширину, поэтому оно разбито посередине. Выберите «Узкая» и сузьте шрифт или замените слово на более короткое.');
+  if ([f1, f2].some(f => f && f.rows.length > 2)) warns.push('Заголовок не влезает в две строки. Сократите текст или выберите «Сэндвич» и поделите его на две части.');
+  if (!a.length) warns.push('Добавьте заголовок.');
+  $('warn').hidden = !warns.length; $('warn').textContent = warns.join(' ');
+  $('sizeOut').textContent = state.size; $('dxOut').textContent = state.dx; $('dyOut').textContent = state.dy;
+  const slug = a.join(' ').toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '');
+  state.name = slug || 'post';
+}
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => { state.img = img; resetPos(); draw(); $('drop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
+  img.src = url;
+}
+
+$('file').addEventListener('change', e => loadFile(e.target.files[0]));
+const drop = $('drop');
+['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+document.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+document.addEventListener('paste', e => {
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (item) loadFile(item.getAsFile());
+});
+
+document.querySelectorAll('input[name=layout]').forEach(r => r.addEventListener('change', () => {
+  state.layout = r.value;
+  $('t2field').hidden = state.layout !== 'sandwich';
+  $('t1label').textContent = state.layout === 'sandwich' ? 'Первая часть (сверху)' : 'Заголовок';
+  syncZ(); resetPos(); draw();
+}));
+async function applyWidth() {
+  $('narrowRow').hidden = state.wd !== 'narrow';
+  $('narrowOut').textContent = state.narrow;
+  if (state.wd === 'narrow') await ensureWidth(state.narrow);
+  draw();
+}
+document.querySelectorAll('input[name=wd]').forEach(r => r.addEventListener('change', () => { state.wd = r.value; applyWidth(); }));
+$('narrow').addEventListener('input', e => { state.narrow = +e.target.value; applyWidth(); });
+['size', 'dx', 'dy'].forEach(k => $(k).addEventListener('input', e => { state[k] = +e.target.value; draw(); }));
+['t1', 't2'].forEach(k => $(k).addEventListener('input', draw));
+let lastField = $('t1');
+['t1', 't2'].forEach(k => $(k).addEventListener('focus', e => { lastField = e.target; }));
+$('nbsp').addEventListener('mousedown', e => e.preventDefault());
+$('nbsp').addEventListener('click', () => {
+  const f = lastField, s = f.selectionStart, e = f.selectionEnd;
+  // Replace a selected (or adjacent) regular space instead of adding a second gap
+  let a = s, b = e;
+  if (a === b && f.value[a - 1] === ' ') a--; else if (a === b && f.value[a] === ' ') b++;
+  f.value = f.value.slice(0, a) + '\u00A0' + f.value.slice(b);
+  f.focus(); f.selectionStart = f.selectionEnd = a + 1;
+  draw();
+});
+// The two middle options only make sense with two text blocks
+function syncZ() {
+  const two = state.layout === 'sandwich';
+  ['overTop', 'overBottom'].forEach(v => { $('zc-' + v).hidden = !two; });
+  if (!two && (state.z === 'overTop' || state.z === 'overBottom')) { state.z = 'under'; $('z-under').checked = true; }
+}
+document.querySelectorAll('input[name=z]').forEach(r => r.addEventListener('change', () => { state.z = r.value; draw(); }));
+$('reset').addEventListener('click', () => { resetPos(); draw(); });
+
+let downloads = null;
+$('dl').addEventListener('click', () => {
+  const st = $('dlStatus');
+  cv.toBlob(async blob => {
+    if (!downloads) {
+      // Outside claude.ai (e.g. GitHub Pages) a plain download link works
+      if (!window.claude) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = `evrone-${state.name}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        st.textContent = 'Готово, файл сохранён.';
+        return;
+      }
+      st.textContent = 'Кнопка скачивания здесь недоступна. Нажмите правой кнопкой мыши на превью и выберите «Сохранить изображение как…».'; return;
+    }
+    try { await downloads.save({ filename: `evrone-${state.name}.png`, data: blob }); st.textContent = 'Готово, файл сохранён.'; }
+    catch (e) {
+      if (e && e.code === 'declined') st.textContent = 'Скачивание отменено.';
+      else if (e && e.code === 'rate_limited') st.textContent = 'Окно сохранения уже открыто. Попробуйте ещё раз через пару секунд.';
+      else st.textContent = 'Не получилось сохранить. Нажмите правой кнопкой на превью и выберите «Сохранить изображение как…».';
+    }
+  }, 'image/png');
+});
+(async () => { try { downloads = await window.claude?.use?.('downloads'); } catch (e) { downloads = null; } })();
+
+const sample = new Image();
+sample.onload = () => { state.img = sample; draw(); };
+sample.src = 'data:image/webp;base64,__LIPS__';
+syncZ();
+resetPos();
+document.fonts.load('180px "RF60"').then(draw, draw);
+draw();
+</script>
