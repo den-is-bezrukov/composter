@@ -140,6 +140,7 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
             <div class="slider wide"><label for="cSat">Насыщенность</label><input type="range" id="cSat" min="50" max="120" step="1" value="100"><output id="cSatOut"></output></div>
             <div class="slider wide"><label for="cVal">Яркость</label><input type="range" id="cVal" min="80" max="150" step="1" value="100"><output id="cValOut"></output></div>
             <div class="slider wide"><label for="cCast">Убрать желтизну</label><input type="range" id="cCast" min="0" max="100" step="1" value="0"><output id="cCastOut"></output></div>
+            <div class="slider wide"><label for="cFeather">Растушёвка маски</label><input type="range" id="cFeather" min="0" max="10" step="1" value="3"><output id="cFeatherOut"></output></div>
             <span class="hint">Меняются только яркие красные и тёплый налёт на стекле и металле. Зажмите превью, чтобы увидеть оригинал. <button class="linkbtn" type="button" id="colorReset">Сбросить</button></span>
           </div>
         </details>
@@ -794,7 +795,7 @@ cv.addEventListener('wheel', e => {
 
 // ---- Illustration colour: selective correction of bright reds and warm cast (tuned in the colour lab) ----
 const COLOR0 = { hue: 0, sat: 100, val: 100, cast: 0 };
-const color = { ...COLOR0, cache: null, out: null, showOriginal: false, raf: 0 };
+const color = { ...COLOR0, feather: 3, cache: null, out: null, showOriginal: false, raf: 0 };
 const colorChanged = () => Object.keys(COLOR0).some(k => color[k] !== COLOR0[k]);
 const sm = (e0, e1, x) => { let t = (x - e0) / (e1 - e0); t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); };
 const angDist = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
@@ -833,9 +834,7 @@ function colorAnalyse(img) {
     R[j] = red;
     C[j] = sm(70, 45, angDist(hu, 25)) * (1 - red) * sm(0.04, 0.12, s) * (1 - sm(0.75, 0.9, mx));
   }
-  const radius = Math.max(1, Math.round(Math.max(w, h) / 500));
-  boxBlur(R, w, h, radius); boxBlur(C, w, h, radius);
-  color.cache = { w, h, src, H, S, V, R, C, canvas: c, ctx: x };
+  color.cache = { w, h, src, H, S, V, rawR: R, rawC: C, feather: -1, canvas: c, ctx: x };
 }
 
 function applyColor() {
@@ -843,6 +842,13 @@ function applyColor() {
   $('colorTag').hidden = !colorChanged();
   if (!state.img || !colorChanged()) { color.out = null; draw(); return; }
   if (!color.cache) colorAnalyse(state.img);
+  if (color.cache.feather !== color.feather) {
+    // Feather in px of a 1600 px picture, scaled to this picture's size
+    const k0 = color.cache, r = Math.round(color.feather * Math.max(k0.w, k0.h) / 1600);
+    k0.R = k0.rawR.slice(); k0.C = k0.rawC.slice();
+    if (r > 0) { boxBlur(k0.R, k0.w, k0.h, r); boxBlur(k0.C, k0.w, k0.h, r); }
+    k0.feather = color.feather;
+  }
   // Lab recipe for a softer coral: hue +5°, saturation 85%, brightness 122%, cast 70%
   const k = color.cache, dh = color.hue, ds = color.sat / 100, dv = color.val / 100, cast = color.cast / 100;
   const out = k.ctx.createImageData(k.w, k.h), d = k.src.data, o = out.data;
@@ -869,7 +875,10 @@ const scheduleColor = () => { if (!color.raf) color.raf = requestAnimationFrame(
 const COLOR_UI = { hue: ['cHue', v => '+' + v + '°'], sat: ['cSat', v => '×' + (v / 100).toFixed(2)], val: ['cVal', v => '×' + (v / 100).toFixed(2)], cast: ['cCast', v => v + '%'] };
 function syncColorUI() { for (const [k, [id, fmt]] of Object.entries(COLOR_UI)) { $(id).value = color[k]; $(id + 'Out').textContent = fmt(color[k]); } }
 for (const [k, [id]] of Object.entries(COLOR_UI)) $(id).addEventListener('input', e => { color[k] = +e.target.value; syncColorUI(); scheduleColor(); });
-$('colorReset').addEventListener('click', () => { Object.assign(color, COLOR0); syncColorUI(); applyColor(); });
+const syncFeather = () => { $('cFeather').value = color.feather; $('cFeatherOut').textContent = color.feather + ' px'; };
+$('cFeather').addEventListener('input', e => { color.feather = +e.target.value; syncFeather(); scheduleColor(); });
+syncFeather();
+$('colorReset').addEventListener('click', () => { Object.assign(color, COLOR0, { feather: 3 }); syncColorUI(); syncFeather(); applyColor(); });
 syncColorUI();
 // Hold the preview to see the original illustration (article mode; in case mode the preview pans)
 cv.addEventListener('pointerdown', () => { if (mode === 'article' && color.out) { color.showOriginal = true; draw(); } });
