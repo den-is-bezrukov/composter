@@ -34,7 +34,19 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;overflow:hidden}
 /* Editor: controls in a sidebar, the post centred in the remaining space */
-.app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(280px,34vw,380px) minmax(0,1fr)}
+.app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(260px,24vw,340px) minmax(0,1fr) clamp(280px,24vw,340px);grid-template-rows:minmax(0,1fr)}
+.post-side{grid-column:1}.workspace{grid-column:2}.props{grid-column:3;border-right:0;border-left:1px solid var(--line)}
+.tabs.chips{display:none}
+.tab{font:inherit;background:none;padding:0}
+.tab[aria-pressed="true"] span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* Narrow window: one sidebar slot, «Пост» and «Картинка» swap in it */
+@media (max-width:1100px){
+  .app{grid-template-columns:clamp(260px,34vw,340px) minmax(0,1fr)}
+  .post-side,.props{grid-column:1;grid-row:1;border-left:0;border-right:1px solid var(--line)}
+  .workspace{grid-column:2}
+  .tabs.chips{display:flex}
+  .app.show-props .post-side,.app:not(.show-props) .props{display:none}
+}
 .sidebar{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:var(--space-card);display:flex;flex-direction:column;gap:var(--space-fields)}
 .side-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
 .side-head .btn{white-space:nowrap}
@@ -50,12 +62,7 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 .fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;flex:1;min-width:0;outline:none}
 .fname .ext{padding:10px 12px 10px 1px;color:var(--muted);user-select:none}
 .linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-.disclosure summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer}
-.disclosure summary::-webkit-details-marker{display:none}
-.disclosure summary::before{content:"";width:0;height:0;border-left:5px solid var(--muted);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
-.disclosure[open] summary::before{transform:rotate(90deg)}
-.disclosure .inner{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-.tag{font-size:12px;color:var(--accent);font-weight:600}
+#colorBox .inner{display:flex;flex-direction:column;gap:10px}
 .slider.wide{grid-template-columns:118px 1fr 44px}
 dialog.help{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);color:var(--ink);padding:0;width:min(880px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
 dialog.help::backdrop{background:rgba(0,0,0,.5)}
@@ -114,8 +121,12 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<div class="app">
-  <aside class="sidebar">
+<div class="app" id="app">
+  <aside class="sidebar post-side">
+    <div class="tabs chips" role="group" aria-label="Панель">
+      <button class="chip tab" type="button" data-show="post"><span>Пост</span></button>
+      <button class="chip tab" type="button" data-show="props"><span>Картинка</span></button>
+    </div>
     <div class="side-head">
       <h2>Конструктор</h2>
       <button class="btn" type="button" id="helpOpen">Инструкция</button>
@@ -124,27 +135,7 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
       <label class="chip"><input type="radio" name="mode" id="mode-article" value="article" checked><span>Статья</span></label>
       <label class="chip"><input type="radio" name="mode" id="mode-case" value="case"><span>Кейс</span></label>
     </div>
-      <div class="pane" id="articleControls">
-        <div class="field">
-          <span class="label">Иллюстрация</span>
-          <label class="drop" id="drop" for="file">Перетащите картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
-          <input type="file" id="file" accept="image/*" hidden>
-          <div class="btns"><button class="btn" type="button" id="copyPromptSide">Скопировать промпт для ChatGPT</button></div>
-          <span class="hint" id="copyStatusSide">Промпт рисует иллюстрацию в стиле Evrone. Подробнее — в «Инструкции».</span>
-        </div>
-
-        <details class="field disclosure" id="colorBox">
-          <summary><span class="label">Цвет иллюстрации</span><span class="tag" id="colorTag" hidden>изменён</span></summary>
-          <div class="inner">
-            <div class="slider wide"><label for="cHue">Оттенок красных</label><input type="range" id="cHue" min="0" max="15" step="0.5" value="0"><output id="cHueOut"></output></div>
-            <div class="slider wide"><label for="cSat">Насыщенность</label><input type="range" id="cSat" min="50" max="120" step="1" value="100"><output id="cSatOut"></output></div>
-            <div class="slider wide"><label for="cVal">Яркость</label><input type="range" id="cVal" min="80" max="150" step="1" value="100"><output id="cValOut"></output></div>
-            <div class="slider wide"><label for="cCast">Убрать желтизну</label><input type="range" id="cCast" min="0" max="100" step="1" value="0"><output id="cCastOut"></output></div>
-            <div class="slider wide"><label for="cFeather">Растушёвка маски</label><input type="range" id="cFeather" min="0" max="10" step="1" value="3"><output id="cFeatherOut"></output></div>
-            <span class="hint">Меняются только яркие красные и тёплый налёт на стекле и металле. Зажмите превью, чтобы увидеть оригинал. <button class="linkbtn" type="button" id="colorReset">Сбросить</button></span>
-          </div>
-        </details>
-
+      <div class="pane" id="articleText">
         <div class="field">
           <span class="label">Раскладка</span>
           <div class="chips" role="radiogroup">
@@ -179,6 +170,45 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
           <div class="slider" id="narrowRow" hidden><label for="narrow">Ширина</label><input type="range" id="narrow" min="25" max="60" step="1" value="52"><output id="narrowOut">52</output></div>
           <span class="hint">Сужайте, если длинное слово не помещается или заголовок не укладывается в две строки. Меньше всего шрифт сужается на 25.</span>
         </div>
+      </div>
+  </aside>
+
+  <main class="workspace">
+    <div class="warn" id="warn" hidden></div>
+    <div class="stage" id="stage">
+      <div class="frame" id="frame">
+        <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
+        <div class="grid" id="grid" hidden></div>
+      </div>
+    </div>
+    <form class="savebar" id="saveForm">
+      <div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div>
+      <button class="btn primary" type="submit" id="dl">Скачать PNG</button>
+    </form>
+  </main>
+
+  <aside class="sidebar props">
+    <div class="tabs chips" role="group" aria-label="Панель">
+      <button class="chip tab" type="button" data-show="post"><span>Пост</span></button>
+      <button class="chip tab" type="button" data-show="props"><span>Картинка</span></button>
+    </div>
+    <h2>Картинка</h2>
+      <div class="pane" id="articleProps">
+        <div class="field">
+          <span class="label">Иллюстрация</span>
+          <label class="drop" id="drop" for="file">Перетащите картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
+          <input type="file" id="file" accept="image/*" hidden>
+          <div class="btns"><button class="btn" type="button" id="copyPromptSide">Скопировать промпт для ChatGPT</button></div>
+          <span class="hint" id="copyStatusSide">Промпт рисует иллюстрацию в стиле Evrone. Подробнее — в «Инструкции».</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Положение картинки</span>
+          <div class="slider"><label for="size">Размер</label><input type="range" id="size" min="400" max="1800" step="10"><output id="sizeOut"></output></div>
+          <div class="slider"><label for="dy">Вверх/вниз</label><input type="range" id="dy" min="-500" max="500" step="5"><output id="dyOut"></output></div>
+          <div class="slider"><label for="dx">Влево/вправо</label><input type="range" id="dx" min="-400" max="400" step="5"><output id="dxOut"></output></div>
+          <button class="btn" type="button" id="reset">Сбросить положение</button>
+        </div>
 
         <div class="field">
           <span class="label">Слой картинки</span>
@@ -190,16 +220,20 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
           </div>
         </div>
 
-        <div class="field">
-          <span class="label">Положение картинки</span>
-          <div class="slider"><label for="size">Размер</label><input type="range" id="size" min="400" max="1800" step="10"><output id="sizeOut"></output></div>
-          <div class="slider"><label for="dy">Вверх/вниз</label><input type="range" id="dy" min="-500" max="500" step="5"><output id="dyOut"></output></div>
-          <div class="slider"><label for="dx">Влево/вправо</label><input type="range" id="dx" min="-400" max="400" step="5"><output id="dxOut"></output></div>
-          <button class="btn" type="button" id="reset">Сбросить положение</button>
+        <div class="field" id="colorBox">
+          <span class="label">Цвет иллюстрации</span>
+          <div class="inner">
+            <div class="slider wide"><label for="cHue">Оттенок красных</label><input type="range" id="cHue" min="0" max="15" step="0.5" value="0"><output id="cHueOut"></output></div>
+            <div class="slider wide"><label for="cSat">Насыщенность</label><input type="range" id="cSat" min="50" max="120" step="1" value="100"><output id="cSatOut"></output></div>
+            <div class="slider wide"><label for="cVal">Яркость</label><input type="range" id="cVal" min="80" max="150" step="1" value="100"><output id="cValOut"></output></div>
+            <div class="slider wide"><label for="cCast">Убрать желтизну</label><input type="range" id="cCast" min="0" max="100" step="1" value="0"><output id="cCastOut"></output></div>
+            <div class="slider wide"><label for="cFeather">Растушёвка маски</label><input type="range" id="cFeather" min="0" max="10" step="1" value="3"><output id="cFeatherOut"></output></div>
+            <span class="hint">Меняются только яркие красные и тёплый налёт на стекле и металле. Зажмите превью, чтобы увидеть оригинал. <button class="linkbtn" type="button" id="colorReset">Сбросить</button></span>
+          </div>
         </div>
       </div>
 
-      <div class="pane" id="caseControls" hidden>
+      <div class="pane" id="caseProps" hidden>
         <div class="field">
           <span class="label">Картинка</span>
           <label class="drop" id="caseDrop" for="caseFile">Перетащите готовую картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
@@ -251,20 +285,6 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
         </div>
       </div>
   </aside>
-
-  <main class="workspace">
-    <div class="warn" id="warn" hidden></div>
-    <div class="stage" id="stage">
-      <div class="frame" id="frame">
-        <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
-        <div class="grid" id="grid" hidden></div>
-      </div>
-    </div>
-    <form class="savebar" id="saveForm">
-      <div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div>
-      <button class="btn primary" type="submit" id="dl">Скачать PNG</button>
-    </form>
-  </main>
 </div>
 
 <dialog class="help" id="help" aria-labelledby="helpTitle">
@@ -720,11 +740,21 @@ function syncLogoInputs() {
   $('lSize').value = c.lSize; $('lDx').value = c.lDx; $('lDy').value = c.lDy;
 }
 
+function showPanel(which) {
+  $('app').classList.toggle('show-props', which === 'props');
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.show === which)));
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.show)));
+showPanel('post');
+
 function setMode(m) {
   mode = m;
   $('fname').value = customName[m] ?? autoName();
-  $('articleControls').hidden = m !== 'article';
-  $('caseControls').hidden = m !== 'case';
+  $('articleText').hidden = m !== 'article';
+  $('articleProps').hidden = m !== 'article';
+  $('caseProps').hidden = m !== 'case';
+  // In the narrow layout a case has no text, so open straight on «Картинка»
+  showPanel(m === 'case' ? 'props' : 'post');
   cv.classList.toggle('pannable', m === 'case');
   draw();
 }
@@ -839,7 +869,6 @@ function colorAnalyse(img) {
 
 function applyColor() {
   color.raf = 0;
-  $('colorTag').hidden = !colorChanged();
   if (!state.img || !colorChanged()) { color.out = null; draw(); return; }
   if (!color.cache) colorAnalyse(state.img);
   if (color.cache.feather !== color.feather) {
