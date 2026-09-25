@@ -28,16 +28,23 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 /* Editor: controls in a sidebar, the post centred in the remaining space */
 .app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(260px,24vw,340px) minmax(0,1fr) clamp(280px,24vw,340px);grid-template-rows:minmax(0,1fr) auto}
 .post-side{grid-column:1;grid-row:1}.workspace{grid-column:2;grid-row:1 / 3}.props{grid-column:3;grid-row:1 / 3;border-right:0;border-left:1px solid var(--line)}
-.tabs.chips{display:none}
-.tab{font:inherit;background:none;padding:0;border:0;color:inherit;cursor:pointer}
-.tab[aria-pressed="true"] span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg{display:flex;gap:3px;padding:3px;background:var(--code);border:1px solid var(--line);border-radius:var(--radius-control)}
+.seg label{flex:1 1 0;min-width:0;display:flex}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{--cut:var(--code);flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;padding:7px 6px;border-radius:calc(var(--radius-control) - 3px);cursor:pointer;font-weight:500;font-size:14px;line-height:1.2;color:var(--muted)}
+.seg input:checked+span{--cut:var(--ink);background:var(--ink);color:var(--bg)}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:1px}
+.panel-tabs{display:none}
 /* Narrow window: one sidebar slot, «Пост» and «Картинка» swap in it */
 @media (max-width:1100px){
   .app{grid-template-columns:clamp(260px,34vw,340px) minmax(0,1fr)}
   .post-side,.props{grid-column:1;grid-row:1;border-left:0;border-right:1px solid var(--line)}
   .workspace{grid-column:2;grid-row:1 / 3}
-  .tabs.chips{display:flex}
+  .helpview{grid-column:2}
+  .panel-tabs{display:flex}
   .app.show-props .post-side,.app:not(.show-props) .props{display:none}
+  .app.help .post-side{display:flex}
+  .app.help .panel-tabs{display:none}
 }
 .sidebar{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:var(--space-card);display:flex;flex-direction:column;gap:var(--space-fields)}
 .side-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
@@ -57,10 +64,9 @@ body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui
 .linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 #colorBox .inner{display:flex;flex-direction:column;gap:10px}
 .slider.wide{grid-template-columns:118px 1fr 44px}
-dialog.help{border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);color:var(--ink);padding:0;width:min(880px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
-dialog.help::backdrop{background:rgba(0,0,0,.5)}
-.help-head{position:sticky;top:0;background:var(--surface);display:flex;justify-content:space-between;align-items:center;padding:20px var(--space-card);border-bottom:1px solid var(--line)}
-.help-body{padding:var(--space-card);display:flex;flex-direction:column;gap:32px}
+.helpview{grid-column:2 / 4;grid-row:1 / 3;overflow-y:auto;background:var(--surface);min-width:0}
+.app.help .workspace,.app.help .props{display:none}
+.help-body{padding:32px;max-width:900px;display:flex;flex-direction:column;gap:32px}
 .help-body section{display:flex;flex-direction:column;gap:12px}
 .help-body h3{font:800 22px/1 "RF60","Roboto Flex",sans-serif;text-transform:uppercase;letter-spacing:.01em;margin:0}
 h1,h2{font-family:"RF60","Roboto Flex",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1;margin:0;text-wrap:balance}
@@ -116,25 +122,22 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
 
 <div class="app" id="app">
   <aside class="sidebar post-side">
-    <div class="tabs chips" role="group" aria-label="Панель">
-      <button class="chip tab" type="button" data-show="post"><span>Пост</span></button>
-      <button class="chip tab" type="button" data-show="props"><span>Картинка</span></button>
+    <div class="seg" role="radiogroup" aria-label="Шаблон">
+      <label><input type="radio" name="mode" id="mode-article" value="article" checked><span>Статья</span></label>
+      <label><input type="radio" name="mode" id="mode-case" value="case"><span>Кейс</span></label>
+      <label><input type="radio" name="mode" id="mode-help" value="help"><span>Помощь</span></label>
     </div>
-    <div class="side-head">
-      <h2>Конструктор</h2>
-      <button class="btn" type="button" id="helpOpen">Инструкция</button>
-    </div>
-    <div class="chips" role="radiogroup" aria-label="Тип поста">
-      <label class="chip"><input type="radio" name="mode" id="mode-article" value="article" checked><span>Статья</span></label>
-      <label class="chip"><input type="radio" name="mode" id="mode-case" value="case"><span>Кейс</span></label>
+    <div class="seg panel-tabs" role="radiogroup" aria-label="Панель">
+      <label><input type="radio" name="panelL" value="post"><span>Текст</span></label>
+      <label><input type="radio" name="panelL" value="props"><span>Картинка</span></label>
     </div>
       <div class="pane" id="articleText">
         <div class="field">
           <span class="label">Раскладка</span>
-          <div class="chips" role="radiogroup">
-            <label class="chip"><input type="radio" name="layout" id="lay-top" value="top" checked><span>Текст сверху</span></label>
-            <label class="chip"><input type="radio" name="layout" id="lay-bottom" value="bottom"><span>Текст снизу</span></label>
-            <label class="chip"><input type="radio" name="layout" id="lay-sandwich" value="sandwich"><span>Сэндвич</span></label>
+          <div class="seg" role="radiogroup" aria-label="Раскладка">
+            <label><input type="radio" name="layout" id="lay-top" value="top" checked><span>Сверху</span></label>
+            <label><input type="radio" name="layout" id="lay-bottom" value="bottom"><span>Снизу</span></label>
+            <label><input type="radio" name="layout" id="lay-sandwich" value="sandwich"><span>Сэндвич</span></label>
           </div>
         </div>
 
@@ -184,11 +187,10 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
   </form>
 
   <aside class="sidebar props">
-    <div class="tabs chips" role="group" aria-label="Панель">
-      <button class="chip tab" type="button" data-show="post"><span>Пост</span></button>
-      <button class="chip tab" type="button" data-show="props"><span>Картинка</span></button>
+    <div class="seg panel-tabs" role="radiogroup" aria-label="Панель">
+      <label><input type="radio" name="panelR" value="post"><span>Текст</span></label>
+      <label><input type="radio" name="panelR" value="props"><span>Картинка</span></label>
     </div>
-    <h2>Картинка</h2>
       <div class="pane" id="articleProps">
         <div class="field">
           <span class="label">Иллюстрация</span>
@@ -208,11 +210,11 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
 
         <div class="field">
           <span class="label">Слой картинки</span>
-          <div class="chips" role="radiogroup">
-            <label class="chip" id="zc-under"><input type="radio" name="z" id="z-under" value="under" checked><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Под текстом</span></label>
-            <label class="chip" id="zc-overTop" hidden><input type="radio" name="z" id="z-overTop" value="overTop"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Над верхним</span></label>
-            <label class="chip" id="zc-overBottom" hidden><input type="radio" name="z" id="z-overBottom" value="overBottom"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/></svg>Над нижним</span></label>
-            <label class="chip" id="zc-over"><input type="radio" name="z" id="z-over" value="over"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/></svg>Над текстом</span></label>
+          <div class="seg" role="radiogroup" aria-label="Слой картинки">
+            <label id="zc-under"><input type="radio" name="z" id="z-under" value="under" checked><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Под текстом</span></label>
+            <label id="zc-overTop" hidden><input type="radio" name="z" id="z-overTop" value="overTop"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Над верхним</span></label>
+            <label id="zc-overBottom" hidden><input type="radio" name="z" id="z-overBottom" value="overBottom"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/></svg>Над нижним</span></label>
+            <label id="zc-over"><input type="radio" name="z" id="z-over" value="over"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/></svg>Над текстом</span></label>
           </div>
         </div>
 
@@ -282,13 +284,8 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
         </div>
       </div>
   </aside>
-</div>
 
-<dialog class="help" id="help" aria-labelledby="helpTitle">
-  <div class="help-head">
-    <h2 id="helpTitle">Инструкция</h2>
-    <button class="btn" type="button" id="helpClose">Закрыть</button>
-  </div>
+  <section class="helpview" id="help" hidden aria-label="Помощь">
   <div class="help-body">
     <section>
       <h3>Как сделать пост</h3>
@@ -321,7 +318,9 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
     </ul>
     </section>
   </div>
-</dialog>
+  </section>
+</div>
+
 
 <script type="application/json" id="widths">__WIDTHS__</script>
 <script>
@@ -353,7 +352,7 @@ async function copyPrompt(statusId) {
   try { await navigator.clipboard.writeText(PROMPT); s.textContent = 'Промпт скопирован. Вставьте его в ChatGPT.'; }
   catch (e) {
     // Clipboard refused: show the text in the instructions and select it
-    const help = document.getElementById('help'); if (!help.open) help.showModal();
+    showHelp(true);
     const r = document.createRange(); r.selectNodeContents(document.getElementById('promptText'));
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
     document.getElementById('copyStatus').textContent = 'Текст выделен. Нажмите Ctrl/⌘+C, чтобы скопировать.';
@@ -361,10 +360,13 @@ async function copyPrompt(statusId) {
 }
 document.getElementById('copyPrompt').addEventListener('click', () => copyPrompt('copyStatus'));
 document.getElementById('copyPromptSide').addEventListener('click', () => copyPrompt('copyStatusSide'));
-const help = document.getElementById('help');
-document.getElementById('helpOpen').addEventListener('click', () => help.showModal());
-document.getElementById('helpClose').addEventListener('click', () => help.close());
-help.addEventListener('click', e => { if (e.target === help) help.close(); });
+// «Помощь» replaces the preview and the picture column; «Статья»/«Кейс» bring them back
+function showHelp(on) {
+  document.getElementById('app').classList.toggle('help', on);
+  document.getElementById('help').hidden = !on;
+  if (on) document.getElementById('mode-help').checked = true;
+  else document.getElementById('mode-' + mode).checked = true;
+}
 
 // ---- Builder ----
 const W = 1080, H = 1440, FS = 180, LH = 180;
@@ -740,9 +742,9 @@ function syncLogoInputs() {
 
 function showPanel(which) {
   $('app').classList.toggle('show-props', which === 'props');
-  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.show === which)));
+  document.querySelectorAll('input[name=panelL], input[name=panelR]').forEach(r => { r.checked = r.value === which; });
 }
-document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.show)));
+document.querySelectorAll('input[name=panelL], input[name=panelR]').forEach(r => r.addEventListener('change', () => showPanel(r.value)));
 showPanel('post');
 
 function setMode(m) {
@@ -756,7 +758,10 @@ function setMode(m) {
   cv.classList.toggle('pannable', m === 'case');
   draw();
 }
-document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => setMode(r.value)));
+document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => {
+  if (r.value === 'help') return showHelp(true);
+  setMode(r.value); showHelp(false);
+}));
 
 $('caseFile').addEventListener('change', e => loadCaseFile(e.target.files[0]));
 $('logoFile').addEventListener('change', e => loadLogoFile(e.target.files[0]));
