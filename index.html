@@ -307,7 +307,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
   <main class="workspace">
     <div class="stage" id="stage">
       <div class="frame" id="frame">
-        <canvas id="cv" width="1080" height="1440" aria-label="Превью поста"></canvas>
+        <canvas id="cv" class="pannable" width="1080" height="1440" aria-label="Превью поста"></canvas>
         <div class="grid" id="grid" hidden></div>
       </div>
     </div>
@@ -381,10 +381,10 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         <li><b>Заголовок в две строки</b>По 2–3 слова в строке, разбивать по смыслу: «MIGRATING / TO RUST». Если текст длинный, выберите «Сэндвич» и нажмите Enter там, где текст делится на верх и низ.</li>
         <li><b>Один объект</b>Метафора темы, один предмет или персонаж. Не нужно коллажей, нескольких сцен или надписей на самой картинке.</li>
         <li><b>Ничего лишнего</b>В статье только заголовок и иллюстрация: без логотипа, подписей и рамок.</li>
-        <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку или сдвиньте её ползунком.</li>
+        <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку колёсиком мыши или сдвиньте её мышью прямо на превью (или ползунками).</li>
         <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
         <li><b>Неразрывный пробел</b>Не даёт разорвать слова по разным строкам, например «AI&nbsp;AGENT». Поставьте курсор между словами и нажмите «Вставить неразрывный пробел». На Mac то же делает ⌥+Пробел, на Windows Alt+0160.</li>
-        <li><b>Коррекция цвета</b>Ползунки меняют только яркие красные и тёплый налёт на белом, стекле и металле и крутятся от середины в обе стороны: например, слишком жёлтый красный можно увести в холодный. Зажмите превью, чтобы сравнить с оригиналом.</li>
+        <li><b>Коррекция цвета</b>Ползунки меняют только яркие красные и тёплый налёт на белом, стекле и металле и крутятся от середины в обе стороны: например, слишком жёлтый красный можно увести в холодный. Зажмите превью и подержите, не двигая, чтобы сравнить с оригиналом.</li>
         <li><b>Кейс: кадрирование</b>Картинка всегда закрывает весь пост. Двигайте её мышью прямо на превью или ползунками X и Y, колёсиком мыши меняйте размер.</li>
         <li><b>Кейс: важное ближе к центру</b>Лицо, продукт или логотип на картинке держите подальше от краёв. В ленте и сетке Instagram края поста могут обрезаться.</li>
         <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
@@ -833,7 +833,6 @@ function setMode(m) {
   if (m === 'article') fitText();
   $('caseProps').hidden = m !== 'case';
   $('app').classList.toggle('case', m === 'case');
-  cv.classList.toggle('pannable', m === 'case');
   draw();
 }
 document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => setMode(r.value)));
@@ -861,37 +860,66 @@ $('logoRemove').addEventListener('click', () => {
   draw();
 });
 
-// Direct manipulation on the preview: drag to pan, wheel or pinch to zoom
+// Direct manipulation on the preview, both templates: drag to move, wheel or pinch to resize;
+// the sliders follow. In «Статья» holding still for a moment shows the original colours
 const pointers = new Map();
 function toCanvas(e) {
   const r = cv.getBoundingClientRect();
   return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
 }
+const clampTo = (el, v) => Math.round(Math.min(+el.max, Math.max(+el.min, v)));
+function panBy(dx, dy) {
+  if (mode === 'case') { caseState.x += dx; caseState.y += dy; clampCase(); return; }
+  state.dx = clampTo($('dx'), state.dx + dx); state.dy = clampTo($('dy'), state.dy + dy);
+  $('dx').value = state.dx; $('dy').value = state.dy;
+}
+// Resize around a point so it stays under the cursor
+function zoomBy(factor, p) {
+  if (mode === 'case') { zoomAt(factor, p); return; }
+  const L = LAYOUTS[state.layout], cx = W / 2 + state.dx, cy = L.cy + state.dy;
+  const size = clampTo($('size'), state.size * factor), k = size / state.size;
+  state.size = size;
+  state.dx = clampTo($('dx'), p.x - (p.x - cx) * k - W / 2);
+  state.dy = clampTo($('dy'), p.y - (p.y - cy) * k - L.cy);
+  $('size').value = state.size; $('dx').value = state.dx; $('dy').value = state.dy;
+}
+const canMove = () => mode === 'case' ? !!caseState.img : !!state.img;
+let holdTimer = 0, start = null;
 cv.addEventListener('pointerdown', e => {
-  if (mode !== 'case' || !caseState.img) return;
-  cv.setPointerCapture(e.pointerId); pointers.set(e.pointerId, toCanvas(e));
+  if (!canMove()) return;
+  try { cv.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
+  pointers.set(e.pointerId, toCanvas(e));
   cv.classList.add('dragging'); $('grid').hidden = false;
+  start = pointers.size === 1 ? toCanvas(e) : null;
+  clearTimeout(holdTimer);
+  if (mode === 'article' && color.out && start) holdTimer = setTimeout(() => { color.showOriginal = true; draw(); }, 300);
 });
 cv.addEventListener('pointermove', e => {
   if (!pointers.has(e.pointerId)) return;
-  const c = caseState, p = toCanvas(e), prev = pointers.get(e.pointerId);
-  if (pointers.size === 1) { c.x += p.x - prev.x; c.y += p.y - prev.y; clampCase(); }
+  const p = toCanvas(e), prev = pointers.get(e.pointerId);
+  // A real drag cancels the colour comparison
+  if (start && Math.hypot(p.x - start.x, p.y - start.y) > 12) { clearTimeout(holdTimer); start = null; if (color.showOriginal) color.showOriginal = false; }
+  if (pointers.size === 1) panBy(p.x - prev.x, p.y - prev.y);
   else {
     const other = [...pointers].find(([id]) => id !== e.pointerId)[1];
     const d0 = Math.hypot(prev.x - other.x, prev.y - other.y), d1 = Math.hypot(p.x - other.x, p.y - other.y);
     const m0 = { x: (prev.x + other.x) / 2, y: (prev.y + other.y) / 2 }, m1 = { x: (p.x + other.x) / 2, y: (p.y + other.y) / 2 };
-    c.x += m1.x - m0.x; c.y += m1.y - m0.y;
-    if (d0 > 0) zoomAt(d1 / d0, m1); else clampCase();
+    panBy(m1.x - m0.x, m1.y - m0.y);
+    if (d0 > 0) zoomBy(d1 / d0, m1);
   }
   pointers.set(e.pointerId, p); draw();
 });
 ['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, e => {
   pointers.delete(e.pointerId);
-  if (!pointers.size) { cv.classList.remove('dragging'); $('grid').hidden = true; }
+  if (!pointers.size) {
+    clearTimeout(holdTimer); start = null;
+    cv.classList.remove('dragging'); $('grid').hidden = true;
+    if (color.showOriginal) { color.showOriginal = false; draw(); }
+  }
 }));
 cv.addEventListener('wheel', e => {
-  if (mode !== 'case' || !caseState.img) return;
-  e.preventDefault(); zoomAt(Math.exp(-e.deltaY * 0.0015), toCanvas(e)); draw();
+  if (!canMove()) return;
+  e.preventDefault(); zoomBy(Math.exp(-e.deltaY * 0.0015), toCanvas(e)); draw();
 }, { passive: false });
 
 // ---- Illustration colour: selective correction of bright reds and warm cast (tuned in the colour lab) ----
@@ -977,9 +1005,6 @@ function syncColorUI() { for (const [k, id] of Object.entries(COLOR_UI)) $(id).v
 for (const [k, id] of Object.entries(COLOR_UI)) $(id).addEventListener('input', e => { color[k] = +e.target.value; scheduleColor(); });
 $('colorReset').addEventListener('click', () => { Object.assign(color, COLOR0, { feather: 3 }); syncColorUI(); applyColor(); });
 syncColorUI();
-// Hold the preview to see the original illustration (article mode; in case mode the preview pans)
-cv.addEventListener('pointerdown', () => { if (mode === 'article' && color.out) { color.showOriginal = true; draw(); } });
-['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => { if (color.showOriginal) { color.showOriginal = false; draw(); } }));
 
 // ---- File name input ----
 $('fname').addEventListener('input', e => { customName[mode] = e.target.value.trim() ? e.target.value : null; });
