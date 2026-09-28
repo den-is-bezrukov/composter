@@ -120,7 +120,7 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 
 /* Picture card: thumbnail, file name, «Заменить» */
 .file{display:flex;gap:8px;align-items:center;padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:pointer}
-.file.over{outline:1px solid var(--focus);outline-offset:-1px}
+.file.over,.feedwrap.over{outline:1px solid var(--focus);outline-offset:-1px}
 .thumb{flex:none;width:32px;height:32px;border:1px solid var(--line-t);border-radius:2px;overflow:hidden;
   background:repeating-conic-gradient(#E6E6E6 0 25%,#FFFFFF 0 50%) 0 0/9.36px 9.36px}
 .thumb img{display:block;width:100%;height:100%;object-fit:contain}
@@ -143,7 +143,21 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px}
 
 /* Preview */
-.workspace{display:flex;align-items:center;justify-content:center;padding:45px 40px;min-width:0;min-height:0;overflow:hidden;background:var(--canvas)}
+.workspace{position:relative;display:flex;align-items:center;justify-content:center;padding:45px 40px 72px;min-width:0;min-height:0;overflow:hidden;background:var(--canvas)}
+/* «Сетка»: the post as the newest one in the profile, the rest cut from a profile screenshot */
+.workspace.feedview{align-items:flex-start}
+.feedwrap{position:relative;flex:none}
+.feed{display:grid;grid-template-columns:repeat(3,var(--cw,160px));gap:3px;background:#fff}
+.feed .cell{width:var(--cw,160px);aspect-ratio:3/4;overflow:hidden;background:var(--bg2)}
+.feed .cell canvas{display:block;width:100%;height:100%}
+.feed-empty{position:absolute;left:50%;top:calc(var(--cw,160px) * 4 / 3 + 3px + (var(--cw,160px) * 4 / 3) / 2);transform:translate(-50%,-50%);width:min(320px,90%);padding:16px;border-radius:13px;background:var(--bg);box-shadow:var(--elev);display:flex;flex-direction:column;gap:12px;text-align:center}
+.feed-empty p{margin:0;font-size:13px;line-height:20px}
+.feed-empty .warn{text-align:left}
+.viewbar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:4;display:flex;gap:8px;align-items:center}
+.viewbar .seg.pill{padding:4px;border-radius:10px;background:var(--bg);box-shadow:var(--elev)}
+.viewbar .seg.pill span{padding:0 12px;border:0}
+.viewbar .seg.pill input:checked+span{background:var(--inverse);color:var(--bg)}
+.viewbar .btn{background:var(--bg);box-shadow:var(--elev);border-color:transparent}
 .stage{flex:none;display:flex;align-items:center;justify-content:center}
 .frame{position:relative}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
@@ -286,6 +300,26 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         <canvas id="cv" class="pannable" width="1080" height="1440" aria-label="Превью поста"></canvas>
         <div class="grid" id="grid" hidden></div>
       </div>
+    </div>
+    <div class="feedwrap" id="feedwrap" hidden>
+      <div class="feed" id="feed">
+        <div class="cell"><canvas id="feedMine" width="360" height="480" aria-label="Ваш пост в сетке"></canvas></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      </div>
+      <div class="feed-empty" id="feedEmpty">
+        <p>Вставьте скриншот профиля Evrone в Instagram (Ctrl/⌘+V) или перетащите его сюда. Подойдёт скриншот с телефона или с компьютера, где видны посты.</p>
+        <div class="warn" id="feedWarn" hidden></div>
+        <button class="btn" type="button" id="shotPick">Выбрать скриншот</button>
+      </div>
+    </div>
+    <input type="file" id="shotFile" accept="image/*" hidden>
+    <div class="viewbar">
+      <div class="seg pill" role="radiogroup" aria-label="Вид">
+        <label><input type="radio" name="view" value="post" checked><span>Макет</span></label>
+        <label><input type="radio" name="view" value="grid"><span>Сетка</span></label>
+      </div>
+      <button class="btn" type="button" id="shotReplace" hidden>Другой скриншот</button>
     </div>
   </main>
 
@@ -598,20 +632,21 @@ function loadFile(file) {
 
 $('file').addEventListener('change', e => loadFile(e.target.files[0]));
 // Drop anywhere: on the logo card it's a logo, otherwise the current mode's picture
-const activeDrop = e => e.target.closest?.('#logoDrop') ? $('logoDrop') : $(mode === 'case' ? 'caseDrop' : 'drop');
+// In «Сетка» a dropped or pasted picture is a profile screenshot, not the post picture
+const activeDrop = e => e.target.closest?.('#logoDrop') ? $('logoDrop') : view === 'grid' ? $('feedwrap') : $(mode === 'case' ? 'caseDrop' : 'drop');
 ['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => {
   e.preventDefault();
-  document.querySelectorAll('.file.over').forEach(d => d.classList.remove('over'));
+  document.querySelectorAll('.file.over,.feedwrap.over').forEach(d => d.classList.remove('over'));
   activeDrop(e).classList.add('over');
 }));
-['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); document.querySelectorAll('.file.over').forEach(d => d.classList.remove('over')); }));
+['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); document.querySelectorAll('.file.over,.feedwrap.over').forEach(d => d.classList.remove('over')); }));
 document.addEventListener('drop', e => {
   const f = e.dataTransfer.files[0];
-  if (e.target.closest?.('#logoDrop')) loadLogoFile(f); else loadFile(f);
+  if (e.target.closest?.('#logoDrop')) loadLogoFile(f); else if (view === 'grid') loadShot(f); else loadFile(f);
 });
 document.addEventListener('paste', e => {
   const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
-  if (item) loadFile(item.getAsFile());
+  if (item) (view === 'grid' ? loadShot : loadFile)(item.getAsFile());
 });
 
 document.querySelectorAll('input[name=layout]').forEach(r => r.addEventListener('change', () => {
@@ -720,7 +755,7 @@ function syncResets() {
   $('frameReset').disabled = !c.img || (c.x === W / 2 && c.y === H / 2 && Math.abs(c.scale - coverScale(c.img)) < 1e-9);
   $('logoReset').disabled = c.lSize === 540 && !c.lDx && !c.lDy;
 }
-function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); paintRanges(); syncResets(); }
+function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); paintRanges(); syncResets(); syncMine(); }
 
 const coverScale = img => Math.max(W / img.naturalWidth, H / img.naturalHeight);
 
@@ -1013,6 +1048,134 @@ function placeProps() { (narrowMQ.matches ? $('leftScroll') : $('rightSide')).ap
 narrowMQ.addEventListener('change', placeProps);
 placeProps();
 
+// ---- «Сетка»: how the post sits among the latest posts of the profile ----
+// Find the Instagram profile grid on a screenshot: 3 equal columns, 3:4 tiles, thin gaps.
+// d — RGBA pixels of a copy scaled to <= 700 px wide. Returns tiles in those pixels.
+function findGrid(d, w, h) {
+  const at = (x, y) => (y * w + x) * 4;
+  // Page background: the most common colour of the top rows (status bar / header)
+  const counts = new Map();
+  for (let y = 0; y < Math.max(2, h * 0.03); y++) for (let x = 0; x < w; x += 2) {
+    const i = at(x, y), key = (d[i] >> 4) << 8 | (d[i + 1] >> 4) << 4 | (d[i + 2] >> 4);
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  const top = [...counts].sort((a, b) => b[1] - a[1])[0][0];
+  const bg = [(top >> 8) * 16 + 8, ((top >> 4) & 15) * 16 + 8, (top & 15) * 16 + 8];
+  const diff = (i, j) => Math.max(Math.abs(d[i] - d[j]), Math.abs(d[i + 1] - d[j + 1]), Math.abs(d[i + 2] - d[j + 2]));
+  const offBg = i => Math.max(Math.abs(d[i] - bg[0]), Math.abs(d[i + 1] - bg[1]), Math.abs(d[i + 2] - bg[2]));
+
+  // Columns: share of background pixels over the lower half, where the grid usually is
+  const y1 = Math.floor(h * 0.45), colBg = new Float32Array(w);
+  for (let x = 0; x < w; x++) { let n = 0; for (let y = y1; y < h; y++) if (offBg(at(x, y)) < 24) n++; colBg[x] = n / (h - y1); }
+  let left = 0, right = w;
+  while (left < w && colBg[left] > 0.97) left++;
+  while (right > left && colBg[right - 1] > 0.97) right--;
+  if (right - left < w * 0.4) return null;
+  // Gap width: the one whose gap columns are most background
+  let best = { g: 0, s: -1 };
+  for (let g = 0; g <= Math.max(2, Math.round((right - left) * 0.006)); g++) {
+    const W = (right - left - 2 * g) / 3;
+    const cols = []; for (let j = 0; j < g; j++) cols.push(Math.round(left + W + j), Math.round(left + 2 * W + g + j));
+    const s = g ? cols.reduce((a, x) => a + colBg[x], 0) / cols.length : 0.5;
+    if (s > best.s + 0.05) best = { g, s };
+  }
+  const g = best.g, W = (right - left - 2 * g) / 3, H = W * 4 / 3, P = H + g;
+
+  // Rows: edge strength of each row across the grid width
+  const E = new Float32Array(h);
+  for (let y = 1; y < h; y++) { let s = 0; for (let x = left; x < right; x += 2) s += diff(at(x, y), at(x, y - 1)); E[y] = s / ((right - left) / 2); }
+  const tooth = y => { y = Math.round(y); return y > 0 && y < h ? Math.max(E[y], E[Math.max(1, y - g)], y + 1 < h ? E[y + 1] : 0) : 0; };
+  // Phase: tile tops repeat every P; pick the phase where row borders line up best
+  let phase = 0, ps = -1;
+  for (let f = 0; f < P; f++) {
+    let s = 0, n = 0;
+    for (let t = f; t < h; t += P) { s += tooth(t) + tooth(t + H); n += 2; }
+    if (s / n > ps) { ps = s / n; phase = f; }
+  }
+  // Candidate rows: tile tops in that phase that fit on the screenshot
+  const tops = []; for (let t = phase; t + H <= h + 2; t += P) tops.push(t);
+  const strong = tops.map(tooth), ref = Math.max(0, ...strong);
+  // Share of non-background pixels inside each tile of a row
+  const fill = t => [0, 1, 2].map(c => {
+    let n = 0, all = 0;
+    for (let y = Math.max(0, Math.round(t)); y < Math.min(h, t + H); y += 2)
+      for (let x = Math.round(left + c * (W + g)); x < left + c * (W + g) + W; x += 2) { all++; if (offBg(at(x, y)) >= 24) n++; }
+    return all ? n / all : 0;
+  });
+  // A real row has a clear top border and content in at least two of its three tiles
+  // (the profile header above the grid is mostly empty background)
+  const isRow = k => fill(tops[k]).filter(v => v >= 0.3).length >= 2;
+  const first = tops.findIndex((t, k) => strong[k] > Math.max(20, ref * 0.35) && isRow(k));
+  if (first < 0) return null;
+  const tiles = [];
+  let k = first;
+  for (; k < tops.length && isRow(k); k++)
+    for (let c = 0; c < 3; c++) tiles.push({ x: left + c * (W + g), y: tops[k], w: W, h: H });
+  // A row cut by the bottom edge still counts if at least a fifth of it is visible
+  // (up to the phone's bottom bar: a band of almost empty background across the whole width)
+  const cut = (k ? tops[k - 1] : phase) + P;
+  if (k === tops.length && h - cut > H * 0.2) {
+    const rowFill = y => { let n = 0, all = 0; for (let x = left; x < right; x += 2) { all++; if (offBg(at(x, y)) >= 24) n++; } return n / all; };
+    let end = h, run = 0;
+    for (let y = Math.round(cut + H * 0.15); y < h; y++) {
+      run = rowFill(y) < 0.12 ? run + 1 : 0;
+      if (run >= H * 0.06) { end = y - run + 1; break; }
+    }
+    if (end - cut > H * 0.2)
+      for (let c = 0; c < 3; c++) tiles.push({ x: left + c * (W + g), y: cut, w: W, h: end - cut, partial: true });
+  }
+  // Confidence: row borders in phase must stand out from the average row edge
+  let mean = 0; for (let y = 1; y < h; y++) mean += E[y]; mean /= h - 1;
+  const score = ps / (mean || 1);
+  if (score < 5.5) return null;
+  return { tiles, left, right, g, W, H, score, bg };
+}
+
+let view = 'post';
+function syncMine() {
+  if (view !== 'grid') return;
+  const m = $('feedMine'); m.getContext('2d').drawImage(cv, 0, 0, m.width, m.height);
+}
+function setView(v) {
+  view = v;
+  $('stage').hidden = v !== 'post'; $('feedwrap').hidden = v !== 'grid';
+  document.querySelector('.workspace').classList.toggle('feedview', v === 'grid');
+  fitFrame(); syncMine();
+}
+document.querySelectorAll('input[name=view]').forEach(r => r.addEventListener('change', () => setView(r.value)));
+// The screenshot lives only in this tab: sliced once, never stored
+function loadShot(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const img = new Image(), url = URL.createObjectURL(file);
+  img.onload = () => {
+    const k = Math.min(1, 700 / img.naturalWidth), w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, w, h);
+    const r = findGrid(x.getImageData(0, 0, w, h).data, w, h);
+    URL.revokeObjectURL(url);
+    if (!r || !r.tiles.length) {
+      $('feedWarn').textContent = 'Не нашёл на этом скриншоте сетку постов. Нужен скриншот профиля, где видны посты целиком.';
+      $('feedWarn').hidden = false; $('feedEmpty').hidden = false; return;
+    }
+    const cells = [...document.querySelectorAll('#feed .cell')].slice(1);
+    cells.forEach((cell, i) => {
+      cell.textContent = '';
+      const t = r.tiles[i]; if (!t) return;
+      const o = document.createElement('canvas'); o.width = 360; o.height = 480;
+      const ox = o.getContext('2d'), H = t.w * 4 / 3;
+      ox.fillStyle = `rgb(${r.bg.join(',')})`; ox.fillRect(0, 0, o.width, o.height);
+      // Crop from the full-size screenshot; a cut bottom row keeps only its visible part
+      ox.drawImage(img, t.x / k, t.y / k, t.w / k, t.h / k, 0, 0, o.width, o.height * t.h / H);
+      cell.appendChild(o);
+    });
+    $('feedWarn').hidden = true; $('feedEmpty').hidden = true; $('shotReplace').hidden = false;
+  };
+  img.src = url;
+}
+$('shotPick').addEventListener('click', () => $('shotFile').click());
+$('shotReplace').addEventListener('click', () => $('shotFile').click());
+$('shotFile').addEventListener('change', e => { loadShot(e.target.files[0]); e.target.value = ''; });
+
 // ---- Fit the 3:4 preview into the workspace ----
 function fitFrame() {
   const ws = document.querySelector('.workspace'), cs = getComputedStyle(ws);
@@ -1020,6 +1183,9 @@ function fitFrame() {
   const availH = ws.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const w = Math.max(120, Math.floor(Math.min(availW, availH * 3 / 4)));
   $('frame').style.width = w + 'px'; $('frame').style.height = Math.round(w * 4 / 3) + 'px';
+  // Grid: three columns, about two and a half rows in view like on a phone
+  const cw = Math.max(80, Math.floor(Math.min((availW - 6) / 3, availH / 3.1)));
+  $('feed').style.setProperty('--cw', cw + 'px'); $('feedwrap').style.setProperty('--cw', cw + 'px');
 }
 new ResizeObserver(fitFrame).observe(document.querySelector('.workspace'));
 fitFrame();
