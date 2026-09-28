@@ -53,7 +53,11 @@ function placeInline() {
   s.left = box.x * k + 'px'; s.width = box.w * k + 'px';
   s.top = box.atBottom ? 'auto' : PAD * k + 'px';
   s.bottom = box.atBottom ? PAD * k + 'px' : 'auto';
-  s.height = 'auto'; s.height = ed.scrollHeight + 'px';
+  // Height from the canvas rows: the textarea's own scrollHeight is a few px taller,
+  // which pushed a bottom block up. Grow only if it really wraps into one more line
+  s.height = box.h * k + 'px';
+  if (ed.scrollHeight > ed.clientHeight + LH * k / 2) s.height = ed.scrollHeight + 'px';
+  ed.scrollTop = 0;
 }
 
 ed.addEventListener('input', () => {

@@ -36,7 +36,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .side.left{border-right:1px solid var(--line-t)}
 .side.right{border-left:1px solid var(--line-t)}
 .scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
-.side.right .scroll{padding-bottom:96px}
+.side.right .scroll{padding-bottom:56px}
 /* Narrow window: everything in one column, «Экспорт» stays at the bottom */
 @media (max-width:960px){
   .app{grid-template-columns:240px minmax(0,1fr)}
@@ -67,7 +67,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
 .note{padding:4px 16px;color:var(--text2)}
-.export{border-top:1px solid var(--line);border-bottom:0;flex:none}
+.export{border-top:1px solid var(--line);border-bottom:0;flex:none;padding:12px 0}
 
 /* Segmented control */
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
@@ -159,8 +159,8 @@ canvas.pannable.over-text:not(.dragging){cursor:text}
 /* «?» in the corner and the help popup */
 .helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .helpbtn svg{width:32px;height:32px;fill:currentColor}
-/* Theme button sits right above «?»: 16 + 32 + 8 */
-.themebtn{bottom:56px}
+/* Theme button sits left of «?»: 16 + 32 + 8 */
+.themebtn{right:56px}
 .themebtn svg{width:24px;height:24px}
 dialog.help{width:min(720px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15)}
 dialog.help[open]{display:flex;flex-direction:column}

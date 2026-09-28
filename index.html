@@ -49,7 +49,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .side.left{border-right:1px solid var(--line-t)}
 .side.right{border-left:1px solid var(--line-t)}
 .scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
-.side.right .scroll{padding-bottom:96px}
+.side.right .scroll{padding-bottom:56px}
 /* Narrow window: everything in one column, «Экспорт» stays at the bottom */
 @media (max-width:960px){
   .app{grid-template-columns:240px minmax(0,1fr)}
@@ -80,7 +80,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
 .note{padding:4px 16px;color:var(--text2)}
-.export{border-top:1px solid var(--line);border-bottom:0;flex:none}
+.export{border-top:1px solid var(--line);border-bottom:0;flex:none;padding:12px 0}
 
 /* Segmented control */
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
@@ -172,8 +172,8 @@ canvas.pannable.over-text:not(.dragging){cursor:text}
 /* «?» in the corner and the help popup */
 .helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .helpbtn svg{width:32px;height:32px;fill:currentColor}
-/* Theme button sits right above «?»: 16 + 32 + 8 */
-.themebtn{bottom:56px}
+/* Theme button sits left of «?»: 16 + 32 + 8 */
+.themebtn{right:56px}
 .themebtn svg{width:24px;height:24px}
 dialog.help{width:min(720px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15)}
 dialog.help[open]{display:flex;flex-direction:column}
@@ -294,10 +294,11 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
     </div>
 
     <form class="sec export" id="saveForm">
-      <div class="sec-h"><span>Экспорт</span></div>
+      <div class="sec-h" hidden><span>Экспорт</span></div>
       <div class="row" id="warnSaveRow" hidden><div class="warn" id="warnSave"></div></div>
-      <div class="row"><div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div></div>
-      <div class="row"><button class="btn primary" type="submit" id="dl">Скачать</button></div>
+      <!-- File name field: hidden for a trial, the name is automatic; export.js still handles it -->
+      <div class="row" id="fnameRow" hidden><div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div></div>
+      <div class="row"><button class="btn primary" type="submit" id="dl">Скачать PNG</button></div>
     </form>
   </aside>
 
@@ -1054,7 +1055,11 @@ function placeInline() {
   s.left = box.x * k + 'px'; s.width = box.w * k + 'px';
   s.top = box.atBottom ? 'auto' : PAD * k + 'px';
   s.bottom = box.atBottom ? PAD * k + 'px' : 'auto';
-  s.height = 'auto'; s.height = ed.scrollHeight + 'px';
+  // Height from the canvas rows: the textarea's own scrollHeight is a few px taller,
+  // which pushed a bottom block up. Grow only if it really wraps into one more line
+  s.height = box.h * k + 'px';
+  if (ed.scrollHeight > ed.clientHeight + LH * k / 2) s.height = ed.scrollHeight + 'px';
+  ed.scrollTop = 0;
 }
 
 ed.addEventListener('input', () => {

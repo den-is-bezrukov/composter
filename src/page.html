@@ -100,10 +100,11 @@ __CSS__
     </div>
 
     <form class="sec export" id="saveForm">
-      <div class="sec-h"><span>Экспорт</span></div>
+      <div class="sec-h" hidden><span>Экспорт</span></div>
       <div class="row" id="warnSaveRow" hidden><div class="warn" id="warnSave"></div></div>
-      <div class="row"><div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div></div>
-      <div class="row"><button class="btn primary" type="submit" id="dl">Скачать</button></div>
+      <!-- File name field: hidden for a trial, the name is automatic; export.js still handles it -->
+      <div class="row" id="fnameRow" hidden><div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div></div>
+      <div class="row"><button class="btn primary" type="submit" id="dl">Скачать PNG</button></div>
     </form>
   </aside>
 
