@@ -136,9 +136,6 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .filewrap .trash svg{fill:var(--text2)}
 .filewrap .trash:hover{background:var(--line-t)}
 .file:not(.add) .plus{display:none}
-/* A case has no picture panel: two columns */
-.app.case{grid-template-columns:240px minmax(0,1fr)}
-.app.case .side.right{display:none}
 .file .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .file .name{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .file .act{color:var(--text2)}
@@ -232,20 +229,6 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
 
       <div id="caseProps" hidden>
         <section class="sec">
-          <div class="sec-h"><span>Фон</span><button class="ghost" type="button" id="frameReset">Сбросить</button></div>
-          <div class="row">
-            <label class="file" id="caseDrop" for="caseFile">
-              <span class="thumb"><img id="caseThumb" alt=""></span>
-              <span class="meta"><span class="name" id="caseName">Пример.jpg</span><span class="act">Заменить</span></span>
-            </label>
-            <input type="file" id="caseFile" accept="image/*" hidden>
-          </div>
-          <div class="prop"><div class="lbl"><label for="caseZoom">Масштаб</label><span class="alert" id="warnPic" tabindex="0" role="img" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.28484 2.91497C7.06163 1.62045 8.93765 1.62055 9.71452 2.91497L13.9489 9.97063C14.7487 11.3037 13.7877 12.9999 12.2331 12.9999H3.76628C2.21179 12.9998 1.25066 11.3036 2.05046 9.97063L6.28484 2.91497ZM8.8571 3.42864C8.46857 2.78205 7.5307 2.78193 7.14226 3.42864L2.90886 10.4853L2.84343 10.6122C2.58781 11.2117 2.97823 11.9008 3.6237 11.9902L3.76628 11.9999H12.2331C13.0104 11.9999 13.4904 11.1518 13.0905 10.4853L8.8571 3.42864ZM7.99968 9.63665C8.16816 9.63665 8.31411 9.69719 8.43718 9.81829C8.56206 9.93942 8.62462 10.0855 8.62468 10.2558C8.62465 10.3712 8.59541 10.4766 8.53679 10.5712C8.48002 10.6658 8.40382 10.741 8.30925 10.7978C8.21645 10.8527 8.11332 10.8808 7.99968 10.8808C7.82741 10.8808 7.67939 10.8203 7.55632 10.6991C7.43527 10.578 7.37472 10.4299 7.37468 10.2558C7.37474 10.0855 7.43529 9.9394 7.55632 9.81829C7.67939 9.69715 7.82741 9.63667 7.99968 9.63665ZM8.00066 4.99993C8.30209 4.99993 8.54464 5.24837 8.53777 5.54973L8.46745 8.65227C8.46144 8.906 8.25353 9.10833 7.99968 9.10833C7.74568 9.10819 7.5385 8.90527 7.53288 8.65129L7.46452 5.54876C7.4581 5.24786 7.69969 5.00014 8.00066 4.99993Z"/></svg><span class="tip" id="warnPicTip"></span></span></div><input type="range" id="caseZoom" min="100" max="400" step="1" value="100" data-zero="100"></div>
-          <div class="prop"><label class="lbl" for="caseDx"><span>Горизонтальное смещение</span></label><input type="range" id="caseDx" min="0" max="0" step="1" value="0" data-zero="0"></div>
-          <div class="prop"><label class="lbl" for="caseDy"><span>Вертикальное смещение</span></label><input type="range" id="caseDy" min="0" max="0" step="1" value="0" data-zero="0"></div>
-        </section>
-
-        <section class="sec">
           <div class="sec-h"><span>Логотип</span><button class="ghost" type="button" id="logoReset" hidden>Сбросить</button></div>
           <div class="row">
             <div class="filewrap">
@@ -313,6 +296,21 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
 
   <aside class="side right" id="rightSide">
     <div class="scroll" id="props">
+      <div id="caseBg" hidden>
+        <section class="sec">
+          <div class="sec-h"><span>Фон</span><button class="ghost" type="button" id="frameReset">Сбросить</button></div>
+          <div class="row">
+            <label class="file" id="caseDrop" for="caseFile">
+              <span class="thumb"><img id="caseThumb" alt=""></span>
+              <span class="meta"><span class="name" id="caseName">Пример.jpg</span><span class="act">Заменить</span></span>
+            </label>
+            <input type="file" id="caseFile" accept="image/*" hidden>
+          </div>
+          <div class="prop"><div class="lbl"><label for="caseZoom">Масштаб</label><span class="alert" id="warnPic" tabindex="0" role="img" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.28484 2.91497C7.06163 1.62045 8.93765 1.62055 9.71452 2.91497L13.9489 9.97063C14.7487 11.3037 13.7877 12.9999 12.2331 12.9999H3.76628C2.21179 12.9998 1.25066 11.3036 2.05046 9.97063L6.28484 2.91497ZM8.8571 3.42864C8.46857 2.78205 7.5307 2.78193 7.14226 3.42864L2.90886 10.4853L2.84343 10.6122C2.58781 11.2117 2.97823 11.9008 3.6237 11.9902L3.76628 11.9999H12.2331C13.0104 11.9999 13.4904 11.1518 13.0905 10.4853L8.8571 3.42864ZM7.99968 9.63665C8.16816 9.63665 8.31411 9.69719 8.43718 9.81829C8.56206 9.93942 8.62462 10.0855 8.62468 10.2558C8.62465 10.3712 8.59541 10.4766 8.53679 10.5712C8.48002 10.6658 8.40382 10.741 8.30925 10.7978C8.21645 10.8527 8.11332 10.8808 7.99968 10.8808C7.82741 10.8808 7.67939 10.8203 7.55632 10.6991C7.43527 10.578 7.37472 10.4299 7.37468 10.2558C7.37474 10.0855 7.43529 9.9394 7.55632 9.81829C7.67939 9.69715 7.82741 9.63667 7.99968 9.63665ZM8.00066 4.99993C8.30209 4.99993 8.54464 5.24837 8.53777 5.54973L8.46745 8.65227C8.46144 8.906 8.25353 9.10833 7.99968 9.10833C7.74568 9.10819 7.5385 8.90527 7.53288 8.65129L7.46452 5.54876C7.4581 5.24786 7.69969 5.00014 8.00066 4.99993Z"/></svg><span class="tip" id="warnPicTip"></span></span></div><input type="range" id="caseZoom" min="100" max="400" step="1" value="100" data-zero="100"></div>
+          <div class="prop"><label class="lbl" for="caseDx"><span>Горизонтальное смещение</span></label><input type="range" id="caseDx" min="0" max="0" step="1" value="0" data-zero="0"></div>
+          <div class="prop"><label class="lbl" for="caseDy"><span>Вертикальное смещение</span></label><input type="range" id="caseDy" min="0" max="0" step="1" value="0" data-zero="0"></div>
+        </section>
+      </div>
       <div id="articleProps">
         <section class="sec">
           <div class="sec-h"><span>Изображение</span><button class="ghost" type="button" id="posReset">Сбросить</button></div>
@@ -825,8 +823,8 @@ function setMode(m) {
   $('fname').value = customName[m] ?? autoName();
   ['layoutRow', 'zRow', 'textSec', 'fontSec', 'articleProps'].forEach(id => { $(id).hidden = m !== 'article'; });
   if (m === 'article') fitText();
-  $('caseProps').hidden = m !== 'case';
-  $('app').classList.toggle('case', m === 'case');
+  // Case: logo on the left, background on the right, like text / picture in an article
+  ['caseProps', 'caseBg'].forEach(id => { $(id).hidden = m !== 'case'; });
   draw();
 }
 document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => setMode(r.value)));
