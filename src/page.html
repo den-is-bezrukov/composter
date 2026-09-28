@@ -1,111 +1,133 @@
 <title>Evrone Article Posts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap">
 <style>
 @font-face{font-family:"RF60";src:url(data:font/woff2;base64,__RF60__) format("woff2");font-display:block}
+/* Tokens from the Figma Post-Builder file (UI3 panels) */
 :root{
-  --bg:#F2F2F3; --surface:#FFFFFF; --ink:#141415; --muted:#66666C; --line:#DEDEE2;
-  --accent:#FF5533; --accent-ink:#FFFFFF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12; --code:#F7F7F8;
-  --radius-card:14px; --radius-drop:10px; --radius-control:8px; --radius-pill:999px;
-  --space-section:40px; --space-columns:32px; --space-card:24px; --space-fields:20px; --space-field:6px;
+  --bg:#FFFFFF; --bg2:#F5F5F5; --canvas:#F5F5F5; --seg-on:#FFFFFF;
+  --line:#E6E6E6; --line-t:rgba(0,0,0,.1);
+  --text:rgba(0,0,0,.9); --text2:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
+  --inverse:#2C2C2C; --focus:#0D99FF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
+  --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
+  --radius:5px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0C0C0D; --surface:#17171A; --ink:#EEEEEE; --muted:#9C9CA3; --line:#2B2B30;
-    --accent:#FF6A4D; --accent-ink:#0C0C0D; --warn-bg:#2A1510; --warn-ink:#FFB39F; --code:#111113;
+    --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
+    --line:#444444; --line-t:rgba(255,255,255,.1);
+    --text:rgba(255,255,255,.9); --text2:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
+    --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0C0C0D; --surface:#17171A; --ink:#EEEEEE; --muted:#9C9CA3; --line:#2B2B30;
-  --accent:#FF6A4D; --accent-ink:#0C0C0D; --warn-bg:#2A1510; --warn-ink:#FFB39F; --code:#111113;
+  --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
+  --line:#444444; --line-t:rgba(255,255,255,.1);
+  --text:rgba(255,255,255,.9); --text2:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
+  --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 "Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;overflow:hidden}
-/* Editor: controls in a sidebar, the post centred in the remaining space */
-.app{position:fixed;inset:0;display:grid;grid-template-columns:clamp(260px,24vw,340px) minmax(0,1fr) clamp(280px,24vw,340px);grid-template-rows:minmax(0,1fr) auto}
-.post-side{grid-column:1;grid-row:1}.workspace{grid-column:2;grid-row:1 / 3}.props{grid-column:3;grid-row:1 / 3;border-right:0;border-left:1px solid var(--line)}
-.seg{display:flex;gap:3px;padding:3px;background:var(--code);border:1px solid var(--line);border-radius:var(--radius-control)}
+body{background:var(--canvas);color:var(--text);font:450 11px/16px "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em;margin:0;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
+
+/* Three columns: controls 240 · preview · picture 240 */
+.app{position:fixed;inset:0;display:grid;grid-template-columns:240px minmax(0,1fr) 240px}
+.side{background:var(--bg);display:flex;flex-direction:column;min-height:0;min-width:0}
+.side.left{border-right:1px solid var(--line-t)}
+.side.right{border-left:1px solid var(--line-t)}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+.side.right .scroll{padding-bottom:56px}
+/* Narrow window: everything in one column, «Экспорт» stays at the bottom */
+@media (max-width:960px){
+  .app{grid-template-columns:240px minmax(0,1fr)}
+  .side.right{display:none}
+  .side.left .scroll{padding-bottom:12px}
+}
+
+.apphead{padding:8px 16px 12px;border-bottom:1px solid var(--line)}
+.apphead .title{font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em;height:24px;display:flex;align-items:center}
+.apphead .sub{color:var(--text2)}
+
+/* Section: 40 px header, 4 px rows, 12 px bottom padding */
+.sec{border-bottom:1px solid var(--line);padding-bottom:12px}
+.sec-h{height:40px;display:flex;align-items:center;gap:8px;padding:0 8px 0 16px;font-weight:550}
+.sec-h > span{flex:1;min-width:0}
+.row{display:flex;gap:8px;align-items:center;padding:4px 16px}
+.row > *{flex:1 1 0;min-width:0}
+.prop{display:flex;flex-direction:column;gap:8px;padding:8px 16px}
+.prop .lbl{display:flex;color:var(--text2)}
+.prop .lbl span{flex:1}
+.prop .lbl output{color:var(--text);font-variant-numeric:lining-nums tabular-nums}
+.note{padding:4px 16px;color:var(--text2)}
+.export{border-top:1px solid var(--line);border-bottom:0;flex:none}
+
+/* Segmented control */
+.seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
 .seg label{flex:1 1 0;min-width:0;display:flex}
 .seg input{position:absolute;opacity:0;pointer-events:none}
-.seg span{--cut:var(--code);flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;padding:7px 6px;border-radius:calc(var(--radius-control) - 3px);cursor:pointer;font-weight:500;font-size:14px;line-height:1.2;color:var(--muted)}
-.seg input:checked+span{--cut:var(--ink);background:var(--ink);color:var(--bg)}
-.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:1px}
-.panel-tabs{display:none}
-.seg{flex-wrap:wrap}
-.seg.grid2 label{flex:1 1 calc(50% - 3px)}
-.seg span > svg{flex:none}
-/* Narrow window: one sidebar slot, «Пост» and «Картинка» swap in it */
-@media (max-width:1100px){
-  .app{grid-template-columns:clamp(260px,34vw,340px) minmax(0,1fr)}
-  .post-side,.props{grid-column:1;grid-row:1;border-left:0;border-right:1px solid var(--line)}
-  .workspace{grid-column:2;grid-row:1 / 3}
-  .helpview{grid-column:2}
-  .panel-tabs{display:flex}
-  .app.show-props .post-side,.app:not(.show-props) .props{display:none}
-  .app.help .post-side{display:flex}
-  .app.help .panel-tabs{display:none}
-}
-.sidebar{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:var(--space-card);display:flex;flex-direction:column;gap:var(--space-fields)}
-.side-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
-.side-head .btn{white-space:nowrap}
-.workspace{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;min-width:0;min-height:0;overflow:hidden}
+.seg span{flex:1;min-width:0;height:32px;display:flex;align-items:center;justify-content:center;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);color:var(--text2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg input:checked+span{background:var(--seg-on);border-color:var(--line);color:var(--text)}
+.seg input:focus-visible+span{outline:1px solid var(--focus);outline-offset:-1px}
+.seg svg{width:24px;height:24px;flex:none;fill:currentColor}
+
+/* Buttons */
+.btn{height:32px;display:flex;align-items:center;justify-content:center;padding:4px 12px;border:1px solid var(--line-t);border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--bg2)}
+.ghost{flex:none;height:24px;padding:4px 8px;border:0;border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
+.ghost:hover:not(:disabled){background:var(--bg2)}
+.ghost:disabled{color:var(--text3);cursor:default}
+.btn:focus-visible,.ghost:focus-visible,.file:focus-within,.helpbtn:focus-visible,.icon-btn:focus-visible{outline:1px solid var(--focus);outline-offset:-1px}
+
+/* Text inputs */
+textarea,.fname{background:var(--bg2);border:0;border-radius:var(--radius)}
+textarea{display:block;width:100%;padding:8px;resize:none;min-height:48px;max-height:160px;field-sizing:content;outline:none}
+textarea:focus,.fname input:focus{outline:1px solid var(--focus);outline-offset:-1px}
+.fname{display:flex;gap:1px;background:transparent;overflow:hidden}
+.fname input,.fname .ext{background:var(--bg2);border:0;padding:8px}
+.fname input{flex:1;min-width:0;padding-right:4px;border-radius:var(--radius) 0 0 var(--radius)}
+.fname .ext{flex:none;padding-left:6px;color:var(--text3);user-select:none;border-radius:0 var(--radius) var(--radius) 0}
+
+/* Slider: 16 px track, white knob; .fill paints from the left, otherwise a tick marks the default */
+input[type=range]{--p:0;--z:.5;-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:100px;height:16px;margin:0;border-radius:999px;cursor:pointer;
+  background:radial-gradient(circle at calc(8px + (100% - 16px) * var(--z)) 50%,var(--text3) 2px,transparent 2.5px),var(--bg2);
+  box-shadow:inset 0 0 0 1px var(--line-t)}
+input[type=range].fill{background:linear-gradient(to right,var(--inverse) calc(8px + (100% - 16px) * var(--p)),transparent 0),var(--bg2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:var(--elev)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#fff;box-shadow:var(--elev)}
+input[type=range]::-moz-range-track{background:transparent}
+input[type=range]:focus-visible{outline:1px solid var(--focus);outline-offset:1px}
+
+/* Picture card: thumbnail, file name, «Заменить» */
+.file{display:flex;gap:8px;align-items:center;padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:pointer}
+.file.over{outline:1px solid var(--focus);outline-offset:-1px}
+.thumb{flex:none;width:32px;height:32px;border:1px solid var(--line-t);border-radius:2px;overflow:hidden;
+  background:repeating-conic-gradient(#E6E6E6 0 25%,#FFFFFF 0 50%) 0 0/9.36px 9.36px}
+.thumb img{display:block;width:100%;height:100%;object-fit:contain}
+.thumb.empty{background:var(--bg)}
+.file .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.file .name{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file .act{color:var(--text2)}
+
+.check{display:flex;gap:8px;align-items:center;cursor:pointer}
+.check input{width:12px;height:12px;margin:0;accent-color:var(--inverse)}
+.colorfield{display:flex;gap:8px;align-items:center;height:32px;padding:0 8px;background:var(--bg2);border-radius:var(--radius);cursor:pointer}
+.colorfield input{width:16px;height:16px;padding:0;border:1px solid var(--line-t);border-radius:2px;background:none;cursor:pointer}
+.colorfield input::-webkit-color-swatch-wrapper{padding:0}
+.colorfield input::-webkit-color-swatch{border:0;border-radius:1px}
+.colorfield input::-moz-color-swatch{border:0;border-radius:1px}
+.colorfield span{text-transform:uppercase;font-variant-numeric:tabular-nums}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px}
+
+/* Preview */
+.workspace{display:flex;align-items:center;justify-content:center;padding:45px 40px;min-width:0;min-height:0;overflow:hidden;background:var(--canvas)}
 .stage{flex:none;display:flex;align-items:center;justify-content:center}
-#dl{white-space:nowrap;flex:none}
 .frame{position:relative}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
-.savebar{grid-column:1;grid-row:2;display:flex;flex-wrap:wrap;gap:8px;padding:14px var(--space-card);background:var(--surface);border-right:1px solid var(--line);border-top:1px solid var(--line)}
-.savebar .fname{flex:1 1 150px;min-width:0}
-.savebar .warn{flex:1 1 100%}
-.fname{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface)}
-.fname input{border:0;background:transparent;color:var(--ink);font:inherit;padding:10px 0 10px 12px;flex:1;min-width:0}
-.fname .ext{padding:10px 12px 10px 1px;color:var(--muted);user-select:none}
-.linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-#colorBox .inner{display:flex;flex-direction:column;gap:10px}
-.slider.wide{grid-template-columns:118px 1fr 44px}
-.helpview{grid-column:2 / 4;grid-row:1 / 3;overflow-y:auto;background:var(--surface);min-width:0}
-.app.help .workspace,.app.help .props{display:none}
-.help-body{padding:32px;max-width:900px;display:flex;flex-direction:column;gap:32px}
-.help-body section{display:flex;flex-direction:column;gap:12px}
-.help-body h3{font:800 22px/1 "RF60","Roboto Flex",sans-serif;text-transform:uppercase;letter-spacing:.01em;margin:0}
-h1,h2{font-family:"RF60","Roboto Flex",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1;margin:0;text-wrap:balance}
-h1{font-size:clamp(44px,8vw,84px)}
-h2{font-size:32px}
-.lead{color:var(--muted);max-width:62ch;margin:12px 0 0}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:0;padding:0;list-style:none;counter-reset:s}
-.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-drop);padding:14px 16px;display:flex;gap:12px}
-.steps li::before{content:counter(s);font:800 28px/1 "RF60",sans-serif;color:var(--accent)}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);padding:var(--space-card)}
-.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--radius-control);padding:10px 16px;cursor:pointer}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn:focus-visible,.chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
-pre{background:var(--code);border:1px solid var(--line);border-radius:var(--radius-control);padding:16px;overflow-x:auto;white-space:pre-wrap;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0;max-height:360px;overflow-y:auto}
-.field{display:flex;flex-direction:column;gap:var(--space-field)}
-.label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.hint{font-size:13px;color:var(--muted)}
-textarea{font:800 22px/1.05 "RF60",sans-serif;text-transform:uppercase;letter-spacing:.01em;background:var(--code);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-control);padding:10px 12px;resize:vertical;min-height:70px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip input{position:absolute;opacity:0;pointer-events:none}
-.chip span{--cut:var(--surface);display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:var(--radius-pill);padding:7px 14px;cursor:pointer;font-weight:500}
-.zicon{width:18px;height:24px;flex:none}
-.zicon .t{fill:currentColor}
-.zicon .o{fill:var(--accent)}
-.zicon *{stroke:var(--cut);stroke-width:1.6px;paint-order:stroke}
-.chip input:checked+span{--cut:var(--ink);background:var(--ink);color:var(--bg);border-color:var(--ink)}
-input[type=range]{width:100%;accent-color:var(--accent)}
-.slider{display:grid;grid-template-columns:90px 1fr 48px;gap:10px;align-items:center;font-size:14px}
-.slider output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
-.drop{border:1.5px dashed var(--line);border-radius:var(--radius-drop);padding:14px;text-align:center;cursor:pointer;color:var(--muted)}
-.drop.over{border-color:var(--accent);color:var(--ink)}
-.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius-control);padding:10px 14px;font-size:14px}
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 32px;margin:0;padding:0;list-style:none}
-.rules li{border-top:1px solid var(--line);padding-top:10px}
-.rules b{display:block}
-.pane{display:flex;flex-direction:column;gap:var(--space-fields)}
 canvas.pannable{cursor:grab;touch-action:none}
 canvas.pannable.dragging{cursor:grabbing}
 .grid{position:absolute;inset:0;pointer-events:none;
@@ -113,64 +135,108 @@ canvas.pannable.dragging{cursor:grabbing}
   background:
     linear-gradient(to right,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px)),
     linear-gradient(to bottom,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
-.btns{display:flex;flex-wrap:wrap;gap:8px}
-.check{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
-.check input{width:16px;height:16px;accent-color:var(--accent)}
-.colorrow{display:flex;gap:10px;align-items:center;font-size:14px}
-input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-radius:var(--radius-control);background:var(--surface);padding:2px;cursor:pointer}
-.status{font-size:14px;color:var(--muted);min-height:1.5em;text-align:center}
+
+/* «?» in the corner and the help popup */
+.helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.helpbtn svg{width:32px;height:32px;fill:currentColor}
+dialog.help{width:min(720px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15)}
+dialog.help[open]{display:flex;flex-direction:column}
+dialog.help::backdrop{background:rgba(0,0,0,.3)}
+.dlg-h{flex:none;height:48px;display:flex;align-items:center;gap:8px;padding:0 8px 0 16px;border-bottom:1px solid var(--line)}
+.dlg-h h2{flex:1;margin:0;font-size:13px;line-height:22px;font-weight:550}
+.icon-btn{width:32px;height:32px;padding:0;border:0;border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{background:var(--bg2)}
+.icon-btn svg{width:24px;height:24px;fill:currentColor}
+.dlg-b{overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:24px;font-size:13px;line-height:20px}
+.dlg-b section{display:flex;flex-direction:column;gap:8px}
+.dlg-b h3{margin:0;font-size:13px;line-height:20px;font-weight:600}
+.dlg-b p{margin:0}
+.dlg-b .muted{color:var(--text2)}
+.dlg-head{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.dlg-head .btn{flex:none}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.steps li{counter-increment:s;background:var(--bg2);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:4px}
+.steps li::before{content:counter(s);font-weight:600}
+.rules{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 24px}
+.rules li{border-top:1px solid var(--line);padding-top:8px}
+.rules b{display:block;font-weight:600}
+pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);border-radius:var(--radius);white-space:pre-wrap;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Icons from the Figma file: circle = picture, bars = text -->
+  <symbol id="i-top" viewBox="0 0 24 24"><path d="M12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9ZM17.5 5C17.7761 5 18 5.22386 18 5.5C18 5.77614 17.7761 6 17.5 6H6.5C6.22386 6 6 5.77614 6 5.5C6 5.22386 6.22386 5 6.5 5H17.5Z"/></symbol>
+  <symbol id="i-sandwich" viewBox="0 0 24 24"><path d="M17.5 18C17.7761 18 18 18.2239 18 18.5C18 18.7761 17.7761 19 17.5 19H6.5C6.22386 19 6 18.7761 6 18.5C6 18.2239 6.22386 18 6.5 18H17.5ZM12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9ZM17.5 5C17.7761 5 18 5.22386 18 5.5C18 5.77614 17.7761 6 17.5 6H6.5C6.22386 6 6 5.77614 6 5.5C6 5.22386 6.22386 5 6.5 5H17.5Z"/></symbol>
+  <symbol id="i-bottom" viewBox="0 0 24 24"><path d="M17.5 18C17.7761 18 18 18.2239 18 18.5C18 18.7761 17.7761 19 17.5 19H6.5C6.22386 19 6 18.7761 6 18.5C6 18.2239 6.22386 18 6.5 18H17.5ZM12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"/></symbol>
+  <symbol id="i-under" viewBox="0 0 24 24"><path d="M17.5 15C17.7761 15 18 15.2239 18 15.5C18 15.7761 17.7761 16 17.5 16H6.5C6.22386 16 6 15.7761 6 15.5C6 15.2239 6.22386 15 6.5 15H17.5ZM9.76855 10C9.29228 10.531 9 11.2305 9 12C9 12.7695 9.29228 13.469 9.76855 14H8.53613C8.19564 13.4116 8 12.7288 8 12C8 11.2712 8.19564 10.5884 8.53613 10H9.76855ZM15.4639 10C15.8044 10.5884 16 11.2712 16 12C16 12.7288 15.8044 13.4116 15.4639 14H14.2314C14.7077 13.469 15 12.7695 15 12C15 11.2305 14.7077 10.531 14.2314 10H15.4639ZM17.5 8C17.7761 8 18 8.22386 18 8.5C18 8.77614 17.7761 9 17.5 9H6.5C6.22386 9 6 8.77614 6 8.5C6 8.22386 6.22386 8 6.5 8H17.5Z"/></symbol>
+  <symbol id="i-over" viewBox="0 0 24 24"><path d="M8 15C8.28445 15.3787 8.62134 15.7156 9 16H6.5C6.22386 16 6 15.7761 6 15.5C6 15.2239 6.22386 15 6.5 15H8ZM12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8ZM17.5 15C17.7761 15 18 15.2239 18 15.5C18 15.7761 17.7761 16 17.5 16H15C15.3787 15.7156 15.7156 15.3787 16 15H17.5ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9ZM9 8C8.62134 8.28445 8.28445 8.62134 8 9H6.5C6.22386 9 6 8.77614 6 8.5C6 8.22386 6.22386 8 6.5 8H9ZM17.5 8C17.7761 8 18 8.22386 18 8.5C18 8.77614 17.7761 9 17.5 9H16C15.7156 8.62134 15.3787 8.28445 15 8H17.5Z"/></symbol>
+  <symbol id="i-overBottom" viewBox="0 0 24 24"><path d="M8 15C8.28445 15.3787 8.62134 15.7156 9 16H6.5C6.22386 16 6 15.7761 6 15.5C6 15.2239 6.22386 15 6.5 15H8ZM9.76855 10C9.29228 10.531 9 11.2305 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 11.2305 14.7077 10.531 14.2314 10H15.4639C15.8044 10.5884 16 11.2712 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 11.2712 8.19564 10.5884 8.53613 10H9.76855ZM17.5 15C17.7761 15 18 15.2239 18 15.5C18 15.7761 17.7761 16 17.5 16H15C15.3787 15.7156 15.7156 15.3787 16 15H17.5ZM17.5 8C17.7761 8 18 8.22386 18 8.5C18 8.77614 17.7761 9 17.5 9H6.5C6.22386 9 6 8.77614 6 8.5C6 8.22386 6.22386 8 6.5 8H17.5Z"/></symbol>
+  <symbol id="i-overTop" viewBox="0 0 24 24"><path d="M8 9C8.28445 8.62134 8.62134 8.28445 9 8H6.5C6.22386 8 6 8.22386 6 8.5C6 8.77614 6.22386 9 6.5 9H8ZM9.76855 14C9.29228 13.469 9 12.7695 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12C15 12.7695 14.7077 13.469 14.2314 14H15.4639C15.8044 13.4116 16 12.7288 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 12.7288 8.19564 13.4116 8.53613 14H9.76855ZM17.5 9C17.7761 9 18 8.77614 18 8.5C18 8.22386 17.7761 8 17.5 8H15C15.3787 8.28445 15.7156 8.62134 16 9H17.5ZM17.5 16C17.7761 16 18 15.7761 18 15.5C18 15.2239 17.7761 15 17.5 15H6.5C6.22386 15 6 15.2239 6 15.5C6 15.7761 6.22386 16 6.5 16H17.5Z"/></symbol>
+</svg>
+
 <div class="app" id="app">
-  <aside class="sidebar post-side">
-    <div class="seg" role="radiogroup" aria-label="Шаблон">
-      <label><input type="radio" name="mode" id="mode-article" value="article" checked><span>Статья</span></label>
-      <label><input type="radio" name="mode" id="mode-case" value="case"><span>Кейс</span></label>
-      <label><input type="radio" name="mode" id="mode-help" value="help"><span>Помощь</span></label>
-    </div>
-    <div class="seg panel-tabs" role="radiogroup" aria-label="Панель">
-      <label><input type="radio" name="panelL" value="post"><span>Текст</span></label>
-      <label><input type="radio" name="panelL" value="props"><span>Картинка</span></label>
-    </div>
-      <div class="pane" id="articleText">
-        <div class="field">
-          <span class="label">Раскладка</span>
+  <aside class="side left">
+    <div class="scroll" id="leftScroll">
+      <header class="apphead">
+        <div class="title">Evrone Post</div>
+        <div class="sub">Instagram · 1080×1440</div>
+      </header>
+
+      <section class="sec">
+        <div class="sec-h"><span>Шаблон</span></div>
+        <div class="row">
+          <div class="seg" role="radiogroup" aria-label="Шаблон">
+            <label><input type="radio" name="mode" value="article" checked><span>Статья</span></label>
+            <label><input type="radio" name="mode" value="case"><span>Кейс</span></label>
+          </div>
+        </div>
+        <div class="row" id="layoutRow">
           <div class="seg" role="radiogroup" aria-label="Раскладка">
-            <label><input type="radio" name="layout" id="lay-top" value="top" checked><span>Сверху</span></label>
-            <label><input type="radio" name="layout" id="lay-bottom" value="bottom"><span>Снизу</span></label>
-            <label><input type="radio" name="layout" id="lay-sandwich" value="sandwich"><span>Сэндвич</span></label>
+            <label title="Текст сверху"><input type="radio" name="layout" value="top" checked aria-label="Текст сверху"><span><svg><use href="#i-top"/></svg></span></label>
+            <label title="Сэндвич: текст сверху и снизу"><input type="radio" name="layout" value="sandwich" aria-label="Сэндвич"><span><svg><use href="#i-sandwich"/></svg></span></label>
+            <label title="Текст снизу"><input type="radio" name="layout" value="bottom" aria-label="Текст снизу"><span><svg><use href="#i-bottom"/></svg></span></label>
           </div>
         </div>
-
-        <div class="field">
-          <label class="label" for="t1" id="t1label">Заголовок</label>
-          <textarea id="t1" rows="3" spellcheck="false">Новый пост Evrone</textarea>
-          <span class="hint">Просто пишите текст: строки переносятся сами. Хорошо, когда заголовок укладывается в две строки.</span>
+        <div class="row" id="zRow">
+          <div class="seg" role="radiogroup" aria-label="Слой картинки">
+            <label title="Картинка под текстом"><input type="radio" name="z" id="z-under" value="under" checked aria-label="Картинка под текстом"><span><svg><use href="#i-under"/></svg></span></label>
+            <label title="Картинка над текстом"><input type="radio" name="z" value="over" aria-label="Картинка над текстом"><span><svg><use href="#i-over"/></svg></span></label>
+            <label title="Картинка над нижним текстом" id="zc-overBottom"><input type="radio" name="z" value="overBottom" aria-label="Картинка над нижним текстом"><span><svg><use href="#i-overBottom"/></svg></span></label>
+            <label title="Картинка над верхним текстом" id="zc-overTop"><input type="radio" name="z" value="overTop" aria-label="Картинка над верхним текстом"><span><svg><use href="#i-overTop"/></svg></span></label>
+          </div>
         </div>
+      </section>
 
-        <div class="warn" id="warnText" hidden></div>
+      <section class="sec" id="textSec">
+        <div class="sec-h"><span>Текст</span></div>
+        <div class="row"><textarea id="t1" rows="2" spellcheck="false" aria-label="Заголовок">Новый пост Evrone</textarea></div>
+        <div class="note" id="sandwichNote" hidden>Enter делит текст на верх и низ. Без Enter текст делится пополам сам.</div>
+        <div class="row" id="warnTextRow" hidden><div class="warn" id="warnText"></div></div>
+        <div class="row"><button class="btn" type="button" id="nbsp" title="Не даёт разорвать слова по разным строкам, например «AI AGENT». Поставьте курсор между словами и нажмите. На Mac то же делает ⌥+Пробел, на Windows Alt+0160.">Вставить неразрывный пробел</button></div>
+      </section>
 
-        <div class="field" id="t2field" hidden>
-          <label class="label" for="t2">Вторая часть (снизу)</label>
-          <textarea id="t2" rows="3" spellcheck="false"></textarea>
-        </div>
-
-        <div class="field">
-          <div><button class="btn" type="button" id="nbsp">Вставить неразрывный пробел</button></div>
-          <span class="hint">Неразрывный пробел не даёт разорвать слова по разным строкам, например «AI&nbsp;AGENT». Поставьте курсор между словами вместо обычного пробела и нажмите кнопку. На Mac то же самое делает ⌥+Пробел, на Windows Alt+0160.</span>
-        </div>
-
-        <div class="field">
-          <span class="label">Шрифт</span>
+      <section class="sec" id="fontSec">
+        <div class="sec-h"><span>Шрифт</span></div>
+        <div class="row">
           <div class="seg" role="radiogroup" aria-label="Шрифт">
-            <label><input type="radio" name="wd" id="wd-auto" value="auto" checked><span>Авто</span></label>
-            <label><input type="radio" name="wd" id="wd-narrow" value="narrow"><span>Настроить</span></label>
+            <label><input type="radio" name="wd" value="auto" checked><span>По умолчанию</span></label>
+            <label><input type="radio" name="wd" value="narrow"><span>Настроить</span></label>
           </div>
-          <div class="slider" id="narrowRow" hidden><label for="narrow">Ширина</label><input type="range" id="narrow" min="25" max="60" step="1" value="52"><output id="narrowOut">52</output></div>
-          <span class="hint">Сужайте, если длинное слово не помещается или заголовок не укладывается в две строки. Меньше всего шрифт сужается на 25.</span>
         </div>
-      </div>
+        <div class="prop" id="narrowRow" hidden>
+          <label class="lbl" for="narrow"><span>Ширина букв</span><output id="narrowOut">52</output></label>
+          <input type="range" class="fill" id="narrow" min="25" max="60" step="1" value="52">
+        </div>
+      </section>
+    </div>
+
+    <form class="sec export" id="saveForm">
+      <div class="sec-h"><span>Экспорт</span></div>
+      <div class="row" id="warnSaveRow" hidden><div class="warn" id="warnSave"></div></div>
+      <div class="row"><div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div></div>
+      <div class="row"><button class="btn" type="submit" id="dl">Скачать</button></div>
+    </form>
   </aside>
 
   <main class="workspace">
@@ -182,146 +248,142 @@ input[type=color]{width:44px;height:34px;border:1px solid var(--line);border-rad
     </div>
   </main>
 
-  <form class="savebar" id="saveForm">
-    <div class="warn" id="warnSave" hidden></div>
-    <div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div>
-    <button class="btn primary" type="submit" id="dl">Скачать PNG</button>
-  </form>
+  <aside class="side right" id="rightSide">
+    <div class="scroll" id="props">
+      <div id="articleProps">
+        <section class="sec">
+          <div class="sec-h"><span>Изображение</span></div>
+          <div class="row">
+            <label class="file" id="drop" for="file">
+              <span class="thumb"><img id="fileThumb" alt=""></span>
+              <span class="meta"><span class="name" id="fileName">Пример.webp</span><span class="act">Заменить</span></span>
+            </label>
+            <input type="file" id="file" accept="image/*" hidden>
+          </div>
+          <div class="row"><button class="btn" type="button" id="copyPromptSide">Скопировать промпт стиля</button></div>
+        </section>
 
-  <aside class="sidebar props">
-    <div class="seg panel-tabs" role="radiogroup" aria-label="Панель">
-      <label><input type="radio" name="panelR" value="post"><span>Текст</span></label>
-      <label><input type="radio" name="panelR" value="props"><span>Картинка</span></label>
+        <section class="sec">
+          <div class="sec-h"><span>Коррекция цвета</span><button class="ghost" type="button" id="colorReset">Сбросить</button></div>
+          <div class="prop"><label class="lbl" for="cHue"><span>Оттенок красного</span></label><input type="range" class="fill" id="cHue" min="0" max="15" step="0.5" value="0"></div>
+          <div class="prop"><label class="lbl" for="cSat"><span>Насыщенность</span></label><input type="range" id="cSat" min="50" max="120" step="1" value="100" data-zero="100"></div>
+          <div class="prop"><label class="lbl" for="cVal"><span>Яркость</span></label><input type="range" id="cVal" min="80" max="150" step="1" value="100" data-zero="100"></div>
+          <div class="prop"><label class="lbl" for="cCast"><span>Почистить белый и металл</span></label><input type="range" class="fill" id="cCast" min="0" max="100" step="1" value="0"></div>
+          <div class="prop"><label class="lbl" for="cFeather"><span>Размытие маски</span></label><input type="range" class="fill" id="cFeather" min="0" max="10" step="1" value="3"></div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><span>Положение</span><button class="ghost" type="button" id="posReset">Сбросить</button></div>
+          <div class="prop"><label class="lbl" for="size"><span>Размер</span></label><input type="range" id="size" min="400" max="1800" step="10"></div>
+          <div class="prop"><label class="lbl" for="dx"><span>X, Левее/Правее</span></label><input type="range" id="dx" min="-400" max="400" step="5" value="0" data-zero="0"></div>
+          <div class="prop"><label class="lbl" for="dy"><span>Y, Выше/Ниже</span></label><input type="range" id="dy" min="-500" max="500" step="5" value="0" data-zero="0"></div>
+        </section>
+      </div>
+
+      <div id="caseProps" hidden>
+        <section class="sec">
+          <div class="sec-h"><span>Изображение</span></div>
+          <div class="row">
+            <label class="file" id="caseDrop" for="caseFile">
+              <span class="thumb"><img id="caseThumb" alt=""></span>
+              <span class="meta"><span class="name" id="caseName">Пример.jpg</span><span class="act">Заменить</span></span>
+            </label>
+            <input type="file" id="caseFile" accept="image/*" hidden>
+          </div>
+          <div class="row" id="warnPicRow" hidden><div class="warn" id="warnPic"></div></div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><span>Кадр</span><button class="ghost" type="button" id="frameReset">Сбросить</button></div>
+          <div class="note">Двигайте картинку мышью прямо на превью, колёсиком меняйте масштаб.</div>
+          <div class="prop"><label class="lbl" for="caseZoom"><span>Масштаб</span></label><input type="range" class="fill" id="caseZoom" min="50" max="400" step="1" value="100"></div>
+          <div class="row"><label class="check"><input type="checkbox" id="noGaps" checked>Без пустых краёв</label></div>
+          <div class="row"><button class="btn" type="button" id="caseFit">Вписать целиком</button></div>
+        </section>
+
+        <section class="sec" id="bgSec">
+          <div class="sec-h"><span>Фон</span></div>
+          <div class="row">
+            <div class="seg" role="radiogroup" aria-label="Фон под пустыми краями">
+              <label><input type="radio" name="bg" value="color" checked><span>Цвет</span></label>
+              <label><input type="radio" name="bg" value="blur"><span>Размытая картинка</span></label>
+            </div>
+          </div>
+          <div class="row" id="bgColorRow"><label class="colorfield"><input type="color" id="bgColor" value="#000000" aria-label="Цвет фона"><span id="bgColorHex">000000</span></label></div>
+          <div class="note">Фон виден, если выключить «Без пустых краёв» или вписать картинку целиком. Цвет подбирается по краям картинки.</div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><span>Логотип</span><button class="ghost" type="button" id="logoRemove" hidden>Убрать</button><button class="ghost" type="button" id="logoReset" hidden>Сбросить</button></div>
+          <div class="row">
+            <label class="file" id="logoDrop" for="logoFile">
+              <span class="thumb empty"><img id="logoThumb" alt="" hidden></span>
+              <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">SVG или PNG с прозрачным фоном</span></span>
+            </label>
+            <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
+          </div>
+          <div id="logoControls" hidden>
+            <div class="row">
+              <div class="seg" role="radiogroup" aria-label="Цвет логотипа">
+                <label><input type="radio" name="tint" value="orig" checked><span>Как есть</span></label>
+                <label><input type="radio" name="tint" value="#FFFFFF"><span>Белый</span></label>
+                <label><input type="radio" name="tint" value="#000000"><span>Чёрный</span></label>
+              </div>
+            </div>
+            <div class="prop"><label class="lbl" for="lSize"><span>Размер</span></label><input type="range" id="lSize" min="100" max="1020" step="10" value="540" data-zero="540"></div>
+            <div class="prop"><label class="lbl" for="lDx"><span>X, Левее/Правее</span></label><input type="range" id="lDx" min="-500" max="500" step="5" value="0" data-zero="0"></div>
+            <div class="prop"><label class="lbl" for="lDy"><span>Y, Выше/Ниже</span></label><input type="range" id="lDy" min="-700" max="700" step="5" value="0" data-zero="0"></div>
+          </div>
+        </section>
+      </div>
     </div>
-      <div class="pane" id="articleProps">
-        <div class="field">
-          <span class="label">Иллюстрация</span>
-          <label class="drop" id="drop" for="file">Перетащите картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
-          <input type="file" id="file" accept="image/*" hidden>
-          <div class="btns"><button class="btn" type="button" id="copyPromptSide">Скопировать промпт для ChatGPT</button></div>
-          <span class="hint" id="copyStatusSide">Промпт рисует иллюстрацию в стиле Evrone. Подробнее — в «Помощи».</span>
-        </div>
-
-        <div class="field">
-          <span class="label">Положение картинки</span>
-          <div class="slider"><label for="size">Размер</label><input type="range" id="size" min="400" max="1800" step="10"><output id="sizeOut"></output></div>
-          <div class="slider"><label for="dy">Вверх/вниз</label><input type="range" id="dy" min="-500" max="500" step="5"><output id="dyOut"></output></div>
-          <div class="slider"><label for="dx">Влево/вправо</label><input type="range" id="dx" min="-400" max="400" step="5"><output id="dxOut"></output></div>
-          <button class="btn" type="button" id="reset">Сбросить положение</button>
-        </div>
-
-        <div class="field">
-          <span class="label">Слой картинки</span>
-          <div class="seg grid2" role="radiogroup" aria-label="Слой картинки">
-            <label id="zc-under"><input type="radio" name="z" id="z-under" value="under" checked><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Под текстом</span></label>
-            <label id="zc-overTop" hidden><input type="radio" name="z" id="z-overTop" value="overTop"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/></svg>Над верхним</span></label>
-            <label id="zc-overBottom" hidden><input type="radio" name="z" id="z-overBottom" value="overBottom"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/><rect class="t" x="1" y="2" width="16" height="6" rx="1"/></svg>Над нижним</span></label>
-            <label id="zc-over"><input type="radio" name="z" id="z-over" value="over"><span><svg class="zicon" viewBox="0 0 18 24" aria-hidden="true"><rect class="t" x="1" y="2" width="16" height="6" rx="1"/><rect class="t" x="1" y="16" width="16" height="6" rx="1"/><circle class="o" cx="9" cy="12" r="6.5"/></svg>Над текстом</span></label>
-          </div>
-        </div>
-
-        <div class="field" id="colorBox">
-          <span class="label">Цвет иллюстрации</span>
-          <div class="inner">
-            <div class="slider wide"><label for="cHue">Оттенок красных</label><input type="range" id="cHue" min="0" max="15" step="0.5" value="0"><output id="cHueOut"></output></div>
-            <div class="slider wide"><label for="cSat">Насыщенность</label><input type="range" id="cSat" min="50" max="120" step="1" value="100"><output id="cSatOut"></output></div>
-            <div class="slider wide"><label for="cVal">Яркость</label><input type="range" id="cVal" min="80" max="150" step="1" value="100"><output id="cValOut"></output></div>
-            <div class="slider wide"><label for="cCast">Убрать желтизну</label><input type="range" id="cCast" min="0" max="100" step="1" value="0"><output id="cCastOut"></output></div>
-            <div class="slider wide"><label for="cFeather">Растушёвка маски</label><input type="range" id="cFeather" min="0" max="10" step="1" value="3"><output id="cFeatherOut"></output></div>
-            <span class="hint">Меняются только яркие красные и тёплый налёт на стекле и металле. Зажмите превью, чтобы увидеть оригинал. <button class="linkbtn" type="button" id="colorReset">Сбросить</button></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="pane" id="caseProps" hidden>
-        <div class="field">
-          <span class="label">Картинка</span>
-          <label class="drop" id="caseDrop" for="caseFile">Перетащите готовую картинку сюда, вставьте её (Ctrl/⌘+V) или нажмите, чтобы выбрать файл</label>
-          <input type="file" id="caseFile" accept="image/*" hidden>
-          <div class="warn" id="warnPic" hidden></div>
-        </div>
-
-        <div class="field">
-          <span class="label">Кадр</span>
-          <span class="hint">Двигайте картинку мышью или пальцем прямо на превью. Колёсиком мыши или щипком меняйте масштаб.</span>
-          <div class="slider"><label for="caseZoom">Масштаб</label><input type="range" id="caseZoom" min="50" max="400" step="1" value="100"><output id="caseZoomOut"></output></div>
-          <div class="btns">
-            <button class="btn" type="button" id="caseFill">Заполнить</button>
-            <button class="btn" type="button" id="caseFit">Вписать целиком</button>
-            <button class="btn" type="button" id="caseCenter">По центру</button>
-          </div>
-          <label class="check"><input type="checkbox" id="noGaps" checked>Без пустых краёв</label>
-        </div>
-
-        <div class="field">
-          <span class="label">Фон под пустыми краями</span>
-          <div class="chips" role="radiogroup">
-            <label class="chip"><input type="radio" name="bg" id="bg-color" value="color" checked><span>Цвет</span></label>
-            <label class="chip"><input type="radio" name="bg" id="bg-blur" value="blur"><span>Размытая картинка</span></label>
-          </div>
-          <div class="colorrow" id="bgColorRow"><input type="color" id="bgColor" value="#000000"><label for="bgColor">Цвет подбирается по краям картинки, его можно поменять</label></div>
-          <span class="hint">Фон виден, только если выключить «Без пустых краёв» или нажать «Вписать целиком».</span>
-        </div>
-
-        <div class="field">
-          <span class="label">Логотип клиента</span>
-          <label class="drop" id="logoDrop" for="logoFile">Перетащите логотип сюда (SVG или PNG с прозрачным фоном) или нажмите, чтобы выбрать файл</label>
-          <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
-          <div id="logoControls" class="pane" hidden>
-            <div class="chips" role="radiogroup">
-              <label class="chip"><input type="radio" name="tint" id="tint-orig" value="orig" checked><span>Как есть</span></label>
-              <label class="chip"><input type="radio" name="tint" id="tint-white" value="#FFFFFF"><span>Белый</span></label>
-              <label class="chip"><input type="radio" name="tint" id="tint-black" value="#000000"><span>Чёрный</span></label>
-            </div>
-            <div>
-              <div class="slider"><label for="lSize">Размер</label><input type="range" id="lSize" min="100" max="1020" step="10" value="540"><output id="lSizeOut"></output></div>
-              <div class="slider"><label for="lDy">Вверх/вниз</label><input type="range" id="lDy" min="-700" max="700" step="5" value="0"><output id="lDyOut"></output></div>
-              <div class="slider"><label for="lDx">Влево/вправо</label><input type="range" id="lDx" min="-500" max="500" step="5" value="0"><output id="lDxOut"></output></div>
-            </div>
-            <div class="btns">
-              <button class="btn" type="button" id="logoReset">По центру</button>
-              <button class="btn" type="button" id="logoRemove">Убрать логотип</button>
-            </div>
-          </div>
-        </div>
-      </div>
   </aside>
+</div>
 
-  <section class="helpview" id="help" hidden aria-label="Помощь">
-  <div class="help-body">
+<button class="helpbtn" type="button" id="helpBtn" aria-label="Помощь" title="Помощь">
+  <svg viewBox="8 5 32 32" aria-hidden="true"><path d="M23.9999 27.1504C24.4694 27.1504 24.8495 27.5306 24.8495 28C24.8495 28.4694 24.4693 28.8496 23.9999 28.8496C23.5305 28.8496 23.1503 28.4694 23.1503 28C23.1503 27.5306 23.5305 27.1504 23.9999 27.1504ZM24.2665 14C25.4408 14 26.4862 14.383 27.2431 15.0781C28.0033 15.7764 28.4442 16.7645 28.4443 17.9111C28.4443 18.7366 28.2603 19.4298 27.8915 20.0381C27.5271 20.6392 27.0008 21.1258 26.3661 21.5713C25.542 22.1496 25.105 22.555 24.8525 23.0117C24.6035 23.462 24.4999 24.0249 24.4999 25H23.4999C23.4999 23.9751 23.6027 23.2035 23.9765 22.5273C24.3467 21.8579 24.9491 21.3437 25.7909 20.7529C26.3628 20.3516 26.7695 19.9591 27.036 19.5195C27.2983 19.0871 27.4443 18.5781 27.4443 17.9111C27.4442 17.0325 27.1118 16.3154 26.5663 15.8145C26.0174 15.3104 25.2241 15 24.2665 15C23.291 15 22.4035 15.2811 21.7685 15.8311C21.1448 16.3714 20.7157 17.213 20.7157 18.4443H19.7157C19.7157 16.9579 20.2458 15.8274 21.1142 15.0752C21.9715 14.3327 23.1102 14 24.2665 14Z"/></svg>
+</button>
+
+<dialog class="help" id="help" aria-labelledby="helpTitle">
+  <div class="dlg-h">
+    <h2 id="helpTitle">Помощь</h2>
+    <button class="icon-btn" type="button" id="helpClose" aria-label="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.35 6.65 12 11.29l4.65-4.64.7.7L12.71 12l4.64 4.65-.7.7L12 12.71l-4.65 4.64-.7-.7L11.29 12 6.65 7.35l.7-.7Z"/></svg></button>
+  </div>
+  <div class="dlg-b">
     <section>
       <h3>Как сделать пост</h3>
-    <ol class="steps">
-    <li><div>Придумайте объект: метафору темы статьи. Например, мозг из микросхем для статьи про AI-ассистента.</div></li>
-    <li><div>Нажмите «Скопировать промпт для ChatGPT» в конструкторе, вставьте промпт в ChatGPT и впишите объект в строку «НАРИСУЙ». Чтобы перерисовать готовую картинку, приложите её к сообщению.</div></li>
-    <li><div>Скачайте картинку и перетащите её в конструктор. Впишите заголовок и выберите раскладку.</div></li>
-    <li><div>Нажмите «Скачать PNG» и получите готовый пост 1080×1440.</div></li>
-    </ol>
+      <ol class="steps">
+        <li>Придумайте объект: метафору темы статьи. Например, мозг из микросхем для статьи про AI-ассистента.</li>
+        <li>Нажмите «Скопировать промпт стиля», вставьте промпт в ChatGPT и впишите объект в строку «НАРИСУЙ». Чтобы перерисовать готовую картинку, приложите её к сообщению.</li>
+        <li>Скачайте картинку и перетащите её в конструктор. Впишите заголовок и выберите раскладку.</li>
+        <li>Нажмите «Скачать» и получите готовый пост 1080×1440.</li>
+      </ol>
     </section>
     <section>
-      <div class="row">
+      <div class="dlg-head">
         <h3>Промпт для иллюстрации</h3>
-        <button class="btn primary" id="copyPrompt" type="button">Скопировать промпт</button>
+        <button class="btn" id="copyPrompt" type="button">Скопировать промпт</button>
       </div>
-      <p class="hint" id="copyStatus" style="margin:0">Вставьте промпт в ChatGPT и в первой строке после «НАРИСУЙ» опишите, что нарисовать. Если нужно перерисовать готовую картинку в этом стиле, приложите её к сообщению. ChatGPT вернёт квадратный PNG с прозрачным фоном.</p>
+      <p class="muted" id="copyStatus">Вставьте промпт в ChatGPT и в первой строке после «НАРИСУЙ» опишите, что нарисовать. Если нужно перерисовать готовую картинку в этом стиле, приложите её к сообщению. ChatGPT вернёт квадратный PNG с прозрачным фоном.</p>
       <pre id="promptText"></pre>
     </section>
     <section>
       <h3>Правила хорошего поста</h3>
-    <ul class="rules">
-      <li><b>Заголовок в две строки</b>По 2–3 слова в строке, разбивать по смыслу: «MIGRATING / TO RUST». Если текст длинный, выберите «Сэндвич» и поделите его на верх и низ.</li>
-      <li><b>Один объект</b>Метафора темы, один предмет или персонаж. Не нужно коллажей, нескольких сцен или надписей на самой картинке.</li>
-      <li><b>Ничего лишнего</b>В статье только заголовок и иллюстрация: без логотипа, подписей и рамок.</li>
-      <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку или сдвиньте её ползунком.</li>
-      <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
-      <li><b>Кейс: важное ближе к центру</b>Лицо, продукт или логотип на картинке держите подальше от краёв. В ленте и сетке Instagram края поста могут обрезаться.</li>
-      <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
-      <li><b>Сложные случаи</b>Если объект должен перекрывать буквы или картинка должна выходить за край, передайте пост дизайнеру.</li>
-    </ul>
+      <ul class="rules">
+        <li><b>Заголовок в две строки</b>По 2–3 слова в строке, разбивать по смыслу: «MIGRATING / TO RUST». Если текст длинный, выберите «Сэндвич» и нажмите Enter там, где текст делится на верх и низ.</li>
+        <li><b>Один объект</b>Метафора темы, один предмет или персонаж. Не нужно коллажей, нескольких сцен или надписей на самой картинке.</li>
+        <li><b>Ничего лишнего</b>В статье только заголовок и иллюстрация: без логотипа, подписей и рамок.</li>
+        <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку или сдвиньте её ползунком.</li>
+        <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
+        <li><b>Неразрывный пробел</b>Не даёт разорвать слова по разным строкам, например «AI&nbsp;AGENT». Поставьте курсор между словами и нажмите «Вставить неразрывный пробел». На Mac то же делает ⌥+Пробел, на Windows Alt+0160.</li>
+        <li><b>Коррекция цвета</b>Ползунки меняют только яркие красные и тёплый налёт на белом, стекле и металле. Зажмите превью, чтобы сравнить с оригиналом.</li>
+        <li><b>Кейс: важное ближе к центру</b>Лицо, продукт или логотип на картинке держите подальше от краёв. В ленте и сетке Instagram края поста могут обрезаться.</li>
+        <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
+        <li><b>Сложные случаи</b>Если объект должен перекрывать буквы или картинка должна выходить за край, передайте пост дизайнеру.</li>
+      </ul>
     </section>
   </div>
-  </section>
-</div>
+</dialog>
 
 
 <script type="application/json" id="widths">__WIDTHS__</script>
@@ -348,50 +410,56 @@ Main accent: warm coral-orange (#FF5533), soft and slightly muted, never crimson
 AVOID
 Any background or backdrop, flat or vector illustration, cartoon outlines, comic-book halftone dots, printed pop-art look, cropping the object, several separate objects, white or light environment reflections, saturated pure red or crimson, yellow or brown tint on glass and metal, text of any kind.`;
 
-document.getElementById('promptText').textContent = PROMPT;
-async function copyPrompt(statusId) {
-  const s = document.getElementById(statusId);
-  try { await navigator.clipboard.writeText(PROMPT); s.textContent = 'Промпт скопирован. Вставьте его в ChatGPT.'; }
-  catch (e) {
-    // Clipboard refused: show the text in the instructions and select it
-    showHelp(true);
-    const r = document.createRange(); r.selectNodeContents(document.getElementById('promptText'));
+const $ = id => document.getElementById(id);
+$('promptText').textContent = PROMPT;
+
+// ---- Help popup ----
+function openHelp() { if (!$('help').open) $('help').showModal(); }
+$('helpBtn').addEventListener('click', openHelp);
+$('helpClose').addEventListener('click', () => $('help').close());
+// A click on the dimmed backdrop lands on the <dialog> itself
+$('help').addEventListener('click', e => { if (e.target === $('help')) $('help').close(); });
+
+async function copyPrompt(btn) {
+  try {
+    await navigator.clipboard.writeText(PROMPT);
+    const label = btn.dataset.label || (btn.dataset.label = btn.textContent);
+    btn.textContent = 'Скопировано'; clearTimeout(btn._t);
+    btn._t = setTimeout(() => { btn.textContent = label; }, 2000);
+  } catch (e) {
+    // Clipboard refused: open the help with the prompt selected
+    openHelp();
+    const r = document.createRange(); r.selectNodeContents($('promptText'));
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-    document.getElementById('copyStatus').textContent = 'Текст выделен. Нажмите Ctrl/⌘+C, чтобы скопировать.';
+    $('promptText').scrollIntoView({ block: 'nearest' });
+    $('copyStatus').textContent = 'Текст выделен. Нажмите Ctrl/⌘+C, чтобы скопировать.';
   }
 }
-document.getElementById('copyPrompt').addEventListener('click', () => copyPrompt('copyStatus'));
-document.getElementById('copyPromptSide').addEventListener('click', () => copyPrompt('copyStatusSide'));
-// «Помощь» replaces the preview and the picture column; «Статья»/«Кейс» bring them back
-function showHelp(on) {
-  document.getElementById('app').classList.toggle('help', on);
-  document.getElementById('help').hidden = !on;
-  if (on) document.getElementById('mode-help').checked = true;
-  else document.getElementById('mode-' + mode).checked = true;
-}
+$('copyPrompt').addEventListener('click', e => copyPrompt(e.currentTarget));
+$('copyPromptSide').addEventListener('click', e => copyPrompt(e.currentTarget));
 
 // ---- Builder ----
 const W = 1080, H = 1440, FS = 180, LH = 180;
 // Roboto Flex hhea: ascent 1900, descent 500, upm 2048 — baseline inside a 180px line box
 const BASE = (LH - (2400 / 2048) * FS) / 2 + (1900 / 2048) * FS;
-const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
-const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
 const LAYOUTS = {
   top:      { size: 960,  cy: 930 },
   bottom:   { size: 1200, cy: 525 },
   sandwich: { size: 900,  cy: 720 },
 };
-const state = { img: null, layout: 'top', wd: 'auto', narrow: 52, size: 960, dx: 0, dy: 0, name: 'новый-пост-evrone', z: 'under' };
+const state = { img: null, layout: 'top', wd: 'auto', narrow: 52, size: 960, dx: 0, dy: 0, z: 'under' };
 
 function resetPos() {
   const L = LAYOUTS[state.layout];
   state.size = L.size; state.dx = 0; state.dy = 0;
+  $('size').dataset.zero = L.size;
   $('size').value = state.size; $('dx').value = 0; $('dy').value = 0;
 }
 
 // Regular spaces are break points; U+00A0 keeps words together
 function lines(txt) {
-  return txt.split('\n').map(s => s.replace(/[ \t]+/g, ' ').replace(/ ?\u00A0+ ?/g, '\u00A0').replace(/^[ \u00A0]+|[ \u00A0]+$/g, '').toUpperCase()).filter(Boolean);
+  return txt.split('\n').map(s => s.replace(/[ \t]+/g, ' ').replace(/ ? + ?/g, ' ').replace(/^[  ]+|[  ]+$/g, '').toUpperCase()).filter(Boolean);
 }
 
 function setFont(family, size) {
@@ -422,7 +490,7 @@ function wrap(ls, boxW) {
   return out;
 }
 
-// Size is always 180. Auto width uses 52 only when a single word doesn't fit at 60
+// Size is always 180; «По умолчанию» is width 60, «Настроить» takes the slider value
 function layoutBlock(ls, boxW) {
   const fam = state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
   setFont(fam, FS);
@@ -430,8 +498,32 @@ function layoutBlock(ls, boxW) {
   return { fam, rows: wrap(ls, boxW), overflow };
 }
 
+// Sandwich takes one field: the first Enter splits top from bottom.
+// Without it the words are split in half: fewest rows per part first,
+// then no short word (preposition) left hanging at the end of the top, then equal length
+function textBlocks() {
+  const raw = $('t1').value;
+  if (state.layout !== 'sandwich') return [lines(raw), []];
+  const i = raw.indexOf('\n');
+  if (i >= 0) {
+    const a = lines(raw.slice(0, i)), b = lines(raw.slice(i + 1));
+    if (a.length && b.length) return [a, b];
+  }
+  const words = lines(raw.replace(/\n/g, ' ')).join(' ').split(' ').filter(Boolean);
+  if (words.length < 2) return [words, []];
+  const better = (s, t) => { for (let j = 0; j < s.length; j++) if (s[j] !== t[j]) return s[j] < t[j]; return false; };
+  let best = null;
+  for (let k = 1; k < words.length; k++) {
+    const a = words.slice(0, k).join(' '), b = words.slice(k).join(' ');
+    const rows = Math.max(layoutBlock([a], 1020).rows.length, layoutBlock([b], 1020).rows.length);
+    const score = [rows, words[k - 1].length <= 2 ? 1 : 0, Math.abs(a.length - b.length)];
+    if (!best || better(score, best.score)) best = { score, a, b };
+  }
+  return [[best.a], [best.b]];
+}
+
 // Static wdth instances 25–60 (canvas can't set variation axes), registered on first use
-const WIDTHS = JSON.parse(document.getElementById('widths').textContent);
+const WIDTHS = JSON.parse($('widths').textContent);
 const loadedW = new Set([60]);
 async function ensureWidth(w) {
   if (loadedW.has(w)) return;
@@ -460,7 +552,7 @@ function drawImage() {
 
 function drawArticle() {
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-  const a = lines($('t1').value), b = lines($('t2').value);
+  const [a, b] = textBlocks();
   const warns = [];
   let f1, f2;
   const top = () => { if (state.layout !== 'bottom') f1 = drawBlock(a, 30, 1020, 30, false); };
@@ -475,11 +567,19 @@ function drawArticle() {
     over:       [top, bottom, drawImage],
   }[state.z];
   order.forEach(fn => fn());
-  if ([f1, f2].some(f => f && f.overflow)) warns.push('Слово не помещается в ширину, поэтому оно разбито посередине. Выберите «Узкая» и сузьте шрифт или замените слово на более короткое.');
-  if ([f1, f2].some(f => f && f.rows.length > 2)) warns.push('Заголовок не влезает в две строки. Сократите текст или выберите «Сэндвич» и поделите его на две части.');
+  if ([f1, f2].some(f => f && f.overflow)) warns.push('Слово не помещается в ширину, поэтому оно разбито посередине. В «Шрифте» выберите «Настроить» и сузьте буквы или замените слово на более короткое.');
+  if ([f1, f2].some(f => f && f.rows.length > 2)) warns.push(state.layout === 'sandwich'
+    ? 'Текст не влезает: сверху и снизу должно быть не больше двух строк. Сократите текст.'
+    : 'Заголовок не влезает в две строки. Сократите текст или выберите «Сэндвич».');
   if (!a.length) warns.push('Добавьте заголовок.');
-  $('warnText').hidden = !warns.length; $('warnText').textContent = warns.join(' ');
-  $('sizeOut').textContent = state.size; $('dxOut').textContent = state.dx; $('dyOut').textContent = state.dy;
+  $('warnTextRow').hidden = !warns.length; $('warnText').textContent = warns.join(' ');
+}
+
+// ---- Picture cards ----
+function setCard(prefix, name, src) {
+  $(prefix + 'Name').textContent = name;
+  const t = $(prefix + 'Thumb'); t.src = src; t.hidden = false;
+  t.parentNode.classList.remove('empty');
 }
 
 function loadFile(file) {
@@ -487,18 +587,19 @@ function loadFile(file) {
   if (mode === 'case') return loadCaseFile(file);
   const url = URL.createObjectURL(file);
   const img = new Image();
-  img.onload = () => { state.img = img; color.cache = null; applyColor(); resetPos(); draw(); $('drop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
+  img.onload = () => { state.img = img; color.cache = null; applyColor(); resetPos(); draw(); setCard('file', file.name, url); };
   img.src = url;
 }
 
 $('file').addEventListener('change', e => loadFile(e.target.files[0]));
+// Drop anywhere: on the logo card it's a logo, otherwise the current mode's picture
 const activeDrop = e => e.target.closest?.('#logoDrop') ? $('logoDrop') : $(mode === 'case' ? 'caseDrop' : 'drop');
 ['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => {
   e.preventDefault();
-  document.querySelectorAll('.drop.over').forEach(d => d.classList.remove('over'));
+  document.querySelectorAll('.file.over').forEach(d => d.classList.remove('over'));
   activeDrop(e).classList.add('over');
 }));
-['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); document.querySelectorAll('.drop.over').forEach(d => d.classList.remove('over')); }));
+['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); document.querySelectorAll('.file.over').forEach(d => d.classList.remove('over')); }));
 document.addEventListener('drop', e => {
   const f = e.dataTransfer.files[0];
   if (e.target.closest?.('#logoDrop')) loadLogoFile(f); else loadFile(f);
@@ -510,8 +611,7 @@ document.addEventListener('paste', e => {
 
 document.querySelectorAll('input[name=layout]').forEach(r => r.addEventListener('change', () => {
   state.layout = r.value;
-  $('t2field').hidden = state.layout !== 'sandwich';
-  $('t1label').textContent = state.layout === 'sandwich' ? 'Первая часть (сверху)' : 'Заголовок';
+  $('sandwichNote').hidden = state.layout !== 'sandwich';
   syncZ(); resetPos(); draw();
 }));
 async function applyWidth() {
@@ -523,31 +623,29 @@ async function applyWidth() {
 document.querySelectorAll('input[name=wd]').forEach(r => r.addEventListener('change', () => { state.wd = r.value; applyWidth(); }));
 $('narrow').addEventListener('input', e => { state.narrow = +e.target.value; applyWidth(); });
 ['size', 'dx', 'dy'].forEach(k => $(k).addEventListener('input', e => { state[k] = +e.target.value; draw(); }));
-['t1', 't2'].forEach(k => $(k).addEventListener('input', draw));
-let lastField = $('t1');
-['t1', 't2'].forEach(k => $(k).addEventListener('focus', e => { lastField = e.target; }));
+$('t1').addEventListener('input', draw);
 $('nbsp').addEventListener('mousedown', e => e.preventDefault());
 $('nbsp').addEventListener('click', () => {
-  const f = lastField, s = f.selectionStart, e = f.selectionEnd;
+  const f = $('t1'), s = f.selectionStart, e = f.selectionEnd;
   // Replace a selected (or adjacent) regular space instead of adding a second gap
   let a = s, b = e;
   if (a === b && f.value[a - 1] === ' ') a--; else if (a === b && f.value[a] === ' ') b++;
-  f.value = f.value.slice(0, a) + '\u00A0' + f.value.slice(b);
+  f.value = f.value.slice(0, a) + ' ' + f.value.slice(b);
   f.focus(); f.selectionStart = f.selectionEnd = a + 1;
   draw();
 });
-// The two middle options only make sense with two text blocks
+// «Над нижним» and «Над верхним» only make sense with two text blocks
 function syncZ() {
   const two = state.layout === 'sandwich';
   ['overTop', 'overBottom'].forEach(v => { $('zc-' + v).hidden = !two; });
   if (!two && (state.z === 'overTop' || state.z === 'overBottom')) { state.z = 'under'; $('z-under').checked = true; }
 }
 document.querySelectorAll('input[name=z]').forEach(r => r.addEventListener('change', () => { state.z = r.value; draw(); }));
-$('reset').addEventListener('click', () => { resetPos(); draw(); });
+$('posReset').addEventListener('click', () => { resetPos(); draw(); });
 
 let downloads = null;
-const saveError = msg => { $('warnSave').textContent = msg; $('warnSave').hidden = false; };
-$('fname').addEventListener('focus', () => { $('warnSave').hidden = true; });
+const saveError = msg => { $('warnSave').textContent = msg; $('warnSaveRow').hidden = false; };
+$('fname').addEventListener('focus', () => { $('warnSaveRow').hidden = true; });
 $('saveForm').addEventListener('submit', e => {
   e.preventDefault();
   const name = fileName();
@@ -593,7 +691,24 @@ const autoName = () => mode === 'case'
   : 'evrone-' + (safeName(lines($('t1').value).join(' ')) || 'post');
 const fileName = () => (safeName(customName[mode] || '') || autoName()) + '.png';
 function syncName() { const f = $('fname'); if (customName[mode] === null && document.activeElement !== f) f.value = autoName(); }
-function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); }
+
+// Range fill and the default tick follow the value
+function paintRanges() {
+  document.querySelectorAll('input[type=range]').forEach(r => {
+    const mn = +r.min, span = (+r.max - mn) || 1;
+    r.style.setProperty('--p', (r.value - mn) / span);
+    if (r.dataset.zero !== undefined) r.style.setProperty('--z', (r.dataset.zero - mn) / span);
+  });
+}
+// «Сбросить» fades out when there is nothing to reset
+function syncResets() {
+  const c = caseState;
+  $('posReset').disabled = state.size === LAYOUTS[state.layout].size && !state.dx && !state.dy;
+  $('colorReset').disabled = !colorChanged() && color.feather === 3;
+  $('frameReset').disabled = !c.img || (c.noGaps && c.x === W / 2 && c.y === H / 2 && Math.abs(c.scale - coverScale(c.img)) < 1e-9);
+  $('logoReset').disabled = c.lSize === 540 && !c.lDx && !c.lDy;
+}
+function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); paintRanges(); syncResets(); }
 
 const coverScale = img => Math.max(W / img.naturalWidth, H / img.naturalHeight);
 const containScale = img => Math.min(W / img.naturalWidth, H / img.naturalHeight);
@@ -683,26 +798,25 @@ function drawCase() {
     const cover = coverScale(c.img), zoom = $('caseZoom');
     zoom.min = Math.floor((c.noGaps ? 1 : containScale(c.img) * 0.5 / cover) * 100);
     zoom.value = Math.round(c.scale / cover * 100);
-    $('caseZoomOut').textContent = zoom.value + '%';
-  } else warns.push('Загрузите картинку.');
+  }
   if (c.logo) drawLogo();
-  $('warnPic').hidden = !warns.length; $('warnPic').textContent = warns.join(' ');
-  $('lSizeOut').textContent = c.lSize; $('lDxOut').textContent = c.lDx; $('lDyOut').textContent = c.lDy;
+  $('warnPicRow').hidden = !warns.length; $('warnPic').textContent = warns.join(' ');
 }
 
 function setCaseImage(img, name) {
   const c = caseState;
   c.img = img; c.name = slugify(name); c.blurCache = null;
-  c.bgColor = edgeColor(img); $('bgColor').value = c.bgColor;
+  setBgColor(edgeColor(img));
   c.scale = coverScale(img); c.x = W / 2; c.y = H / 2; clampCase();
   draw();
 }
+function setBgColor(v) { caseState.bgColor = v; $('bgColor').value = v; $('bgColorHex').textContent = v.slice(1); }
 
 function loadCaseFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
-  const img = new Image();
-  img.onload = () => { setCaseImage(img, file.name); $('caseDrop').textContent = 'Загружено: ' + file.name + '. Можно заменить.'; };
-  img.src = URL.createObjectURL(file);
+  const img = new Image(), url = URL.createObjectURL(file);
+  img.onload = () => { setCaseImage(img, file.name); setCard('case', file.name, url); };
+  img.src = url;
 }
 
 // SVGs without width/height get them from the viewBox, otherwise they load at 0×0 or 300×150
@@ -719,22 +833,22 @@ async function loadLogoFile(file) {
     const pct = /%/.test(svg.getAttribute('width') || '') || /%/.test(svg.getAttribute('height') || '');
     if (vb.length === 4 && vb[2] > 0 && vb[3] > 0 && (pct || !aw || !ah)) { w = vb[2]; h = vb[3]; }
     else { w = aw; h = ah; }
-    if (!w || !h) { $('logoDrop').textContent = 'В этом SVG не указан размер. Экспортируйте логотип заново или возьмите PNG.'; return; }
+    if (!w || !h) { $('logoAct').textContent = 'В этом SVG не указан размер. Экспортируйте логотип заново или возьмите PNG.'; return; }
     svg.setAttribute('width', w); svg.setAttribute('height', h);
     blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
   }
-  const img = new Image();
+  const img = new Image(), url = URL.createObjectURL(blob);
   img.onload = () => {
     const c = caseState;
     c.logo = { img, width: w || img.naturalWidth, height: h || img.naturalHeight };
     c.lSize = 540; c.lDx = 0; c.lDy = 0; syncLogoInputs();
-    $('logoControls').hidden = false;
-    $('logoDrop').textContent = 'Логотип: ' + file.name + '. Можно заменить.';
+    ['logoControls', 'logoRemove', 'logoReset'].forEach(id => { $(id).hidden = false; });
+    setCard('logo', file.name, url); $('logoAct').textContent = 'Заменить';
     if (!caseState.img || caseState.name === 'more-tv') caseState.name = slugify(file.name);
     draw();
   };
-  img.onerror = () => { $('logoDrop').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; };
-  img.src = URL.createObjectURL(blob);
+  img.onerror = () => { $('logoAct').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; };
+  img.src = url;
 }
 
 function syncLogoInputs() {
@@ -742,28 +856,15 @@ function syncLogoInputs() {
   $('lSize').value = c.lSize; $('lDx').value = c.lDx; $('lDy').value = c.lDy;
 }
 
-function showPanel(which) {
-  $('app').classList.toggle('show-props', which === 'props');
-  document.querySelectorAll('input[name=panelL], input[name=panelR]').forEach(r => { r.checked = r.value === which; });
-}
-document.querySelectorAll('input[name=panelL], input[name=panelR]').forEach(r => r.addEventListener('change', () => showPanel(r.value)));
-showPanel('post');
-
 function setMode(m) {
   mode = m;
   $('fname').value = customName[m] ?? autoName();
-  $('articleText').hidden = m !== 'article';
-  $('articleProps').hidden = m !== 'article';
+  ['layoutRow', 'zRow', 'textSec', 'fontSec', 'articleProps'].forEach(id => { $(id).hidden = m !== 'article'; });
   $('caseProps').hidden = m !== 'case';
-  // In the narrow layout a case has no text, so open straight on «Картинка»
-  showPanel(m === 'case' ? 'props' : 'post');
   cv.classList.toggle('pannable', m === 'case');
   draw();
 }
-document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => {
-  if (r.value === 'help') return showHelp(true);
-  setMode(r.value); showHelp(false);
-}));
+document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => setMode(r.value)));
 
 $('caseFile').addEventListener('change', e => loadCaseFile(e.target.files[0]));
 $('logoFile').addEventListener('change', e => loadLogoFile(e.target.files[0]));
@@ -771,8 +872,9 @@ $('caseZoom').addEventListener('input', e => {
   if (!caseState.img) return;
   zoomAt(coverScale(caseState.img) * e.target.value / 100 / caseState.scale, { x: W / 2, y: H / 2 }); draw();
 });
-$('caseFill').addEventListener('click', () => {
+$('frameReset').addEventListener('click', () => {
   const c = caseState; if (!c.img) return;
+  c.noGaps = true; $('noGaps').checked = true;
   c.scale = coverScale(c.img); c.x = W / 2; c.y = H / 2; draw();
 });
 $('caseFit').addEventListener('click', () => {
@@ -780,18 +882,19 @@ $('caseFit').addEventListener('click', () => {
   c.noGaps = false; $('noGaps').checked = false;
   c.scale = containScale(c.img); c.x = W / 2; c.y = H / 2; draw();
 });
-$('caseCenter').addEventListener('click', () => { caseState.x = W / 2; caseState.y = H / 2; clampCase(); draw(); });
 $('noGaps').addEventListener('change', e => { caseState.noGaps = e.target.checked; clampCase(); draw(); });
 document.querySelectorAll('input[name=bg]').forEach(r => r.addEventListener('change', () => {
   caseState.bg = r.value; $('bgColorRow').hidden = r.value !== 'color'; draw();
 }));
-$('bgColor').addEventListener('input', e => { caseState.bgColor = e.target.value; draw(); });
+$('bgColor').addEventListener('input', e => { setBgColor(e.target.value); draw(); });
 document.querySelectorAll('input[name=tint]').forEach(r => r.addEventListener('change', () => { caseState.tint = r.value; draw(); }));
 ['lSize', 'lDx', 'lDy'].forEach(k => $(k).addEventListener('input', e => { caseState[k] = +e.target.value; draw(); }));
-$('logoReset').addEventListener('click', () => { const c = caseState; c.lDx = 0; c.lDy = 0; syncLogoInputs(); draw(); });
+$('logoReset').addEventListener('click', () => { const c = caseState; c.lSize = 540; c.lDx = 0; c.lDy = 0; syncLogoInputs(); draw(); });
 $('logoRemove').addEventListener('click', () => {
-  caseState.logo = null; $('logoControls').hidden = true; $('logoFile').value = '';
-  $('logoDrop').textContent = 'Перетащите логотип сюда (SVG или PNG с прозрачным фоном) или нажмите, чтобы выбрать файл';
+  caseState.logo = null; $('logoFile').value = '';
+  ['logoControls', 'logoRemove', 'logoReset', 'logoThumb'].forEach(id => { $(id).hidden = true; });
+  $('logoThumb').parentNode.classList.add('empty');
+  $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'SVG или PNG с прозрачным фоном';
   draw();
 });
 
@@ -906,13 +1009,10 @@ function applyColor() {
   draw();
 }
 const scheduleColor = () => { if (!color.raf) color.raf = requestAnimationFrame(applyColor); };
-const COLOR_UI = { hue: ['cHue', v => '+' + v + '°'], sat: ['cSat', v => '×' + (v / 100).toFixed(2)], val: ['cVal', v => '×' + (v / 100).toFixed(2)], cast: ['cCast', v => v + '%'] };
-function syncColorUI() { for (const [k, [id, fmt]] of Object.entries(COLOR_UI)) { $(id).value = color[k]; $(id + 'Out').textContent = fmt(color[k]); } }
-for (const [k, [id]] of Object.entries(COLOR_UI)) $(id).addEventListener('input', e => { color[k] = +e.target.value; syncColorUI(); scheduleColor(); });
-const syncFeather = () => { $('cFeather').value = color.feather; $('cFeatherOut').textContent = color.feather + ' px'; };
-$('cFeather').addEventListener('input', e => { color.feather = +e.target.value; syncFeather(); scheduleColor(); });
-syncFeather();
-$('colorReset').addEventListener('click', () => { Object.assign(color, COLOR0, { feather: 3 }); syncColorUI(); syncFeather(); applyColor(); });
+const COLOR_UI = { hue: 'cHue', sat: 'cSat', val: 'cVal', cast: 'cCast', feather: 'cFeather' };
+function syncColorUI() { for (const [k, id] of Object.entries(COLOR_UI)) $(id).value = color[k]; }
+for (const [k, id] of Object.entries(COLOR_UI)) $(id).addEventListener('input', e => { color[k] = +e.target.value; scheduleColor(); });
+$('colorReset').addEventListener('click', () => { Object.assign(color, COLOR0, { feather: 3 }); syncColorUI(); applyColor(); });
 syncColorUI();
 // Hold the preview to see the original illustration (article mode; in case mode the preview pans)
 cv.addEventListener('pointerdown', () => { if (mode === 'article' && color.out) { color.showOriginal = true; draw(); } });
@@ -921,6 +1021,12 @@ cv.addEventListener('pointerdown', () => { if (mode === 'article' && color.out) 
 // ---- File name input ----
 $('fname').addEventListener('input', e => { customName[mode] = e.target.value.trim() ? e.target.value : null; });
 $('fname').addEventListener('blur', syncName);
+
+// ---- Narrow window: the picture sections move under the text sections ----
+const narrowMQ = matchMedia('(max-width:960px)');
+function placeProps() { (narrowMQ.matches ? $('leftScroll') : $('rightSide')).appendChild($('props')); }
+narrowMQ.addEventListener('change', placeProps);
+placeProps();
 
 // ---- Fit the 3:4 preview into the workspace ----
 function fitFrame() {
@@ -933,12 +1039,13 @@ function fitFrame() {
 new ResizeObserver(fitFrame).observe(document.querySelector('.workspace'));
 fitFrame();
 
+// Placeholders: a picture is always there, it can only be replaced
 const caseSample = new Image();
-caseSample.onload = () => { if (!caseState.img) setCaseImage(caseSample, 'more-tv'); };
+caseSample.onload = () => { if (!caseState.img) { setCaseImage(caseSample, 'more-tv'); setCard('case', 'Пример.jpg', caseSample.src); } };
 caseSample.src = 'data:image/jpeg;base64,__CASE__';
 
 const sample = new Image();
-sample.onload = () => { state.img = sample; draw(); };
+sample.onload = () => { if (!state.img) { state.img = sample; setCard('file', 'Пример.webp', sample.src); draw(); } };
 sample.src = 'data:image/webp;base64,__LIPS__';
 syncZ();
 resetPos();
