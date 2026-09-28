@@ -9,7 +9,7 @@
   --bg:#FFFFFF; --bg2:#F5F5F5; --canvas:#F5F5F5; --seg-on:#FFFFFF;
   --line:#E6E6E6; --line-t:rgba(0,0,0,.1);
   --text:rgba(0,0,0,.9); --text2:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
-  --inverse:#2C2C2C; --focus:#0D99FF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
+  --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
   --radius:5px;
 }
@@ -63,12 +63,12 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .prop .lbl{display:flex;color:var(--text2)}
 .prop .lbl > span:not(.alert){flex:1}
 .prop .lbl output{color:var(--text);font-variant-numeric:lining-nums tabular-nums}
-.prop div.lbl{align-items:center;gap:8px}
-.prop div.lbl label{flex:1}
+.prop div.lbl{position:relative;align-items:center;gap:4px}
+.prop div.lbl label{flex:none}
 /* Warning next to the control it's about: «!» with the text in a tooltip, so nothing below moves */
-.alert{position:relative;flex:none;width:16px;height:16px;border-radius:50%;color:var(--warn-ink);cursor:help;outline:none}
+.alert{flex:none;width:16px;height:16px;border-radius:3px;color:var(--danger);cursor:help;outline:none}
 .alert svg{display:block;width:16px;height:16px;fill:currentColor}
-.alert .tip{position:absolute;right:-8px;top:calc(100% + 6px);z-index:10;width:200px;padding:8px;border-radius:var(--radius);background:var(--inverse);color:var(--bg);box-shadow:var(--elev);opacity:0;visibility:hidden;transition:opacity .12s}
+.alert .tip{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;padding:8px;border-radius:var(--radius);background:var(--inverse);color:var(--bg);box-shadow:var(--elev);opacity:0;visibility:hidden;transition:opacity .12s}
 .alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
 .note{padding:4px 16px;color:var(--text2)}
@@ -109,6 +109,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#fff;box-shadow:var(--elev)}
 input[type=range]::-moz-range-track{background:transparent}
 input[type=range]:focus-visible{outline:1px solid var(--focus);outline-offset:1px}
+input[type=range]:disabled{opacity:.4;cursor:default}
 
 /* Picture card: thumbnail, file name, «Заменить» */
 .file{display:flex;gap:8px;align-items:center;padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:pointer}
@@ -116,19 +117,18 @@ input[type=range]:focus-visible{outline:1px solid var(--focus);outline-offset:1p
 .thumb{flex:none;width:32px;height:32px;border:1px solid var(--line-t);border-radius:2px;overflow:hidden;
   background:repeating-conic-gradient(#E6E6E6 0 25%,#FFFFFF 0 50%) 0 0/9.36px 9.36px}
 .thumb img{display:block;width:100%;height:100%;object-fit:contain}
-.thumb.empty{background:var(--bg)}
+/* Empty card (no logo yet): outlined, «+» instead of a thumbnail */
+.file.add{background:transparent;box-shadow:inset 0 0 0 1px var(--line-t)}
+.file.add .thumb{background:var(--bg2);border:0;display:flex;align-items:center;justify-content:center}
+.file .plus{width:24px;height:24px;fill:var(--text2)}
+.file:not(.add) .plus{display:none}
+/* A case has no picture panel: two columns */
+.app.case{grid-template-columns:240px minmax(0,1fr)}
+.app.case .side.right{display:none}
 .file .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .file .name{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .file .act{color:var(--text2)}
 
-.check{display:flex;gap:8px;align-items:center;cursor:pointer}
-.check input{width:12px;height:12px;margin:0;accent-color:var(--inverse)}
-.colorfield{display:flex;gap:8px;align-items:center;height:32px;padding:0 8px;background:var(--bg2);border-radius:var(--radius);cursor:pointer}
-.colorfield input{width:16px;height:16px;padding:0;border:1px solid var(--line-t);border-radius:2px;background:none;cursor:pointer}
-.colorfield input::-webkit-color-swatch-wrapper{padding:0}
-.colorfield input::-webkit-color-swatch{border:0;border-radius:1px}
-.colorfield input::-moz-color-swatch{border:0;border-radius:1px}
-.colorfield span{text-transform:uppercase;font-variant-numeric:tabular-nums}
 .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px}
 
 /* Preview */
@@ -216,6 +216,49 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         </div>
       </section>
 
+      <div id="caseProps" hidden>
+        <section class="sec">
+          <div class="sec-h"><span>Фон</span></div>
+          <div class="row">
+            <label class="file" id="caseDrop" for="caseFile">
+              <span class="thumb"><img id="caseThumb" alt=""></span>
+              <span class="meta"><span class="name" id="caseName">Пример.jpg</span><span class="act">Заменить</span></span>
+            </label>
+            <input type="file" id="caseFile" accept="image/*" hidden>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><span>Кадрирование</span><button class="ghost" type="button" id="frameReset">Сбросить</button></div>
+          <div class="prop"><div class="lbl"><label for="caseZoom">Размер</label><span class="alert" id="warnPic" tabindex="0" role="img" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.28484 2.91497C7.06163 1.62045 8.93765 1.62055 9.71452 2.91497L13.9489 9.97063C14.7487 11.3037 13.7877 12.9999 12.2331 12.9999H3.76628C2.21179 12.9998 1.25066 11.3036 2.05046 9.97063L6.28484 2.91497ZM8.8571 3.42864C8.46857 2.78205 7.5307 2.78193 7.14226 3.42864L2.90886 10.4853L2.84343 10.6122C2.58781 11.2117 2.97823 11.9008 3.6237 11.9902L3.76628 11.9999H12.2331C13.0104 11.9999 13.4904 11.1518 13.0905 10.4853L8.8571 3.42864ZM7.99968 9.63665C8.16816 9.63665 8.31411 9.69719 8.43718 9.81829C8.56206 9.93942 8.62462 10.0855 8.62468 10.2558C8.62465 10.3712 8.59541 10.4766 8.53679 10.5712C8.48002 10.6658 8.40382 10.741 8.30925 10.7978C8.21645 10.8527 8.11332 10.8808 7.99968 10.8808C7.82741 10.8808 7.67939 10.8203 7.55632 10.6991C7.43527 10.578 7.37472 10.4299 7.37468 10.2558C7.37474 10.0855 7.43529 9.9394 7.55632 9.81829C7.67939 9.69715 7.82741 9.63667 7.99968 9.63665ZM8.00066 4.99993C8.30209 4.99993 8.54464 5.24837 8.53777 5.54973L8.46745 8.65227C8.46144 8.906 8.25353 9.10833 7.99968 9.10833C7.74568 9.10819 7.5385 8.90527 7.53288 8.65129L7.46452 5.54876C7.4581 5.24786 7.69969 5.00014 8.00066 4.99993Z"/></svg><span class="tip" id="warnPicTip"></span></span></div><input type="range" id="caseZoom" min="100" max="400" step="1" value="100" data-zero="100"></div>
+          <div class="prop"><label class="lbl" for="caseDx"><span>X, Левее/Правее</span></label><input type="range" id="caseDx" min="0" max="0" step="1" value="0" data-zero="0"></div>
+          <div class="prop"><label class="lbl" for="caseDy"><span>Y, Выше/Ниже</span></label><input type="range" id="caseDy" min="0" max="0" step="1" value="0" data-zero="0"></div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><span>Логотип</span><button class="ghost" type="button" id="logoRemove" hidden>Убрать</button><button class="ghost" type="button" id="logoReset" hidden>Сбросить</button></div>
+          <div class="row">
+            <label class="file add" id="logoDrop" for="logoFile">
+              <span class="thumb"><svg class="plus" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.0049 6.00468C12.2809 6.00468 12.5047 6.22869 12.5049 6.50468V11.4998H17.5C17.7761 11.4998 17.9999 11.7237 18 11.9998C18 12.2759 17.7761 12.4998 17.5 12.4998H12.5049V17.5047C12.5049 17.7808 12.281 18.0047 12.0049 18.0047C11.7288 18.0046 11.5049 17.7808 11.5049 17.5047V12.4998H6.5C6.22386 12.4998 6 12.2759 6 11.9998C6.00011 11.7237 6.22393 11.4998 6.5 11.4998H11.5049V6.50468C11.5051 6.22872 11.7289 6.00474 12.0049 6.00468Z"/></svg><img id="logoThumb" alt="" hidden></span>
+              <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">SVG или PNG без фона</span></span>
+            </label>
+            <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
+          </div>
+          <div id="logoControls" hidden>
+            <div class="row">
+              <div class="seg" role="radiogroup" aria-label="Цвет логотипа">
+                <label><input type="radio" name="tint" value="orig" checked><span>Как есть</span></label>
+                <label><input type="radio" name="tint" value="#FFFFFF"><span>Белый</span></label>
+                <label><input type="radio" name="tint" value="#000000"><span>Чёрный</span></label>
+              </div>
+            </div>
+            <div class="prop"><label class="lbl" for="lSize"><span>Размер</span></label><input type="range" id="lSize" min="100" max="1020" step="10" value="540" data-zero="540"></div>
+            <div class="prop"><label class="lbl" for="lDx"><span>X, Левее/Правее</span></label><input type="range" id="lDx" min="-500" max="500" step="5" value="0" data-zero="0"></div>
+            <div class="prop"><label class="lbl" for="lDy"><span>Y, Выше/Ниже</span></label><input type="range" id="lDy" min="-700" max="700" step="5" value="0" data-zero="0"></div>
+          </div>
+        </section>
+      </div>
+
       <section class="sec" id="textSec">
         <div class="sec-h"><span>Текст</span></div>
         <div class="row"><textarea id="t1" rows="2" spellcheck="false" aria-label="Заголовок">Новый пост Evrone</textarea></div>
@@ -287,62 +330,6 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
           <div class="prop"><label class="lbl" for="dy"><span>Y, Выше/Ниже</span></label><input type="range" id="dy" min="-500" max="500" step="5" value="0" data-zero="0"></div>
         </section>
       </div>
-
-      <div id="caseProps" hidden>
-        <section class="sec">
-          <div class="sec-h"><span>Изображение</span></div>
-          <div class="row">
-            <label class="file" id="caseDrop" for="caseFile">
-              <span class="thumb"><img id="caseThumb" alt=""></span>
-              <span class="meta"><span class="name" id="caseName">Пример.jpg</span><span class="act">Заменить</span></span>
-            </label>
-            <input type="file" id="caseFile" accept="image/*" hidden>
-          </div>
-        </section>
-
-        <section class="sec">
-          <div class="sec-h"><span>Кадр</span><button class="ghost" type="button" id="frameReset">Сбросить</button></div>
-          <div class="note">Двигайте картинку мышью прямо на превью, колёсиком меняйте масштаб.</div>
-          <div class="prop"><div class="lbl"><label for="caseZoom">Масштаб</label><span class="alert" id="warnPic" tabindex="0" role="img" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm0 9.6a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8ZM8 4a.75.75 0 0 0-.75.75v4a.75.75 0 0 0 1.5 0v-4A.75.75 0 0 0 8 4Z"/></svg><span class="tip" id="warnPicTip"></span></span></div><input type="range" class="fill" id="caseZoom" min="50" max="400" step="1" value="100"></div>
-          <div class="row"><label class="check"><input type="checkbox" id="noGaps" checked>Без пустых краёв</label></div>
-          <div class="row"><button class="btn" type="button" id="caseFit">Вписать целиком</button></div>
-        </section>
-
-        <section class="sec" id="bgSec">
-          <div class="sec-h"><span>Фон</span></div>
-          <div class="row">
-            <div class="seg" role="radiogroup" aria-label="Фон под пустыми краями">
-              <label><input type="radio" name="bg" value="color" checked><span>Цвет</span></label>
-              <label><input type="radio" name="bg" value="blur"><span>Размытая картинка</span></label>
-            </div>
-          </div>
-          <div class="row" id="bgColorRow"><label class="colorfield"><input type="color" id="bgColor" value="#000000" aria-label="Цвет фона"><span id="bgColorHex">000000</span></label></div>
-          <div class="note">Фон виден, если выключить «Без пустых краёв» или вписать картинку целиком. Цвет подбирается по краям картинки.</div>
-        </section>
-
-        <section class="sec">
-          <div class="sec-h"><span>Логотип</span><button class="ghost" type="button" id="logoRemove" hidden>Убрать</button><button class="ghost" type="button" id="logoReset" hidden>Сбросить</button></div>
-          <div class="row">
-            <label class="file" id="logoDrop" for="logoFile">
-              <span class="thumb empty"><img id="logoThumb" alt="" hidden></span>
-              <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">SVG или PNG с прозрачным фоном</span></span>
-            </label>
-            <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
-          </div>
-          <div id="logoControls" hidden>
-            <div class="row">
-              <div class="seg" role="radiogroup" aria-label="Цвет логотипа">
-                <label><input type="radio" name="tint" value="orig" checked><span>Как есть</span></label>
-                <label><input type="radio" name="tint" value="#FFFFFF"><span>Белый</span></label>
-                <label><input type="radio" name="tint" value="#000000"><span>Чёрный</span></label>
-              </div>
-            </div>
-            <div class="prop"><label class="lbl" for="lSize"><span>Размер</span></label><input type="range" id="lSize" min="100" max="1020" step="10" value="540" data-zero="540"></div>
-            <div class="prop"><label class="lbl" for="lDx"><span>X, Левее/Правее</span></label><input type="range" id="lDx" min="-500" max="500" step="5" value="0" data-zero="0"></div>
-            <div class="prop"><label class="lbl" for="lDy"><span>Y, Выше/Ниже</span></label><input type="range" id="lDy" min="-700" max="700" step="5" value="0" data-zero="0"></div>
-          </div>
-        </section>
-      </div>
     </div>
   </aside>
 </div>
@@ -384,6 +371,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
         <li><b>Неразрывный пробел</b>Не даёт разорвать слова по разным строкам, например «AI&nbsp;AGENT». Поставьте курсор между словами и нажмите «Вставить неразрывный пробел». На Mac то же делает ⌥+Пробел, на Windows Alt+0160.</li>
         <li><b>Коррекция цвета</b>Ползунки меняют только яркие красные и тёплый налёт на белом, стекле и металле. Зажмите превью, чтобы сравнить с оригиналом.</li>
+        <li><b>Кейс: кадрирование</b>Картинка всегда закрывает весь пост. Двигайте её мышью прямо на превью или ползунками X и Y, колёсиком мыши меняйте размер.</li>
         <li><b>Кейс: важное ближе к центру</b>Лицо, продукт или логотип на картинке держите подальше от краёв. В ленте и сетке Instagram края поста могут обрезаться.</li>
         <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
         <li><b>Сложные случаи</b>Если объект должен перекрывать буквы или картинка должна выходить за край, передайте пост дизайнеру.</li>
@@ -586,7 +574,7 @@ function drawArticle() {
 function setCard(prefix, name, src) {
   $(prefix + 'Name').textContent = name;
   const t = $(prefix + 'Thumb'); t.src = src; t.hidden = false;
-  t.parentNode.classList.remove('empty');
+  t.closest('.file').classList.remove('add');
 }
 
 function loadFile(file) {
@@ -681,8 +669,7 @@ $('saveForm').addEventListener('submit', e => {
 // ---- Case: a ready-made picture cropped to 3:4, optional client logo ----
 let mode = 'article';
 const caseState = {
-  img: null, scale: 1, x: W / 2, y: H / 2, noGaps: true,
-  bg: 'color', bgColor: '#000000', blurCache: null,
+  img: null, scale: 1, x: W / 2, y: H / 2,
   logo: null, tint: 'orig', lSize: 540, lDx: 0, lDy: 0, name: 'case',
 };
 const slugify = s => s.toLowerCase().replace(/\.[a-z0-9]+$/i, '').replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '') || 'case';
@@ -712,26 +699,22 @@ function syncResets() {
   const c = caseState;
   $('posReset').disabled = state.size === LAYOUTS[state.layout].size && !state.dx && !state.dy;
   $('colorReset').disabled = !colorChanged() && color.feather === 3;
-  $('frameReset').disabled = !c.img || (c.noGaps && c.x === W / 2 && c.y === H / 2 && Math.abs(c.scale - coverScale(c.img)) < 1e-9);
+  $('frameReset').disabled = !c.img || (c.x === W / 2 && c.y === H / 2 && Math.abs(c.scale - coverScale(c.img)) < 1e-9);
   $('logoReset').disabled = c.lSize === 540 && !c.lDx && !c.lDy;
 }
 function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); paintRanges(); syncResets(); }
 
 const coverScale = img => Math.max(W / img.naturalWidth, H / img.naturalHeight);
-const containScale = img => Math.min(W / img.naturalWidth, H / img.naturalHeight);
 
-// Keep scale in range and, with "no gaps", keep the picture covering the whole frame
+// The picture always covers the whole post: no empty edges, only zoom in and move
 function clampCase() {
   const c = caseState;
   if (!c.img) return;
   const cover = coverScale(c.img);
-  const min = c.noGaps ? cover : containScale(c.img) * 0.5;
-  c.scale = Math.min(Math.max(c.scale, min), cover * 4);
-  if (c.noGaps) {
-    const hw = c.img.naturalWidth * c.scale / 2, hh = c.img.naturalHeight * c.scale / 2;
-    c.x = Math.min(Math.max(c.x, W - hw), hw);
-    c.y = Math.min(Math.max(c.y, H - hh), hh);
-  }
+  c.scale = Math.min(Math.max(c.scale, cover), cover * 4);
+  const hw = c.img.naturalWidth * c.scale / 2, hh = c.img.naturalHeight * c.scale / 2;
+  c.x = Math.min(Math.max(c.x, W - hw), hw);
+  c.y = Math.min(Math.max(c.y, H - hh), hh);
 }
 
 // Zoom around a point on the canvas so that point stays under the cursor
@@ -741,46 +724,6 @@ function zoomAt(factor, p) {
   const k = c.scale / before;
   c.x = p.x - (p.x - c.x) * k; c.y = p.y - (p.y - c.y) * k;
   clampCase();
-}
-
-// Average colour of the picture's outer edge, used to fill gaps
-function edgeColor(img) {
-  const n = 32, t = document.createElement('canvas'); t.width = t.height = n;
-  const x = t.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, n, n);
-  const d = x.getImageData(0, 0, n, n).data; let r = 0, g = 0, b = 0, k = 0;
-  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
-    if (i && j && i < n - 1 && j < n - 1) continue;
-    const o = (j * n + i) * 4; r += d[o]; g += d[o + 1]; b += d[o + 2]; k++;
-  }
-  return '#' + [r, g, b].map(v => Math.round(v / k).toString(16).padStart(2, '0')).join('');
-}
-
-// Blurred cover copy of the picture, built once per image.
-// ctx.filter where supported; otherwise shrink hard and scale back up in steps (older Safari)
-function blurBackdrop() {
-  const c = caseState;
-  if (!c.blurCache) {
-    const out = document.createElement('canvas'); out.width = W; out.height = H;
-    const ox = out.getContext('2d');
-    const k = coverScale(c.img) * 1.4, w = c.img.naturalWidth * k, h = c.img.naturalHeight * k;
-    if ('filter' in ox) {
-      ox.filter = 'blur(140px)';
-      ox.drawImage(c.img, (W - w) / 2, (H - h) / 2, w, h);
-    } else {
-      let src = document.createElement('canvas'); src.width = 12; src.height = 16;
-      const sx = 12 / W, sy = 16 / H;
-      src.getContext('2d').drawImage(c.img, (12 - w * sx) / 2, (16 - h * sy) / 2, w * sx, h * sy);
-      for (let f = 2; src.width * f < W; ) {
-        const nx = document.createElement('canvas'); nx.width = src.width * f; nx.height = src.height * f;
-        const nctx = nx.getContext('2d'); nctx.imageSmoothingQuality = 'high';
-        nctx.drawImage(src, 0, 0, nx.width, nx.height); src = nx;
-      }
-      ox.imageSmoothingQuality = 'high'; ox.drawImage(src, 0, 0, W, H);
-    }
-    ox.filter = 'none'; ox.fillStyle = 'rgba(0,0,0,.25)'; ox.fillRect(0, 0, W, H);
-    c.blurCache = out;
-  }
-  ctx.drawImage(c.blurCache, 0, 0);
 }
 
 function drawLogo() {
@@ -796,15 +739,17 @@ function drawLogo() {
 
 function drawCase() {
   const c = caseState, warns = [];
-  ctx.fillStyle = c.bgColor; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
   if (c.img) {
-    if (c.bg === 'blur') blurBackdrop();
     const iw = c.img.naturalWidth * c.scale, ih = c.img.naturalHeight * c.scale;
     ctx.drawImage(c.img, c.x - iw / 2, c.y - ih / 2, iw, ih);
     if (c.scale > 1.25) warns.push(`Картинка растянута в ${c.scale.toFixed(1).replace('.', ',')} раза и будет мыльной. Нужен исходник от 1080×1440 или меньший масштаб.`);
-    const cover = coverScale(c.img), zoom = $('caseZoom');
-    zoom.min = Math.floor((c.noGaps ? 1 : containScale(c.img) * 0.5 / cover) * 100);
-    zoom.value = Math.round(c.scale / cover * 100);
+    $('caseZoom').value = Math.round(c.scale / coverScale(c.img) * 100);
+    // X/Y go as far as the picture sticks out past the edge
+    [['caseDx', iw - W, c.x - W / 2], ['caseDy', ih - H, c.y - H / 2]].forEach(([id, over, v]) => {
+      const r = $(id), m = Math.floor(over / 2);
+      r.min = -m; r.max = m; r.value = Math.round(v); r.disabled = m < 1;
+    });
   }
   if (c.logo) drawLogo();
   $('warnPic').hidden = !warns.length; $('warnPicTip').textContent = warns.join(' '); $('warnPic').setAttribute('aria-label', warns.join(' '));
@@ -812,12 +757,10 @@ function drawCase() {
 
 function setCaseImage(img, name) {
   const c = caseState;
-  c.img = img; c.name = slugify(name); c.blurCache = null;
-  setBgColor(edgeColor(img));
+  c.img = img; c.name = slugify(name);
   c.scale = coverScale(img); c.x = W / 2; c.y = H / 2; clampCase();
   draw();
 }
-function setBgColor(v) { caseState.bgColor = v; $('bgColor').value = v; $('bgColorHex').textContent = v.slice(1); }
 
 function loadCaseFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
@@ -868,6 +811,7 @@ function setMode(m) {
   $('fname').value = customName[m] ?? autoName();
   ['layoutRow', 'zRow', 'textSec', 'fontSec', 'articleProps'].forEach(id => { $(id).hidden = m !== 'article'; });
   $('caseProps').hidden = m !== 'case';
+  $('app').classList.toggle('case', m === 'case');
   cv.classList.toggle('pannable', m === 'case');
   draw();
 }
@@ -881,27 +825,18 @@ $('caseZoom').addEventListener('input', e => {
 });
 $('frameReset').addEventListener('click', () => {
   const c = caseState; if (!c.img) return;
-  c.noGaps = true; $('noGaps').checked = true;
   c.scale = coverScale(c.img); c.x = W / 2; c.y = H / 2; draw();
 });
-$('caseFit').addEventListener('click', () => {
-  const c = caseState; if (!c.img) return;
-  c.noGaps = false; $('noGaps').checked = false;
-  c.scale = containScale(c.img); c.x = W / 2; c.y = H / 2; draw();
-});
-$('noGaps').addEventListener('change', e => { caseState.noGaps = e.target.checked; clampCase(); draw(); });
-document.querySelectorAll('input[name=bg]').forEach(r => r.addEventListener('change', () => {
-  caseState.bg = r.value; $('bgColorRow').hidden = r.value !== 'color'; draw();
-}));
-$('bgColor').addEventListener('input', e => { setBgColor(e.target.value); draw(); });
+$('caseDx').addEventListener('input', e => { if (!caseState.img) return; caseState.x = W / 2 + +e.target.value; clampCase(); draw(); });
+$('caseDy').addEventListener('input', e => { if (!caseState.img) return; caseState.y = H / 2 + +e.target.value; clampCase(); draw(); });
 document.querySelectorAll('input[name=tint]').forEach(r => r.addEventListener('change', () => { caseState.tint = r.value; draw(); }));
 ['lSize', 'lDx', 'lDy'].forEach(k => $(k).addEventListener('input', e => { caseState[k] = +e.target.value; draw(); }));
 $('logoReset').addEventListener('click', () => { const c = caseState; c.lSize = 540; c.lDx = 0; c.lDy = 0; syncLogoInputs(); draw(); });
 $('logoRemove').addEventListener('click', () => {
   caseState.logo = null; $('logoFile').value = '';
   ['logoControls', 'logoRemove', 'logoReset', 'logoThumb'].forEach(id => { $(id).hidden = true; });
-  $('logoThumb').parentNode.classList.add('empty');
-  $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'SVG или PNG с прозрачным фоном';
+  $('logoDrop').classList.add('add');
+  $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'SVG или PNG без фона';
   draw();
 });
 
