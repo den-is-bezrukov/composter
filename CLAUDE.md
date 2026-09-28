@@ -2,7 +2,7 @@
 
 Конструктор постов-статей для Instagram Evrone. Две версии:
 - **рабочая** — артефакт https://claude.ai/artifact/VPVrM77jsDNwbu7d2LZzGV, обновляется после каждой правки;
-- **стабильная** — GitHub Pages https://den-is-bezrukov.github.io/evrone-article-posts/ (репозиторий https://github.com/den-is-bezrukov/evrone-article-posts, публичный), обновляется только по команде пользователя.
+- **стабильная** — GitHub Pages https://den-is-bezrukov.github.io/composter/ (репозиторий https://github.com/den-is-bezrukov/composter, публичный), обновляется только по команде пользователя.
 
 Этот репозиторий — единственный источник правды для обеих версий.
 
