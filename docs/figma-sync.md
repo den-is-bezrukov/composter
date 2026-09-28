@@ -10,8 +10,8 @@
 | Страница | Что там | Во что превращается в коде |
 |---|---|---|
 | Foundations | Коллекция переменных «Builder UI» (Light/Dark), коллекция «Post», текстовые стили | CSS-переменные в `:root`, константы поста в скрипте, `font`-свойства классов |
-| Components | Button, Chip, Drop zone, Slider, Checkbox, Headline input, Warning, Color input, Step | `.btn`, `.chip`, `.drop`, `.slider`, `.check`, `textarea`, `.warn`, `input[type=color]`, `.steps li` |
-| Screens | «Статья» и «Кейс» на десктопе, «Статья» на телефоне | Разметка `.builder`, `.controls`, `.preview`, секции `.card` |
+| Components | Button, Chip, Tab, Layer tab, Drop zone, Slider (Default/Wide), Checkbox, Headline input, File name, Warning, Color input, Step | `.btn`, `.chip`, `.seg span`, `.seg.grid2 span`, `.drop`, `.slider` / `.slider.wide`, `.check`, `textarea`, `.fname`, `.warn`, `input[type=color]`, `.steps li` |
+| Screens | 1440×900: «Статья», «Кейс», «Помощь»; узкое окно 1024: вкладки «Текст» и «Картинка» | `.app` (три колонки), `.post-side`, `.workspace`, `.props`, `.savebar`, `.helpview`, медиазапрос ≤1100 px |
 | Post templates | «Статья» (Top, Bottom, Sandwich) и «Кейс», 1080×1440 | `LAYOUTS`, поля 30/60, `FS`/`LH`, цвет заголовка, ширина логотипа 540 |
 
 ## Соответствия

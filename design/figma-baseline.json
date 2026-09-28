@@ -1,5 +1,5 @@
 {
- "readAt": "2026-09-25T13:37:31.170Z",
+ "readAt": "2026-09-28T12:00:00.000Z",
  "variables": {
   "color/bg": {
    "collection": "Builder UI",
@@ -420,6 +420,48 @@
     "value": 0
    },
    "textCase": "ORIGINAL"
+  },
+  "UI/Tab": {
+   "family": "Roboto Flex",
+   "style": "Medium",
+   "size": 14,
+   "lineHeight": {
+    "unit": "PERCENT",
+    "value": 120
+   },
+   "letterSpacing": {
+    "unit": "PERCENT",
+    "value": 0
+   },
+   "textCase": "ORIGINAL"
+  },
+  "UI/Section Heading": {
+   "family": "Roboto Flex",
+   "style": "ExtraBold",
+   "axes": {
+    "GRAD": 0,
+    "XOPQ": 96,
+    "XTRA": 468,
+    "YOPQ": 60,
+    "YTAS": 750,
+    "YTDE": -203,
+    "YTFI": 738,
+    "YTLC": 514,
+    "YTUC": 712,
+    "slnt": 0,
+    "wdth": 60,
+    "wght": 800
+   },
+   "size": 22,
+   "lineHeight": {
+    "unit": "PERCENT",
+    "value": 100
+   },
+   "letterSpacing": {
+    "unit": "PERCENT",
+    "value": 1
+   },
+   "textCase": "UPPER"
   }
  },
  "components": {
@@ -490,6 +532,34 @@
     "strokes": "color/ink"
    }
   },
+  "Tab / State=Default": {
+   "layout": "HORIZONTAL",
+   "gap": 6,
+   "pad": [
+    7,
+    6,
+    7,
+    6
+   ],
+   "radius": 5
+  },
+  "Tab / State=Selected": {
+   "layout": "HORIZONTAL",
+   "gap": 6,
+   "pad": [
+    7,
+    6,
+    7,
+    6
+   ],
+   "radius": 5,
+   "vars": {
+    "fills": "color/ink"
+   }
+  },
+  "Layer tab": {
+   "note": "Tab + иконка 18×24; Order: Под текстом / Над верхним / Над нижним / Над текстом × State"
+  },
   "Drop zone / State=Default": {
    "layout": "VERTICAL",
    "pad": [
@@ -528,12 +598,19 @@
     "strokes": "color/accent"
    }
   },
-  "Slider": {
+  "Slider / Size=Default": {
    "w": 360,
    "layout": "HORIZONTAL",
    "gap": 10,
    "label": 90,
    "value": 48
+  },
+  "Slider / Size=Wide": {
+   "w": 360,
+   "layout": "HORIZONTAL",
+   "gap": 10,
+   "label": 118,
+   "value": 44
   },
   "Checkbox": {
    "layout": "HORIZONTAL",
@@ -552,6 +629,23 @@
    "vars": {
     "radius": "radius/control",
     "fills": "color/code",
+    "strokes": "color/line"
+   }
+  },
+  "File name": {
+   "layout": "HORIZONTAL",
+   "gap": 1,
+   "pad": [
+    10,
+    12,
+    10,
+    12
+   ],
+   "stroke": 1,
+   "radius": 8,
+   "vars": {
+    "radius": "radius/control",
+    "fills": "color/surface",
     "strokes": "color/line"
    }
   },
