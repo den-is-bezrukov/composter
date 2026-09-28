@@ -93,7 +93,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 
 /* Text inputs */
 textarea,.fname{background:var(--bg2);border:0;border-radius:var(--radius)}
-textarea{display:block;width:100%;padding:8px;resize:none;min-height:48px;max-height:160px;field-sizing:content;outline:none}
+textarea{display:block;width:100%;padding:8px;resize:none;height:32px;min-height:32px;max-height:160px;overflow-y:hidden;outline:none}
 textarea:focus,.fname input:focus{outline:1px solid var(--focus);outline-offset:-1px}
 .fname{display:flex;gap:1px;background:transparent;overflow:hidden}
 .fname input,.fname .ext{background:var(--bg2);border:0;padding:8px}
@@ -261,7 +261,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
 
       <section class="sec" id="textSec">
         <div class="sec-h"><span>Текст</span></div>
-        <div class="row"><textarea id="t1" rows="2" spellcheck="false" aria-label="Заголовок">Новый пост Evrone</textarea></div>
+        <div class="row"><textarea id="t1" rows="1" spellcheck="false" aria-label="Заголовок">Новый пост Evrone</textarea></div>
         <div class="row" id="warnTextRow" hidden><div class="warn" id="warnText"></div></div>
         <div class="row"><button class="btn" type="button" id="nbsp" title="Не даёт разорвать слова по разным строкам, например «AI AGENT». Поставьте курсор между словами и нажмите. На Mac то же делает ⌥+Пробел, на Windows Alt+0160.">Вставить неразрывный пробел</button></div>
       </section>
@@ -616,7 +616,9 @@ async function applyWidth() {
 document.querySelectorAll('input[name=wd]').forEach(r => r.addEventListener('change', () => { state.wd = r.value; applyWidth(); }));
 $('narrow').addEventListener('input', e => { state.narrow = +e.target.value; applyWidth(); });
 ['size', 'dx', 'dy'].forEach(k => $(k).addEventListener('input', e => { state[k] = +e.target.value; draw(); }));
-$('t1').addEventListener('input', draw);
+// One line by default, grows with the text (field-sizing isn't everywhere yet)
+function fitText() { const t = $('t1'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; t.style.overflowY = t.scrollHeight > 160 ? 'auto' : 'hidden'; }
+$('t1').addEventListener('input', () => { fitText(); draw(); });
 $('nbsp').addEventListener('mousedown', e => e.preventDefault());
 $('nbsp').addEventListener('click', () => {
   const f = $('t1'), s = f.selectionStart, e = f.selectionEnd;
@@ -625,7 +627,7 @@ $('nbsp').addEventListener('click', () => {
   if (a === b && f.value[a - 1] === ' ') a--; else if (a === b && f.value[a] === ' ') b++;
   f.value = f.value.slice(0, a) + ' ' + f.value.slice(b);
   f.focus(); f.selectionStart = f.selectionEnd = a + 1;
-  draw();
+  fitText(); draw();
 });
 // «Над нижним» and «Над верхним» only make sense with two text blocks
 function syncZ() {
@@ -808,6 +810,7 @@ function setMode(m) {
   mode = m;
   $('fname').value = customName[m] ?? autoName();
   ['layoutRow', 'zRow', 'textSec', 'fontSec', 'articleProps'].forEach(id => { $(id).hidden = m !== 'article'; });
+  if (m === 'article') fitText();
   $('caseProps').hidden = m !== 'case';
   $('app').classList.toggle('case', m === 'case');
   cv.classList.toggle('pannable', m === 'case');
@@ -989,6 +992,7 @@ sample.onload = () => { if (!state.img) { state.img = sample; setCard('file', '�
 sample.src = 'data:image/webp;base64,__LIPS__';
 syncZ();
 resetPos();
+fitText();
 document.fonts.load('180px "RF60"').then(draw, draw);
 draw();
 </script>
