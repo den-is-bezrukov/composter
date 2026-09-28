@@ -144,6 +144,12 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
 canvas.pannable{cursor:grab;touch-action:none}
 canvas.pannable.dragging{cursor:grabbing}
+canvas.pannable.over-text:not(.dragging){cursor:text}
+/* Headline being edited on the preview: font and place are set by placeInline() */
+.frame textarea.inline{position:absolute;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#EEEEEE;
+  min-height:0;max-height:none;overflow:hidden;resize:none;text-align:center;text-transform:uppercase;letter-spacing:.01em;
+  font-weight:400;font-synthesis:none;overflow-wrap:anywhere;caret-color:var(--accent);-webkit-font-smoothing:auto}
+.frame textarea.inline:focus{outline:none}
 .grid{position:absolute;inset:0;pointer-events:none;
   --g:rgba(255,255,255,.6);
   background:

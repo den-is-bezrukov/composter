@@ -61,28 +61,35 @@ function layoutBlock(ls, boxW) {
   return { rows: wrap(ls, boxW), overflow };
 }
 
-// Sandwich takes one field: the first Enter splits top from bottom.
-// Without it the words are split in half: fewest rows per part first,
-// then no short word (preposition) left hanging at the end of the top, then equal length
+// Sandwich takes one field: the first Enter splits top from bottom
+// (while the headline is edited on the preview, even with one side empty).
+// Without it the words are split in half, see splitWords()
 function textBlocks() {
   const raw = $('t1').value;
   if (state.layout !== 'sandwich') return [lines(raw), []];
   const i = raw.indexOf('\n');
   if (i >= 0) {
     const a = lines(raw.slice(0, i)), b = lines(raw.slice(i + 1));
-    if (a.length && b.length) return [a, b];
+    if ((a.length && b.length) || inline.part) return [a, b];
   }
   const words = lines(raw.replace(/\n/g, ' ')).join(' ').split(' ').filter(Boolean);
   if (words.length < 2) return [words, []];
+  const k = splitWords(words);
+  return [[words.slice(0, k).join(' ')], [words.slice(k).join(' ')]];
+}
+
+// How many words go on top: fewest rows per part first,
+// then no short word (preposition) left hanging at the end of the top, then equal length
+function splitWords(words) {
   const better = (s, t) => { for (let j = 0; j < s.length; j++) if (s[j] !== t[j]) return s[j] < t[j]; return false; };
   let best = null;
   for (let k = 1; k < words.length; k++) {
     const a = words.slice(0, k).join(' '), b = words.slice(k).join(' ');
     const rows = Math.max(layoutBlock([a], W - 2 * PAD).rows.length, layoutBlock([b], W - 2 * PAD).rows.length);
     const score = [rows, words[k - 1].length <= 2 ? 1 : 0, Math.abs(a.length - b.length)];
-    if (!best || better(score, best.score)) best = { score, a, b };
+    if (!best || better(score, best.score)) best = { score, k };
   }
-  return [[best.a], [best.b]];
+  return best.k;
 }
 
 // Static wdth instances 25–60 (canvas can't set variation axes), registered on first use
@@ -96,11 +103,15 @@ async function ensureWidth(w) {
 }
 
 // ---- Drawing ----
-function drawBlock(ls, boxX, boxW, atBottom) {
-  if (!ls.length) return null;
-  const f = layoutBlock(ls, boxW);
+// Each block's place is kept in textBoxes (post pixels) for editing on the preview;
+// an empty block still gets one line there, so it can be double-clicked
+let textBoxes = [];
+function drawBlock(ls, boxX, boxW, atBottom, part) {
+  const f = ls.length ? layoutBlock(ls, boxW) : null, n = f ? f.rows.length : 1;
+  const y0 = atBottom ? H - PAD - n * LH : PAD;
+  textBoxes.push({ part, x: boxX, y: y0, w: boxW, h: n * LH, atBottom });
+  if (!f || inline.part === part) return f;
   ctx.fillStyle = '#EEEEEE'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-  const y0 = atBottom ? H - PAD - f.rows.length * LH : PAD;
   f.rows.forEach((l, i) => ctx.fillText(l, boxX + boxW / 2, y0 + i * LH + BASE));
   return f;
 }
@@ -117,10 +128,11 @@ function drawArticle() {
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
   const [a, b] = textBlocks();
   let f1, f2;
-  const top = () => { if (state.layout !== 'bottom') f1 = drawBlock(a, PAD, W - 2 * PAD, false); };
+  textBoxes = [];
+  const top = () => { if (state.layout !== 'bottom') f1 = drawBlock(a, PAD, W - 2 * PAD, false, 'a'); };
   const bottom = () => {
-    if (state.layout === 'bottom') f1 = drawBlock(a, 60, 960, true);
-    if (state.layout === 'sandwich') f2 = drawBlock(b, PAD, W - 2 * PAD, true);
+    if (state.layout === 'bottom') f1 = drawBlock(a, 60, 960, true, 'a');
+    if (state.layout === 'sandwich') f2 = drawBlock(b, PAD, W - 2 * PAD, true, 'b');
   };
   const order = {
     under:      [drawImage, top, bottom],
@@ -148,7 +160,7 @@ function loadArticleFile(file) {
 }
 
 // ---- Controls ----
-onRadio('layout', v => { state.layout = v; syncZ(); resetPos(); draw(); });
+onRadio('layout', v => { stopInline(); state.layout = v; syncZ(); resetPos(); draw(); });
 
 async function applyWidth() {
   $('narrowRow').hidden = state.wd !== 'narrow';

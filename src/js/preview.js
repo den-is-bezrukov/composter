@@ -26,16 +26,22 @@ function zoomBy(factor, p) {
 }
 
 const canMove = () => !!(mode === 'case' ? caseState.img : state.img);
-let start = null;
+let start = null, origTimer = 0;
 cv.addEventListener('pointerdown', e => {
   if (!canMove()) return;
   try { cv.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
   pointers.set(e.pointerId, toCanvas(e));
   cv.classList.add('dragging'); $('grid').hidden = mode !== 'case';
   start = pointers.size === 1 ? toCanvas(e) : null;
-  if (mode === 'article' && color.out && start) { color.showOriginal = true; draw(); }
+  if (mode === 'article' && color.out && start) {
+    // On the headline the comparison waits a moment: a double-click there opens the text instead
+    if (textBoxAt(start)) origTimer = setTimeout(() => { if (start) { color.showOriginal = true; draw(); } }, 250);
+    else { color.showOriginal = true; draw(); }
+  }
 });
 cv.addEventListener('pointermove', e => {
+  // Over the headline the cursor says it can be edited (double-click)
+  if (!pointers.size) cv.classList.toggle('over-text', !!textBoxAt(toCanvas(e)));
   if (!pointers.has(e.pointerId)) return;
   const p = toCanvas(e), prev = pointers.get(e.pointerId);
   // A real drag cancels the colour comparison
@@ -53,11 +59,12 @@ cv.addEventListener('pointermove', e => {
 ['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, e => {
   pointers.delete(e.pointerId);
   if (!pointers.size) {
-    start = null;
+    start = null; clearTimeout(origTimer);
     cv.classList.remove('dragging'); $('grid').hidden = true;
     if (color.showOriginal) { color.showOriginal = false; draw(); }
   }
 }));
+cv.addEventListener('pointerleave', () => cv.classList.remove('over-text'));
 cv.addEventListener('wheel', e => {
   if (!canMove()) return;
   e.preventDefault(); zoomBy(Math.exp(-e.deltaY * 0.0015), toCanvas(e)); draw();

@@ -21,9 +21,10 @@ function syncResets() {
   $('logoReset').disabled = !logoChanged();
 }
 
-function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); paintRanges(); syncResets(); }
+function draw() { mode === 'case' ? drawCase() : drawArticle(); syncName(); paintRanges(); syncResets(); placeInline(); }
 
 function setMode(m) {
+  stopInline();
   mode = m;
   $('fname').value = customName[m] ?? autoName();
   show(['textSec', 'fontSec', 'articleProps'], m === 'article');
@@ -46,6 +47,7 @@ function fitFrame() {
   const availH = ws.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const w = Math.max(120, Math.floor(Math.min(availW, availH * 3 / 4)));
   $('frame').style.width = w + 'px'; $('frame').style.height = Math.round(w * 4 / 3) + 'px';
+  placeInline();
 }
 new ResizeObserver(fitFrame).observe(document.querySelector('.workspace'));
 
