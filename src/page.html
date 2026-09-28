@@ -262,7 +262,6 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
       <section class="sec" id="textSec">
         <div class="sec-h"><span>Текст</span></div>
         <div class="row"><textarea id="t1" rows="2" spellcheck="false" aria-label="Заголовок">Новый пост Evrone</textarea></div>
-        <div class="note" id="sandwichNote" hidden>Enter делит текст на верх и низ. Без Enter текст делится пополам сам.</div>
         <div class="row" id="warnTextRow" hidden><div class="warn" id="warnText"></div></div>
         <div class="row"><button class="btn" type="button" id="nbsp" title="Не даёт разорвать слова по разным строкам, например «AI AGENT». Поставьте курсор между словами и нажмите. На Mac то же делает ⌥+Пробел, на Windows Alt+0160.">Вставить неразрывный пробел</button></div>
       </section>
@@ -606,7 +605,6 @@ document.addEventListener('paste', e => {
 
 document.querySelectorAll('input[name=layout]').forEach(r => r.addEventListener('change', () => {
   state.layout = r.value;
-  $('sandwichNote').hidden = state.layout !== 'sandwich';
   syncZ(); resetPos(); draw();
 }));
 async function applyWidth() {
@@ -681,8 +679,8 @@ const safeName = s => s.toLowerCase().trim()
   .replace(/[^a-z0-9_-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-_]+|[-_]+$/g, '');
 const customName = { article: null, case: null };
 const autoName = () => mode === 'case'
-  ? 'evrone-case-' + (safeName(caseState.name) || 'case')
-  : 'evrone-' + (safeName(lines($('t1').value).join(' ')) || 'post');
+  ? safeName(caseState.name) || 'case'
+  : safeName(lines($('t1').value).join(' ')) || 'post';
 const fileName = () => (safeName(customName[mode] || '') || autoName()) + '.png';
 function syncName() { const f = $('fname'); if (customName[mode] === null && document.activeElement !== f) f.value = autoName(); }
 
