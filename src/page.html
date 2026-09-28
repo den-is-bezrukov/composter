@@ -213,21 +213,6 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
             <label><input type="radio" name="mode" value="case"><span>Кейс</span></label>
           </div>
         </div>
-        <div class="row" id="layoutRow">
-          <div class="seg" role="radiogroup" aria-label="Раскладка">
-            <label title="Текст сверху"><input type="radio" name="layout" value="top" checked aria-label="Текст сверху"><span><svg><use href="#i-top"/></svg></span></label>
-            <label title="Сэндвич: текст сверху и снизу"><input type="radio" name="layout" value="sandwich" aria-label="Сэндвич"><span><svg><use href="#i-sandwich"/></svg></span></label>
-            <label title="Текст снизу"><input type="radio" name="layout" value="bottom" aria-label="Текст снизу"><span><svg><use href="#i-bottom"/></svg></span></label>
-          </div>
-        </div>
-        <div class="row" id="zRow">
-          <div class="seg" role="radiogroup" aria-label="Слой картинки">
-            <label title="Картинка под текстом"><input type="radio" name="z" id="z-under" value="under" checked aria-label="Картинка под текстом"><span><svg><use id="zi-under" href="#i-under2"/></svg></span></label>
-            <label title="Картинка над текстом"><input type="radio" name="z" value="over" aria-label="Картинка над текстом"><span><svg><use id="zi-over" href="#i-over2"/></svg></span></label>
-            <label title="Картинка над нижним текстом" id="zc-overBottom"><input type="radio" name="z" value="overBottom" aria-label="Картинка над нижним текстом"><span><svg><use href="#i-overBottom"/></svg></span></label>
-            <label title="Картинка над верхним текстом" id="zc-overTop"><input type="radio" name="z" value="overTop" aria-label="Картинка над верхним текстом"><span><svg><use href="#i-overTop"/></svg></span></label>
-          </div>
-        </div>
       </section>
 
       <div id="caseProps" hidden>
@@ -260,6 +245,13 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
 
       <section class="sec" id="textSec">
         <div class="sec-h"><span>Текст</span></div>
+        <div class="row" id="layoutRow">
+          <div class="seg" role="radiogroup" aria-label="Раскладка">
+            <label title="Текст сверху"><input type="radio" name="layout" value="top" checked aria-label="Текст сверху"><span><svg><use href="#i-top"/></svg></span></label>
+            <label title="Сэндвич: текст сверху и снизу"><input type="radio" name="layout" value="sandwich" aria-label="Сэндвич"><span><svg><use href="#i-sandwich"/></svg></span></label>
+            <label title="Текст снизу"><input type="radio" name="layout" value="bottom" aria-label="Текст снизу"><span><svg><use href="#i-bottom"/></svg></span></label>
+          </div>
+        </div>
         <div class="row"><textarea id="t1" rows="1" spellcheck="false" aria-label="Заголовок">Новый пост Evrone</textarea></div>
         <div class="row" id="warnTextRow" hidden><div class="warn" id="warnText"></div></div>
         <div class="row"><button class="btn" type="button" id="nbsp" title="Не даёт разорвать слова по разным строкам, например «AI AGENT». Поставьте курсор между словами и нажмите. На Mac то же делает ⌥+Пробел, на Windows Alt+0160.">Вставить неразрывный пробел</button></div>
@@ -317,6 +309,14 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
       <div id="articleProps">
         <section class="sec">
           <div class="sec-h"><span>Изображение</span><button class="ghost" type="button" id="posReset">Сбросить</button></div>
+          <div class="row" id="zRow">
+            <div class="seg" role="radiogroup" aria-label="Слой картинки">
+              <label title="Картинка под текстом"><input type="radio" name="z" id="z-under" value="under" checked aria-label="Картинка под текстом"><span><svg><use id="zi-under" href="#i-under2"/></svg></span></label>
+              <label title="Картинка над текстом"><input type="radio" name="z" value="over" aria-label="Картинка над текстом"><span><svg><use id="zi-over" href="#i-over2"/></svg></span></label>
+              <label title="Картинка над нижним текстом" id="zc-overBottom"><input type="radio" name="z" value="overBottom" aria-label="Картинка над нижним текстом"><span><svg><use href="#i-overBottom"/></svg></span></label>
+              <label title="Картинка над верхним текстом" id="zc-overTop"><input type="radio" name="z" value="overTop" aria-label="Картинка над верхним текстом"><span><svg><use href="#i-overTop"/></svg></span></label>
+            </div>
+          </div>
           <div class="row">
             <label class="file" id="drop" for="file">
               <span class="thumb"><img id="fileThumb" alt=""></span>
@@ -325,7 +325,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
             <input type="file" id="file" accept="image/*" hidden>
           </div>
           <div class="row"><button class="btn" type="button" id="copyPromptSide">Скопировать промпт стиля</button></div>
-          <div class="prop"><label class="lbl" for="size"><span>Масштаб</span></label><input type="range" id="size" min="400" max="1800" step="10" data-zero="400"></div>
+          <div class="prop"><label class="lbl" for="size"><span>Масштаб</span></label><input type="range" id="size" min="260" max="1660" step="10" data-zero="960"></div>
           <div class="prop"><label class="lbl" for="dx"><span>Горизонтальное смещение</span></label><input type="range" id="dx" min="-400" max="400" step="5" value="0" data-zero="0"></div>
           <div class="prop"><label class="lbl" for="dy"><span>Вертикальное смещение</span></label><input type="range" id="dy" min="-500" max="500" step="5" value="0" data-zero="0"></div>
         </section>
@@ -454,10 +454,12 @@ const LAYOUTS = {
 };
 const state = { img: null, layout: 'top', wd: 'auto', narrow: 52, size: 960, dx: 0, dy: 0, z: 'under' };
 
+// The layout's default size sits in the middle of «Масштаб», ±700 px either way
 function resetPos() {
-  const L = LAYOUTS[state.layout];
+  const L = LAYOUTS[state.layout], r = $('size');
+  r.min = L.size - 700; r.max = L.size + 700; r.dataset.zero = L.size;
   state.size = L.size; state.dx = 0; state.dy = 0;
-  $('size').value = state.size; $('dx').value = 0; $('dy').value = 0;
+  r.value = state.size; $('dx').value = 0; $('dy').value = 0;
 }
 
 // Regular spaces are break points; U+00A0 keeps words together
@@ -825,7 +827,7 @@ function syncLogoInputs() {
 function setMode(m) {
   mode = m;
   $('fname').value = customName[m] ?? autoName();
-  ['layoutRow', 'zRow', 'textSec', 'fontSec', 'articleProps'].forEach(id => { $(id).hidden = m !== 'article'; });
+  ['textSec', 'fontSec', 'articleProps'].forEach(id => { $(id).hidden = m !== 'article'; });
   if (m === 'article') fitText();
   // Case: logo on the left, background on the right, like text / picture in an article
   ['caseProps', 'caseBg'].forEach(id => { $(id).hidden = m !== 'case'; });
