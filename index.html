@@ -17,7 +17,7 @@
   --bg:#FFFFFF; --bg2:#F5F5F5; --canvas:#F5F5F5; --seg-on:#FFFFFF;
   --line:#E6E6E6; --line-t:rgba(0,0,0,.1);
   --text:rgba(0,0,0,.9); --text2:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
-  --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
+  --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --accent:#FF5C16; --accent-hover:#E84F0C; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
   --radius:5px;
 }
@@ -94,6 +94,8 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 /* Buttons */
 .btn{height:32px;display:flex;align-items:center;justify-content:center;padding:4px 12px;border:1px solid var(--line-t);border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
 .btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
+.btn.primary:hover{background:var(--accent-hover)}
 .ghost{flex:none;height:24px;padding:4px 8px;border:0;border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
 .ghost:hover:not(:disabled){background:var(--bg2)}
 .ghost:disabled{color:var(--text3);cursor:default}
@@ -108,11 +110,11 @@ textarea:focus,.fname input:focus{outline:1px solid var(--focus);outline-offset:
 .fname input{flex:1;min-width:0;padding-right:4px;border-radius:var(--radius) 0 0 var(--radius)}
 .fname .ext{flex:none;padding-left:6px;color:var(--text3);user-select:none;border-radius:0 var(--radius) var(--radius) 0}
 
-/* Slider: 16 px track, white knob; .fill paints from the left, otherwise a tick marks the default */
-input[type=range]{--p:0;--z:.5;-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:100px;height:16px;margin:0;border-radius:999px;cursor:pointer;
-  background:radial-gradient(circle at calc(8px + (100% - 16px) * var(--z)) 50%,var(--text3) 2px,transparent 2.5px),var(--bg2);
+/* Slider: 16 px track, white knob; the dot marks the default, orange runs from it to the knob */
+input[type=range]{--z:0;--fs:0px;--fe:0px;-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:100px;height:16px;margin:0;border-radius:999px;cursor:pointer;
+  background:linear-gradient(to right,transparent var(--fs),var(--accent) var(--fs) var(--fe),transparent var(--fe)),
+    radial-gradient(circle at calc(8px + (100% - 16px) * var(--z)) 50%,var(--text3) 2px,transparent 2.5px),var(--bg2);
   box-shadow:inset 0 0 0 1px var(--line-t)}
-input[type=range].fill{background:linear-gradient(to right,var(--inverse) calc(8px + (100% - 16px) * var(--p)),transparent 0),var(--bg2)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:var(--elev)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#fff;box-shadow:var(--elev)}
 input[type=range]::-moz-range-track{background:transparent}
@@ -248,7 +250,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
           <div class="row">
             <label class="file add" id="logoDrop" for="logoFile">
               <span class="thumb"><svg class="plus" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.0049 6.00468C12.2809 6.00468 12.5047 6.22869 12.5049 6.50468V11.4998H17.5C17.7761 11.4998 17.9999 11.7237 18 11.9998C18 12.2759 17.7761 12.4998 17.5 12.4998H12.5049V17.5047C12.5049 17.7808 12.281 18.0047 12.0049 18.0047C11.7288 18.0046 11.5049 17.7808 11.5049 17.5047V12.4998H6.5C6.22386 12.4998 6 12.2759 6 11.9998C6.00011 11.7237 6.22393 11.4998 6.5 11.4998H11.5049V6.50468C11.5051 6.22872 11.7289 6.00474 12.0049 6.00468Z"/></svg><img id="logoThumb" alt="" hidden></span>
-              <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">SVG или PNG без фона</span></span>
+              <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">Прозрачный SVG или PNG</span></span>
             </label>
             <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
           </div>
@@ -260,7 +262,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
                 <label><input type="radio" name="tint" value="#000000"><span>Чёрный</span></label>
               </div>
             </div>
-            <div class="prop"><label class="lbl" for="lSize"><span>Размер</span></label><input type="range" id="lSize" min="100" max="1020" step="10" value="540" data-zero="540"></div>
+            <div class="prop"><label class="lbl" for="lSize"><span>Размер</span></label><input type="range" id="lSize" min="100" max="1020" step="10" value="540" data-zero="100"></div>
             <div class="prop"><label class="lbl" for="lDx"><span>X, Левее/Правее</span></label><input type="range" id="lDx" min="-500" max="500" step="5" value="0" data-zero="0"></div>
             <div class="prop"><label class="lbl" for="lDy"><span>Y, Выше/Ниже</span></label><input type="range" id="lDy" min="-700" max="700" step="5" value="0" data-zero="0"></div>
           </div>
@@ -284,7 +286,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         </div>
         <div class="prop" id="narrowRow" hidden>
           <label class="lbl" for="narrow"><span>Ширина букв</span><output id="narrowOut">52</output></label>
-          <input type="range" class="fill" id="narrow" min="25" max="60" step="1" value="52">
+          <input type="range" id="narrow" min="25" max="60" step="1" value="52" data-zero="60" data-origin="25">
         </div>
       </section>
     </div>
@@ -293,7 +295,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
       <div class="sec-h"><span>Экспорт</span></div>
       <div class="row" id="warnSaveRow" hidden><div class="warn" id="warnSave"></div></div>
       <div class="row"><div class="fname"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext">.png</span></div></div>
-      <div class="row"><button class="btn" type="submit" id="dl">Скачать</button></div>
+      <div class="row"><button class="btn primary" type="submit" id="dl">Скачать</button></div>
     </form>
   </aside>
 
@@ -323,16 +325,16 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
 
         <section class="sec">
           <div class="sec-h"><span>Коррекция цвета</span><button class="ghost" type="button" id="colorReset">Сбросить</button></div>
-          <div class="prop"><label class="lbl" for="cHue"><span>Оттенок красного</span></label><input type="range" class="fill" id="cHue" min="0" max="15" step="0.5" value="0"></div>
-          <div class="prop"><label class="lbl" for="cSat"><span>Насыщенность</span></label><input type="range" id="cSat" min="50" max="120" step="1" value="100" data-zero="100"></div>
-          <div class="prop"><label class="lbl" for="cVal"><span>Яркость</span></label><input type="range" id="cVal" min="80" max="150" step="1" value="100" data-zero="100"></div>
-          <div class="prop"><label class="lbl" for="cCast"><span>Почистить белый и металл</span></label><input type="range" class="fill" id="cCast" min="0" max="100" step="1" value="0"></div>
-          <div class="prop"><label class="lbl" for="cFeather"><span>Размытие маски</span></label><input type="range" class="fill" id="cFeather" min="0" max="10" step="1" value="3"></div>
+          <div class="prop"><label class="lbl" for="cHue"><span>Оттенок красного</span></label><input type="range" id="cHue" min="-15" max="15" step="0.5" value="0" data-zero="0"></div>
+          <div class="prop"><label class="lbl" for="cSat"><span>Насыщенность</span></label><input type="range" id="cSat" min="50" max="150" step="1" value="100" data-zero="100"></div>
+          <div class="prop"><label class="lbl" for="cVal"><span>Яркость</span></label><input type="range" id="cVal" min="50" max="150" step="1" value="100" data-zero="100"></div>
+          <div class="prop"><label class="lbl" for="cCast"><span>Почистить белый и металл</span></label><input type="range" id="cCast" min="-100" max="100" step="1" value="0" data-zero="0"></div>
+          <div class="prop"><label class="lbl" for="cFeather"><span>Размытие маски</span></label><input type="range" id="cFeather" min="0" max="10" step="1" value="3" data-zero="0"></div>
         </section>
 
         <section class="sec">
           <div class="sec-h"><span>Положение</span><button class="ghost" type="button" id="posReset">Сбросить</button></div>
-          <div class="prop"><label class="lbl" for="size"><span>Размер</span></label><input type="range" id="size" min="400" max="1800" step="10"></div>
+          <div class="prop"><label class="lbl" for="size"><span>Размер</span></label><input type="range" id="size" min="400" max="1800" step="10" data-zero="400"></div>
           <div class="prop"><label class="lbl" for="dx"><span>X, Левее/Правее</span></label><input type="range" id="dx" min="-400" max="400" step="5" value="0" data-zero="0"></div>
           <div class="prop"><label class="lbl" for="dy"><span>Y, Выше/Ниже</span></label><input type="range" id="dy" min="-500" max="500" step="5" value="0" data-zero="0"></div>
         </section>
@@ -377,7 +379,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         <li><b>Текст читается</b>Объект не должен заходить под буквы. Если заходит, уменьшите картинку или сдвиньте её ползунком.</li>
         <li><b>Фон прозрачный</b>Картинка должна быть PNG с прозрачным фоном: тогда её можно положить и под текст, и над ним. Если ChatGPT вернул картинку с фоном, попросите «make the background transparent».</li>
         <li><b>Неразрывный пробел</b>Не даёт разорвать слова по разным строкам, например «AI&nbsp;AGENT». Поставьте курсор между словами и нажмите «Вставить неразрывный пробел». На Mac то же делает ⌥+Пробел, на Windows Alt+0160.</li>
-        <li><b>Коррекция цвета</b>Ползунки меняют только яркие красные и тёплый налёт на белом, стекле и металле. Зажмите превью, чтобы сравнить с оригиналом.</li>
+        <li><b>Коррекция цвета</b>Ползунки меняют только яркие красные и тёплый налёт на белом, стекле и металле и крутятся от середины в обе стороны: например, слишком жёлтый красный можно увести в холодный. Зажмите превью, чтобы сравнить с оригиналом.</li>
         <li><b>Кейс: кадрирование</b>Картинка всегда закрывает весь пост. Двигайте её мышью прямо на превью или ползунками X и Y, колёсиком мыши меняйте размер.</li>
         <li><b>Кейс: важное ближе к центру</b>Лицо, продукт или логотип на картинке держите подальше от краёв. В ленте и сетке Instagram края поста могут обрезаться.</li>
         <li><b>Кейс: логотип клиента</b>Берите SVG или PNG с прозрачным фоном из брендбука клиента. Если логотип цветной и теряется на фоне, перекрасьте его в белый или чёрный.</li>
@@ -455,7 +457,6 @@ const state = { img: null, layout: 'top', wd: 'auto', narrow: 52, size: 960, dx:
 function resetPos() {
   const L = LAYOUTS[state.layout];
   state.size = L.size; state.dx = 0; state.dy = 0;
-  $('size').dataset.zero = L.size;
   $('size').value = state.size; $('dx').value = 0; $('dy').value = 0;
 }
 
@@ -695,11 +696,15 @@ const fileName = () => (safeName(customName[mode] || '') || autoName()) + '.png'
 function syncName() { const f = $('fname'); if (customName[mode] === null && document.activeElement !== f) f.value = autoName(); }
 
 // Range fill and the default tick follow the value
+// Orange runs from the origin (the default dot, or data-origin) to the knob, in either direction
 function paintRanges() {
+  const at = t => t <= 0 ? '0px' : t >= 1 ? '100%' : `calc(8px + (100% - 16px) * ${t})`;
   document.querySelectorAll('input[type=range]').forEach(r => {
-    const mn = +r.min, span = (+r.max - mn) || 1;
-    r.style.setProperty('--p', (r.value - mn) / span);
-    if (r.dataset.zero !== undefined) r.style.setProperty('--z', (r.dataset.zero - mn) / span);
+    const mn = +r.min, span = (+r.max - mn) || 1, f = v => Math.min(1, Math.max(0, (v - mn) / span));
+    const zero = r.dataset.zero ?? r.min, p = f(+r.value), o = f(+(r.dataset.origin ?? zero));
+    r.style.setProperty('--z', f(+zero));
+    r.style.setProperty('--fs', p === o ? '0px' : at(Math.min(p, o)));
+    r.style.setProperty('--fe', p === o ? '0px' : at(Math.max(p, o)));
   });
 }
 // «Сбросить» fades out when there is nothing to reset
@@ -845,7 +850,7 @@ $('logoRemove').addEventListener('click', () => {
   caseState.logo = null; $('logoFile').value = '';
   ['logoControls', 'logoRemove', 'logoReset', 'logoThumb'].forEach(id => { $(id).hidden = true; });
   $('logoDrop').classList.add('add');
-  $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'SVG или PNG без фона';
+  $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'Прозрачный SVG или PNG';
   draw();
 });
 
