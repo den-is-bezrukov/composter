@@ -22,7 +22,7 @@ ROOT = Path(__file__).parent
 SRC = ROOT / "src"
 
 # One shared scope: later parts use what earlier ones define, main.js starts the page
-JS_ORDER = ["core", "help", "article", "color", "case", "preview", "files", "export", "main"]
+JS_ORDER = ["core", "help", "theme", "article", "color", "case", "preview", "files", "export", "main"]
 
 
 def b64(path):

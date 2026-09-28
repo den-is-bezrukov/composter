@@ -49,7 +49,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .side.left{border-right:1px solid var(--line-t)}
 .side.right{border-left:1px solid var(--line-t)}
 .scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
-.side.right .scroll{padding-bottom:56px}
+.side.right .scroll{padding-bottom:96px}
 /* Narrow window: everything in one column, «Экспорт» stays at the bottom */
 @media (max-width:960px){
   .app{grid-template-columns:240px minmax(0,1fr)}
@@ -166,6 +166,9 @@ canvas.pannable.dragging{cursor:grabbing}
 /* «?» in the corner and the help popup */
 .helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .helpbtn svg{width:32px;height:32px;fill:currentColor}
+/* Theme button sits right above «?»: 16 + 32 + 8 */
+.themebtn{bottom:56px}
+.themebtn svg{width:24px;height:24px}
 dialog.help{width:min(720px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15)}
 dialog.help[open]{display:flex;flex-direction:column}
 dialog.help::backdrop{background:rgba(0,0,0,.3)}
@@ -203,6 +206,10 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
   <!-- One text block («Сверху» / «Снизу»): two squares instead of three -->
   <symbol id="i-under2" viewBox="0 0 24 24"><path d="M17 6.5C17.2761 6.5 17.5 6.72386 17.5 7V14C17.5 14.2761 17.2761 14.5 17 14.5H14.5V17C14.5 17.2761 14.2761 17.5 14 17.5H7C6.72386 17.5 6.5 17.2761 6.5 17V10C6.5 9.72386 6.72386 9.5 7 9.5H9.5V7C9.5 6.72386 9.72386 6.5 10 6.5H17ZM10.5 13.5H16.5V7.5H10.5V13.5Z"/></symbol>
   <symbol id="i-over2" viewBox="0 0 24 24"><path d="M17 6.5C17.2761 6.5 17.5 6.72386 17.5 7V14C17.5 14.2761 17.2761 14.5 17 14.5H14.5V17C14.5 17.2761 14.2761 17.5 14 17.5H7C6.72386 17.5 6.5 17.2761 6.5 17V10C6.5 9.72386 6.72386 9.5 7 9.5H9.5V7C9.5 6.72386 9.72386 6.5 10 6.5H17ZM7.5 16.5H13.5V14.5H10C9.72386 14.5 9.5 14.2761 9.5 14V10.5H7.5V16.5Z"/></symbol>
+  <!-- Theme button: system (half-filled circle), light (sun), dark (moon) -->
+  <symbol id="i-theme-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="none" stroke="currentColor"/><path d="M12 6a6 6 0 0 1 0 12z"/></symbol>
+  <symbol id="i-theme-light" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 4.5v2M12 17.5v2M4.5 12h2M17.5 12h2M6.7 6.7l1.4 1.4M15.9 15.9l1.4 1.4M6.7 17.3l1.4-1.4M15.9 8.1l1.4-1.4"/></g></symbol>
+  <symbol id="i-theme-dark" viewBox="0 0 24 24"><path d="M18 14.5A6.5 6.5 0 1 1 9.5 6a7 7 0 0 0 8.5 8.5z" fill="none" stroke="currentColor" stroke-linejoin="round"/></symbol>
 </svg>
 
 <div class="app" id="app">
@@ -351,6 +358,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
   </aside>
 </div>
 
+<button class="helpbtn themebtn" type="button" id="themeBtn"><svg aria-hidden="true"><use id="themeIcon" href="#i-theme-auto"/></svg></button>
 <button class="helpbtn" type="button" id="helpBtn" aria-label="Помощь" title="Помощь">
   <svg viewBox="8 5 32 32" aria-hidden="true"><path d="M23.9999 27.1504C24.4694 27.1504 24.8495 27.5306 24.8495 28C24.8495 28.4694 24.4693 28.8496 23.9999 28.8496C23.5305 28.8496 23.1503 28.4694 23.1503 28C23.1503 27.5306 23.5305 27.1504 23.9999 27.1504ZM24.2665 14C25.4408 14 26.4862 14.383 27.2431 15.0781C28.0033 15.7764 28.4442 16.7645 28.4443 17.9111C28.4443 18.7366 28.2603 19.4298 27.8915 20.0381C27.5271 20.6392 27.0008 21.1258 26.3661 21.5713C25.542 22.1496 25.105 22.555 24.8525 23.0117C24.6035 23.462 24.4999 24.0249 24.4999 25H23.4999C23.4999 23.9751 23.6027 23.2035 23.9765 22.5273C24.3467 21.8579 24.9491 21.3437 25.7909 20.7529C26.3628 20.3516 26.7695 19.9591 27.036 19.5195C27.2983 19.0871 27.4443 18.5781 27.4443 17.9111C27.4442 17.0325 27.1118 16.3154 26.5663 15.8145C26.0174 15.3104 25.2241 15 24.2665 15C23.291 15 22.4035 15.2811 21.7685 15.8311C21.1448 16.3714 20.7157 17.213 20.7157 18.4443H19.7157C19.7157 16.9579 20.2458 15.8274 21.1142 15.0752C21.9715 14.3327 23.1102 14 24.2665 14Z"/></svg>
 </button>
@@ -446,6 +454,33 @@ async function copyPrompt(btn) {
 }
 $('copyPrompt').addEventListener('click', e => copyPrompt(e.currentTarget));
 $('copyPromptSide').addEventListener('click', e => copyPrompt(e.currentTarget));
+
+// ---- Theme button above «?»: as in the system → light → dark ----
+// The choice is remembered in this browser; storage may be unavailable (private window, preview)
+const THEMES = ['auto', 'light', 'dark'];
+const THEME_NAMES = { auto: 'как в системе', light: 'светлая', dark: 'тёмная' };
+const THEME_KEY = 'composter-theme';
+// If the host (claude.ai) sets its own data-theme, «как в системе» brings it back
+const hostTheme = document.documentElement.getAttribute('data-theme');
+let theme = 'auto';
+
+function applyTheme(t) {
+  theme = t;
+  const root = document.documentElement, value = t === 'auto' ? hostTheme : t;
+  if (value) root.setAttribute('data-theme', value); else root.removeAttribute('data-theme');
+  $('themeIcon').setAttribute('href', '#i-theme-' + t);
+  const next = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
+  $('themeBtn').setAttribute('aria-label', 'Тема: ' + THEME_NAMES[t]);
+  $('themeBtn').title = `Тема: ${THEME_NAMES[t]}. Нажмите — ${THEME_NAMES[next]}`;
+}
+
+$('themeBtn').addEventListener('click', () => {
+  applyTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]);
+  try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* not remembered, still switched */ }
+});
+
+try { const saved = localStorage.getItem(THEME_KEY); if (THEMES.includes(saved)) theme = saved; } catch (e) { /* default */ }
+applyTheme(theme);
 
 // ---- Article: a headline in Roboto Flex and an illustration on black ----
 const FS = 180, LH = 180, PAD = 30;
