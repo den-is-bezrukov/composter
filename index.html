@@ -136,6 +136,13 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .file.add{background:transparent;box-shadow:inset 0 0 0 1px var(--line-t)}
 .file.add .thumb{background:var(--bg2);border:0;display:flex;align-items:center;justify-content:center}
 .file .plus{width:24px;height:24px;fill:var(--text2)}
+/* Loaded logo: a trash button sits inside the card, outside the file label */
+.filewrap{position:relative;flex:1 1 0;min-width:0;display:flex}
+.filewrap .file{flex:1;min-width:0}
+.filewrap:has(.trash:not([hidden])) .file{padding-right:40px}
+.filewrap .trash{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+.filewrap .trash svg{fill:var(--text2)}
+.filewrap .trash:hover{background:var(--line-t)}
 .file:not(.add) .plus{display:none}
 /* A case has no picture panel: two columns */
 .app.case{grid-template-columns:240px minmax(0,1fr)}
@@ -247,12 +254,15 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         </section>
 
         <section class="sec">
-          <div class="sec-h"><span>Логотип</span><button class="ghost" type="button" id="logoRemove" hidden>Убрать</button><button class="ghost" type="button" id="logoReset" hidden>Сбросить</button></div>
+          <div class="sec-h"><span>Логотип</span><button class="ghost" type="button" id="logoReset" hidden>Сбросить</button></div>
           <div class="row">
-            <label class="file add" id="logoDrop" for="logoFile">
-              <span class="thumb"><svg class="plus" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.0049 6.00468C12.2809 6.00468 12.5047 6.22869 12.5049 6.50468V11.4998H17.5C17.7761 11.4998 17.9999 11.7237 18 11.9998C18 12.2759 17.7761 12.4998 17.5 12.4998H12.5049V17.5047C12.5049 17.7808 12.281 18.0047 12.0049 18.0047C11.7288 18.0046 11.5049 17.7808 11.5049 17.5047V12.4998H6.5C6.22386 12.4998 6 12.2759 6 11.9998C6.00011 11.7237 6.22393 11.4998 6.5 11.4998H11.5049V6.50468C11.5051 6.22872 11.7289 6.00474 12.0049 6.00468Z"/></svg><img id="logoThumb" alt="" hidden></span>
-              <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">Прозрачный SVG или PNG</span></span>
-            </label>
+            <div class="filewrap">
+              <label class="file add" id="logoDrop" for="logoFile">
+                <span class="thumb"><svg class="plus" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.0049 6.00468C12.2809 6.00468 12.5047 6.22869 12.5049 6.50468V11.4998H17.5C17.7761 11.4998 17.9999 11.7237 18 11.9998C18 12.2759 17.7761 12.4998 17.5 12.4998H12.5049V17.5047C12.5049 17.7808 12.281 18.0047 12.0049 18.0047C11.7288 18.0046 11.5049 17.7808 11.5049 17.5047V12.4998H6.5C6.22386 12.4998 6 12.2759 6 11.9998C6.00011 11.7237 6.22393 11.4998 6.5 11.4998H11.5049V6.50468C11.5051 6.22872 11.7289 6.00474 12.0049 6.00468Z"/></svg><img id="logoThumb" alt="" hidden></span>
+                <span class="meta"><span class="name" id="logoName">Добавить логотип</span><span class="act" id="logoAct">Прозрачный SVG или PNG</span></span>
+              </label>
+              <button class="icon-btn trash" type="button" id="logoRemove" hidden aria-label="Убрать логотип" title="Убрать логотип"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 4C14.1046 4 15 4.89543 15 6H17.5C18.3284 6 19 6.67157 19 7.5C19 8.16674 18.5646 8.73058 17.9629 8.92578L17.1221 18.1807C17.0284 19.2108 16.1643 20 15.1299 20H8.87012C7.83571 20 6.97158 19.2108 6.87793 18.1807L6.03613 8.92578C5.43491 8.73031 5 8.16641 5 7.5C5 6.67157 5.67157 6 6.5 6H9C9 4.89543 9.89543 4 11 4H13ZM7.87402 18.0908C7.92099 18.6058 8.35301 19 8.87012 19H15.1299C15.647 19 16.079 18.6058 16.126 18.0908L16.9521 9H7.04785L7.87402 18.0908ZM10.5 11C10.7761 11 11 11.2239 11 11.5V16.5C11 16.7761 10.7761 17 10.5 17C10.2239 17 10 16.7761 10 16.5V11.5C10 11.2239 10.2239 11 10.5 11ZM13.5 11C13.7761 11 14 11.2239 14 11.5V16.5C14 16.7761 13.7761 17 13.5 17C13.2239 17 13 16.7761 13 16.5V11.5C13 11.2239 13.2239 11 13.5 11ZM6.5 7C6.22386 7 6 7.22386 6 7.5C6 7.77614 6.22386 8 6.5 8H17.5C17.7761 8 18 7.77614 18 7.5C18 7.22386 17.7761 7 17.5 7H6.5ZM11 5C10.4477 5 10 5.44772 10 6H14C14 5.44772 13.5523 5 13 5H11Z"/></svg></button>
+            </div>
             <input type="file" id="logoFile" accept="image/svg+xml,image/png,image/webp,.svg" hidden>
           </div>
           <div id="logoControls" hidden>
@@ -263,9 +273,9 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
                 <label><input type="radio" name="tint" value="#000000"><span>Чёрный</span></label>
               </div>
             </div>
-            <div class="prop"><label class="lbl" for="lSize"><span>Размер</span></label><input type="range" id="lSize" min="100" max="1020" step="10" value="540" data-zero="100"></div>
-            <div class="prop"><label class="lbl" for="lDx"><span>X, Левее/Правее</span></label><input type="range" id="lDx" min="-500" max="500" step="5" value="0" data-zero="0"></div>
-            <div class="prop"><label class="lbl" for="lDy"><span>Y, Выше/Ниже</span></label><input type="range" id="lDy" min="-700" max="700" step="5" value="0" data-zero="0"></div>
+            <div class="prop"><label class="lbl" for="lSize"><span>Масштаб</span></label><input type="range" id="lSize" min="60" max="1020" step="10" value="540" data-zero="540"></div>
+            <div class="prop"><label class="lbl" for="lDx"><span>Горизонтальное смещение</span></label><input type="range" id="lDx" min="-500" max="500" step="5" value="0" data-zero="0"></div>
+            <div class="prop"><label class="lbl" for="lDy"><span>Вертикальное смещение</span></label><input type="range" id="lDy" min="-700" max="700" step="5" value="0" data-zero="0"></div>
           </div>
         </section>
       </div>
@@ -281,7 +291,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
         <div class="sec-h"><span>Шрифт</span></div>
         <div class="row">
           <div class="seg" role="radiogroup" aria-label="Шрифт">
-            <label><input type="radio" name="wd" value="auto" checked><span>Как есть</span></label>
+            <label><input type="radio" name="wd" value="auto" checked><span>По умолчанию</span></label>
             <label><input type="radio" name="wd" value="narrow"><span>Настроить</span></label>
           </div>
         </div>
@@ -490,7 +500,7 @@ function wrap(ls, boxW) {
   return out;
 }
 
-// Size is always 180; «Как есть» is width 60, «Настроить» takes the slider value
+// Size is always 180; «По умолчанию» is width 60, «Настроить» takes the slider value
 function layoutBlock(ls, boxW) {
   const fam = state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
   setFont(fam, FS);
