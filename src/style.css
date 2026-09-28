@@ -1,0 +1,178 @@
+@font-face{font-family:"RF60";src:url(data:font/woff2;base64,__RF60__) format("woff2");font-display:block}
+/* Tokens from the Figma Post-Builder file (UI3 panels) */
+:root{
+  --bg:#FFFFFF; --bg2:#F5F5F5; --canvas:#F5F5F5; --seg-on:#FFFFFF;
+  --line:#E6E6E6; --line-t:rgba(0,0,0,.1);
+  --text:rgba(0,0,0,.9); --text2:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
+  --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --accent:#FF5C16; --accent-hover:#E84F0C; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
+  --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
+  --radius:5px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
+    --line:#444444; --line-t:rgba(255,255,255,.1);
+    --text:rgba(255,255,255,.9); --text2:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
+    --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
+  --line:#444444; --line-t:rgba(255,255,255,.1);
+  --text:rgba(255,255,255,.9); --text2:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
+  --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--canvas);color:var(--text);font:450 11px/16px "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em;margin:0;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
+
+/* Three columns: controls 240 · preview · picture 240 */
+.app{position:fixed;inset:0;display:grid;grid-template-columns:240px minmax(0,1fr) 240px}
+.side{background:var(--bg);display:flex;flex-direction:column;min-height:0;min-width:0}
+.side.left{border-right:1px solid var(--line-t)}
+.side.right{border-left:1px solid var(--line-t)}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+.side.right .scroll{padding-bottom:56px}
+/* Narrow window: everything in one column, «Экспорт» stays at the bottom */
+@media (max-width:960px){
+  .app{grid-template-columns:240px minmax(0,1fr)}
+  .side.right{display:none}
+  .side.left .scroll{padding-bottom:12px}
+}
+
+.apphead{padding:8px 16px 12px;border-bottom:1px solid var(--line)}
+.apphead .title{font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em;height:24px;display:flex;align-items:center}
+.apphead .sub{color:var(--text2)}
+
+/* Section: 40 px header, 4 px rows, 12 px bottom padding */
+.sec{border-bottom:1px solid var(--line);padding-bottom:12px}
+.sec-h{height:40px;display:flex;align-items:center;gap:8px;padding:0 8px 0 16px;font-weight:550}
+.sec-h > span{flex:1;min-width:0}
+.row{display:flex;gap:8px;align-items:center;padding:4px 16px}
+.row > *{flex:1 1 0;min-width:0}
+.prop{display:flex;flex-direction:column;gap:8px;padding:8px 16px}
+.prop .lbl{display:flex;color:var(--text2)}
+.prop .lbl > span:not(.alert){flex:1}
+.prop .lbl output{color:var(--text);font-variant-numeric:lining-nums tabular-nums}
+.prop div.lbl{position:relative;align-items:center;gap:4px}
+.prop div.lbl label{flex:none}
+/* Warning next to the control it's about: «!» with the text in a tooltip, so nothing below moves */
+.alert{flex:none;width:16px;height:16px;border-radius:3px;color:var(--danger);cursor:help;outline:none}
+.alert svg{display:block;width:16px;height:16px;fill:currentColor}
+.alert .tip{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;padding:8px;border-radius:var(--radius);background:var(--inverse);color:var(--bg);box-shadow:var(--elev);opacity:0;visibility:hidden;transition:opacity .12s}
+.alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
+.alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
+.note{padding:4px 16px;color:var(--text2)}
+.export{border-top:1px solid var(--line);border-bottom:0;flex:none}
+
+/* Segmented control */
+.seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
+.seg label{flex:1 1 0;min-width:0;display:flex}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{flex:1;min-width:0;height:32px;display:flex;align-items:center;justify-content:center;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);color:var(--text2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg input:checked+span{background:var(--seg-on);border-color:var(--line);color:var(--text)}
+.seg input:focus-visible+span{outline:1px solid var(--focus);outline-offset:-1px}
+.seg svg{width:24px;height:24px;flex:none;fill:currentColor}
+
+/* Buttons */
+.btn{height:32px;display:flex;align-items:center;justify-content:center;padding:4px 12px;border:1px solid var(--line-t);border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
+.btn.primary:hover{background:var(--accent-hover)}
+.ghost{flex:none;height:24px;padding:4px 8px;border:0;border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
+.ghost:hover:not(:disabled){background:var(--bg2)}
+.ghost:disabled{color:var(--text3);cursor:default}
+.btn:focus-visible,.ghost:focus-visible,.file:focus-within,.helpbtn:focus-visible,.icon-btn:focus-visible{outline:1px solid var(--focus);outline-offset:-1px}
+
+/* Text inputs */
+textarea,.fname{background:var(--bg2);border:0;border-radius:var(--radius)}
+textarea{display:block;width:100%;padding:8px;resize:none;height:32px;min-height:32px;max-height:160px;overflow-y:hidden;outline:none}
+textarea:focus,.fname input:focus{outline:1px solid var(--focus);outline-offset:-1px}
+.fname{display:flex;gap:1px;background:transparent;overflow:hidden}
+.fname input,.fname .ext{background:var(--bg2);border:0;padding:8px}
+.fname input{flex:1;min-width:0;padding-right:4px;border-radius:var(--radius) 0 0 var(--radius)}
+.fname .ext{flex:none;padding-left:6px;color:var(--text3);user-select:none;border-radius:0 var(--radius) var(--radius) 0}
+
+/* Slider as Figma recommends: a pill from the default dot to the knob, the dot stays visible on top,
+   a moved knob gets a coloured centre */
+input[type=range]{--z:0;--fs:8px;--fe:8px;--fc:transparent;--kd:#fff;-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:100px;height:16px;margin:0;border-radius:999px;cursor:pointer;
+  background:
+    radial-gradient(circle at calc(8px + (100% - 16px) * var(--z)) 50%,var(--text3) 2px,transparent 2.5px),
+    radial-gradient(circle at var(--fs) 50%,var(--fc) 7.5px,transparent 8px),
+    radial-gradient(circle at var(--fe) 50%,var(--fc) 7.5px,transparent 8px),
+    linear-gradient(to right,transparent var(--fs),var(--fc) var(--fs) var(--fe),transparent var(--fe)),
+    var(--bg2);
+  box-shadow:inset 0 0 0 1px var(--line-t)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,var(--kd) 3.5px,#fff 4px);box-shadow:var(--elev)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:radial-gradient(circle,var(--kd) 3.5px,#fff 4px);box-shadow:var(--elev)}
+input[type=range]::-moz-range-track{background:transparent}
+input[type=range]:focus-visible{outline:1px solid var(--focus);outline-offset:1px}
+input[type=range]:disabled{opacity:.4;cursor:default}
+
+/* Picture card: thumbnail, file name, «Заменить» */
+.file{display:flex;gap:8px;align-items:center;padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:pointer}
+.file.over{outline:1px solid var(--focus);outline-offset:-1px}
+.thumb{flex:none;width:32px;height:32px;border:1px solid var(--line-t);border-radius:2px;overflow:hidden;
+  background:repeating-conic-gradient(#E6E6E6 0 25%,#FFFFFF 0 50%) 0 0/9.36px 9.36px}
+.thumb img{display:block;width:100%;height:100%;object-fit:contain}
+/* Empty card (no logo yet): outlined, «+» instead of a thumbnail */
+.file.add{background:transparent;box-shadow:inset 0 0 0 1px var(--line-t)}
+.file.add .thumb{background:var(--bg2);border:0;display:flex;align-items:center;justify-content:center}
+.file .plus{width:24px;height:24px;fill:var(--text2)}
+/* Loaded logo: a trash button sits inside the card, outside the file label */
+.filewrap{position:relative;flex:1 1 0;min-width:0;display:flex}
+.filewrap .file{flex:1;min-width:0}
+.filewrap:has(.trash:not([hidden])) .file{padding-right:40px}
+.filewrap .trash{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+.filewrap .trash svg{fill:var(--text2)}
+.filewrap .trash:hover{background:var(--line-t)}
+.file:not(.add) .plus{display:none}
+.file .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.file .name{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file .act{color:var(--text2)}
+
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px}
+
+/* Preview */
+.workspace{display:flex;align-items:center;justify-content:center;padding:45px 40px;min-width:0;min-height:0;overflow:hidden;background:var(--canvas)}
+.stage{flex:none;display:flex;align-items:center;justify-content:center}
+.frame{position:relative}
+.frame canvas{display:block;width:100%;height:100%;background:#000}
+canvas.pannable{cursor:grab;touch-action:none}
+canvas.pannable.dragging{cursor:grabbing}
+.grid{position:absolute;inset:0;pointer-events:none;
+  --g:rgba(255,255,255,.6);
+  background:
+    linear-gradient(to right,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px)),
+    linear-gradient(to bottom,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
+
+/* «?» in the corner and the help popup */
+.helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.helpbtn svg{width:32px;height:32px;fill:currentColor}
+dialog.help{width:min(720px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15)}
+dialog.help[open]{display:flex;flex-direction:column}
+dialog.help::backdrop{background:rgba(0,0,0,.3)}
+.dlg-h{flex:none;height:48px;display:flex;align-items:center;gap:8px;padding:0 8px 0 16px;border-bottom:1px solid var(--line)}
+.dlg-h h2{flex:1;margin:0;font-size:13px;line-height:22px;font-weight:550}
+.icon-btn{width:32px;height:32px;padding:0;border:0;border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{background:var(--bg2)}
+.icon-btn svg{width:24px;height:24px;fill:currentColor}
+.dlg-b{overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:24px;font-size:13px;line-height:20px}
+.dlg-b section{display:flex;flex-direction:column;gap:8px}
+.dlg-b h3{margin:0;font-size:13px;line-height:20px;font-weight:600}
+.dlg-b p{margin:0}
+.dlg-b .muted{color:var(--text2)}
+.dlg-head{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.dlg-head .btn{flex:none}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.steps li{counter-increment:s;background:var(--bg2);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:4px}
+.steps li::before{content:counter(s);font-weight:600}
+.rules{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 24px}
+.rules li{border-top:1px solid var(--line);padding-top:8px}
+.rules b{display:block;font-weight:600}
+pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);border-radius:var(--radius);white-space:pre-wrap;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}

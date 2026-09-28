@@ -1,0 +1,21 @@
+НАРИСУЙ: [опишите объект. Если приложили картинку, напишите «приложенная картинка»]
+
+ЗАДАЧА
+- Картинка не приложена: нарисуй объект из строки НАРИСУЙ.
+- Картинка приложена: перерисуй её главный объект в стиле ниже. Объект должен остаться узнаваемым: сохрани силуэт, позу, пропорции, характерные детали и фирменные цвета (например, у маскотов и персонажей брендов). Меняй только материалы, свет и отрисовку. Если на картинке несколько объектов или сложный фон, оставь только главный объект, остальное убери.
+
+ФОРМАТ
+- Квадрат 1:1 (1024×1024), PNG с полностью прозрачным фоном.
+- Один объект, целиком, без обрезки, по центру. Занимает около 80% кадра, с небольшим ровным отступом со всех сторон.
+- Кроме объекта ничего: ни фона, ни пола, ни тени на полу, ни рамки, ни подложки.
+- Никакого текста, букв, цифр, логотипов и водяных знаков.
+
+STYLE
+Hyper-realistic 3D render with a surreal, conceptual pop-surrealist idea. The object is lit as if it stood alone in a pure black void studio (dark reflections, crisp rim light, no bright environment reflections), because it will be placed on a black poster, but the output background itself stays transparent. Rich, highly detailed textures visible at macro level, deliberately juxtaposing micro-textured organic surfaces with flawless, glossy, reflective manufactured materials. High-end commercial studio lighting: sharp specular highlights on wet or metallic finishes, soft gradients revealing minute surface depth and patterns. Stylized symmetry and flawless, exaggerated curves, with forms defined entirely by light, shadow and material, never by drawn outlines. Mood: striking, sleek, modern; uncanny hyper-detail with high-fashion commercial polish.
+Tags: hyper-realistic 3D, pop-surrealism, macro-level detail, commercial studio lighting, extreme organic texture, glossy reflections, isolated object, dark studio reflections, high contrast, symmetrical composition, conceptual editorial, sleek finish, metallic highlights, uncanny realism, material juxtaposition.
+
+COLORS
+Main accent: warm coral-orange (#FF5533), soft and slightly muted, never crimson or pure red; shadows deep warm brown-red (#8A2B1F). Supporting: glossy off-white (#F2F2F2) and reflective silver/chrome (#E0E0E0). Keep the palette restrained: mostly coral-orange, white and chrome. Other colors only where the object needs them to stay recognizable.
+
+AVOID
+Any background or backdrop, flat or vector illustration, cartoon outlines, comic-book halftone dots, printed pop-art look, cropping the object, several separate objects, white or light environment reflections, saturated pure red or crimson, yellow or brown tint on glass and metal, text of any kind.
