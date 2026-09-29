@@ -7,6 +7,7 @@
   --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --accent:#FF5C16; --accent-hover:#E84F0C; --on-accent:#FFFFFF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
   --radius:5px; --radius-panel:13px;
+  --control-height:32px; --control-pad:4px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -74,20 +75,31 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
 .seg label{flex:1 1 0;min-width:0;display:flex}
 .seg input{position:absolute;opacity:0;pointer-events:none}
-.seg span{flex:1;min-width:0;height:32px;display:flex;align-items:center;justify-content:center;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg span{flex:1;min-width:0;height:var(--control-height);display:flex;align-items:center;justify-content:center;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seg input:checked+span{background:var(--seg-on);border-color:var(--line);color:var(--text-strong)}
 .seg input:focus-visible+span{outline:1px solid var(--focus);outline-offset:-1px}
 .seg svg{width:24px;height:24px;flex:none;fill:currentColor}
 
-/* Buttons */
-.btn{height:32px;display:flex;align-items:center;justify-content:center;padding:4px 12px;border:1px solid var(--line-t);border-radius:var(--radius);background:var(--seg-on);cursor:pointer;white-space:nowrap}
-.btn:hover{background:var(--bg2)}
-.btn.primary{background:var(--accent);border-color:transparent;color:var(--on-accent)}
-.btn.primary:hover{background:var(--accent-hover)}
-.ghost{flex:none;height:24px;padding:4px 8px;border:0;border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
-.ghost:hover:not(:disabled){background:var(--bg2)}
-.ghost:disabled{color:var(--text3);cursor:default}
-.btn:focus-visible,.ghost:focus-visible,.file:focus-within,.helpbtn:focus-visible,.icon-btn:focus-visible,.tb-btn:focus-visible{outline:1px solid var(--focus);outline-offset:-1px}
+/* Buttons: one .btn, like .button in Figma. No modifier = Secondary; style — .primary / .inverse / .ghost / .floating;
+   .icon — only an icon, square. Size is not a class: data-size="s" on the button or on any container
+   (Figma: the Size variable mode), everything button-like inside follows --control-height / --control-pad */
+[data-size="s"]{--control-height:24px;--control-pad:0px}
+/* Each style only sets its --btn-* colours, so rules never fight over specificity */
+.btn{--btn-bg:var(--seg-on);--btn-bg-hover:var(--bg2);--btn-line:var(--line-t);--btn-fg:var(--text-strong);
+  height:var(--control-height);display:flex;align-items:center;justify-content:center;padding:0 calc(var(--control-pad) + 7px);
+  border:1px solid var(--btn-line);border-radius:var(--radius);background:var(--btn-bg);color:var(--btn-fg);cursor:pointer;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--btn-bg-hover)}
+.btn.primary{--btn-bg:var(--accent);--btn-bg-hover:var(--accent-hover);--btn-line:transparent;--btn-fg:var(--on-accent)}
+.btn.inverse{--btn-bg:var(--inverse);--btn-bg-hover:var(--inverse);--btn-line:transparent;--btn-fg:var(--bg)}
+.btn.inverse:hover{opacity:.9}
+.btn.ghost{--btn-bg:transparent;--btn-line:transparent;flex:none}
+.btn.floating{--btn-bg:var(--bg);--btn-bg-hover:var(--bg);--btn-line:transparent;border-radius:999px;box-shadow:var(--elev)}
+.btn.icon{flex:none;width:var(--control-height);padding:0}
+.btn:disabled{--btn-bg:transparent;--btn-fg:var(--text3);cursor:default}
+/* «?» in the toolbelt is lit (Primary) while the help is open */
+.toolbelt .btn[aria-expanded="true"]{--btn-bg:var(--accent);--btn-bg-hover:var(--accent-hover);--btn-fg:var(--on-accent)}
+.btn svg{flex:none;width:24px;height:24px;fill:currentColor}
+.btn:focus-visible,.file:focus-within{outline:1px solid var(--focus);outline-offset:-1px}
 
 /* Text inputs */
 textarea{background:var(--bg2);border:0;border-radius:var(--radius)}
@@ -132,8 +144,7 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .filewrap .file{flex:1;min-width:0}
 .filewrap:has(.trash:not([hidden])) .file{padding-right:40px}
 .filewrap .trash{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
-.filewrap .trash svg{fill:var(--text)}
-.filewrap .trash:hover{background:var(--line-t)}
+.filewrap .trash{--btn-fg:var(--text);--btn-bg-hover:var(--line-t)}
 .file:not(.add) .plus{display:none}
 .file .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .file .name{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -150,11 +161,8 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .toolbelt{position:relative;flex:none;display:flex;height:48px;border-radius:var(--radius-panel);background:var(--bg);box-shadow:var(--elev)}
 .tb-part{display:flex;align-items:center;gap:8px;padding:8px}
 .tb-part + .tb-part{border-left:1px solid var(--line)}
-.tb-btn{flex:none;width:32px;height:32px;padding:4px;border:0;border-radius:var(--radius);background:transparent;color:var(--text-strong);cursor:pointer;display:flex}
-.tb-btn:hover{background:var(--bg2)}
-.tb-btn svg{width:24px;height:24px;fill:currentColor}
 /* File name hugs its text (up to 192 px, then «…»); .png is a fixed tail */
-.fname{position:relative;flex:none;display:flex;align-items:center;height:32px;padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:text}
+.fname{position:relative;flex:none;display:flex;align-items:center;height:var(--control-height);padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:text}
 .fname:focus-within{outline:1px solid var(--focus);outline-offset:-1px}
 .fname input{width:24px;max-width:192px;padding:0;border:0;background:transparent;outline:none;text-transform:lowercase;text-overflow:ellipsis}
 .fname .ext{user-select:none}
@@ -178,17 +186,12 @@ canvas.pannable.over-text:not(.dragging){cursor:text}
     linear-gradient(to bottom,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
 
 /* «?» in the corner and the help popup */
-.helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text-strong);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.themebtn svg{width:24px;height:24px}
+.themebtn{position:fixed;right:16px;bottom:16px;z-index:5}
 /* Help popover (Figma 44:10536): over the preview, 12 px from the top, 8 px above the toolbelt */
 dialog.help{position:absolute;inset:12px 0 68px;z-index:6;width:min(570px,calc(100% - 32px));height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:var(--radius-panel);background:var(--bg);color:var(--text-strong);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15);overflow:hidden}
 dialog.help[open]{display:flex;flex-direction:column}
 .dlg-h{flex:none;height:40px;display:flex;align-items:center;gap:8px;padding:4px 8px 4px 16px;border-bottom:1px solid var(--line)}
 .dlg-h h2{flex:1;margin:0;font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em}
-.icon-btn{flex:none;width:32px;height:32px;padding:0;border:0;border-radius:var(--radius);background:transparent;color:var(--text-strong);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.icon-btn:hover{background:var(--bg2)}
-.dlg-h .icon-btn{width:24px}
-.icon-btn svg{width:24px;height:24px;fill:currentColor}
 .dlg-b{flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:32px;font-size:13px;line-height:22px;letter-spacing:-.0025em}
 .dlg-b section{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
 .dlg-b section > *{align-self:stretch}
@@ -199,14 +202,10 @@ dialog.help[open]{display:flex;flex-direction:column}
 .rules{margin:0;padding:0;list-style:none}
 .rules li{border-top:1px solid var(--line);padding:12px 0}
 .rules b{display:block;font-weight:550}
-.btn.inverse{align-self:flex-start;background:var(--inverse);border-color:transparent;color:var(--bg)}
-.btn.inverse:hover{background:var(--inverse);opacity:.9}
+.dlg-b .btn.inverse{align-self:flex-start}
 /* Prompt: 9 lines, then «…» and «Показать полностью» */
 .prompt{display:flex;flex-direction:column;align-items:flex-start;padding:8px;background:var(--bg2);border-radius:var(--radius)}
 .prompt-t{align-self:stretch;margin:8px;font-size:11px;line-height:16px;letter-spacing:.005em;white-space:pre-wrap;overflow-wrap:break-word}
 .prompt:not(.open) .prompt-t{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:9;overflow:hidden}
-.prompt .ghost:hover{background:var(--line-t)}
-/* «?» is lit while the help is open */
-.tb-btn[aria-expanded="true"]{background:var(--accent);color:var(--on-accent)}
-.tb-btn[aria-expanded="true"]:hover{background:var(--accent-hover)}
+.prompt .btn.ghost{--btn-bg-hover:var(--line-t)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
