@@ -82,7 +82,6 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .alert .tip{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;padding:8px;border-radius:var(--radius);background:var(--inverse);color:var(--bg);box-shadow:var(--elev);opacity:0;visibility:hidden;transition:opacity .12s}
 .alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
-.note{padding:4px 16px;color:var(--text2)}
 
 /* Segmented control */
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
@@ -237,7 +236,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
   <symbol id="i-theme-dark" viewBox="0 0 24 24"><path d="M18 14.5A6.5 6.5 0 1 1 9.5 6a7 7 0 0 0 8.5 8.5z" fill="none" stroke="currentColor" stroke-linejoin="round"/></symbol>
 </svg>
 
-<div class="app" id="app">
+<div class="app">
   <aside class="side left">
     <div class="scroll" id="leftScroll">
       <header class="apphead">
@@ -285,7 +284,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
 
       <section class="sec" id="textSec">
         <div class="sec-h"><span>Текст</span></div>
-        <div class="row" id="layoutRow">
+        <div class="row">
           <div class="seg" role="radiogroup" aria-label="Раскладка">
             <label title="Текст сверху"><input type="radio" name="layout" value="top" checked aria-label="Текст сверху"><span><svg><use href="#i-top"/></svg></span></label>
             <label title="Сэндвич: текст сверху и снизу"><input type="radio" name="layout" value="sandwich" aria-label="Сэндвич"><span><svg><use href="#i-sandwich"/></svg></span></label>
@@ -326,7 +325,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
       <div class="tb-part"><button class="tb-btn" type="button" id="helpBtn" aria-label="Помощь" title="Помощь"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.9999 17.1504C12.4694 17.1504 12.8495 17.5306 12.8495 18C12.8495 18.4694 12.4694 18.8496 11.9999 18.8496C11.5305 18.8496 11.1503 18.4694 11.1503 18C11.1503 17.5306 11.5305 17.1504 11.9999 17.1504ZM12.2665 4C13.4408 4.00002 14.4862 4.38304 15.2431 5.07812C16.0033 5.77637 16.4443 6.76454 16.4443 7.91113C16.4443 8.73658 16.2604 9.42976 15.8915 10.0381C15.5271 10.6392 15.0008 11.1258 14.3661 11.5713C13.5421 12.1496 13.105 12.555 12.8525 13.0117C12.6036 13.462 12.4999 14.0249 12.4999 15H11.4999C11.4999 13.9751 11.6027 13.2035 11.9765 12.5273C12.3467 11.8579 12.9491 11.3437 13.791 10.7529C14.3628 10.3516 14.7695 9.95909 15.0361 9.51953C15.2983 9.08706 15.4443 8.57806 15.4443 7.91113C15.4443 7.0325 15.1118 6.31542 14.5663 5.81445C14.0174 5.31042 13.2241 5.00002 12.2665 5C11.291 5.00002 10.4035 5.28108 9.76849 5.83105C9.14485 6.3714 8.71575 7.21296 8.71576 8.44434H7.71576C7.71575 6.9579 8.24586 5.82738 9.1142 5.0752C9.97153 4.33269 11.1102 4.00002 12.2665 4Z"/></svg></button></div>
       <div class="tb-part">
         <label class="fname" title="Имя файла"><input id="fname" type="text" spellcheck="false" autocomplete="off" aria-label="Имя файла"><span class="ext" aria-hidden="true">.png</span><span class="fname-measure" id="fnameMeasure" aria-hidden="true"></span></label>
-        <button class="btn primary" type="submit" id="dl">Скачать</button>
+        <button class="btn primary" type="submit">Скачать</button>
       </div>
       <div class="tb-tip" id="warnSave" role="alert" hidden></div>
     </form>
@@ -352,7 +351,7 @@ pre{margin:0;padding:12px;max-height:280px;overflow:auto;background:var(--bg2);b
       <div id="articleProps">
         <section class="sec">
           <div class="sec-h"><span>Изображение</span><button class="ghost" type="button" id="posReset">Сбросить</button></div>
-          <div class="row" id="zRow">
+          <div class="row">
             <div class="seg" role="radiogroup" aria-label="Слой картинки">
               <label title="Картинка под текстом"><input type="radio" name="z" id="z-under" value="under" checked aria-label="Картинка под текстом"><span><svg><use id="zi-under" href="#i-under2"/></svg></span></label>
               <label title="Картинка над текстом"><input type="radio" name="z" value="over" aria-label="Картинка над текстом"><span><svg><use id="zi-over" href="#i-over2"/></svg></span></label>
@@ -529,9 +528,10 @@ const posChanged = () => state.size !== LAYOUTS[state.layout].size || !!state.dx
 
 // ---- Headline text ----
 // Regular spaces are break points; U+00A0 keeps words together
-function lines(txt) {
-  return txt.split('\n').map(s => s.replace(/[ \t]+/g, ' ').replace(/ ? + ?/g, ' ').replace(/^[  ]+|[  ]+$/g, '').toUpperCase()).filter(Boolean);
-}
+const tidy = s => s.replace(/[ \t]+/g, ' ').replace(/ ?\u00a0+ ?/g, '\u00a0').replace(/^[ \u00a0]+|[ \u00a0]+$/g, '');
+const lines = txt => txt.split('\n').map(s => tidy(s).toUpperCase()).filter(Boolean);
+// The whole text as one run of words, ignoring Enters
+const allWords = txt => tidy(txt.replace(/\n/g, ' ')).split(' ').filter(Boolean);
 
 function setFont(family, size) {
   ctx.font = `${size}px "${family}"`;
@@ -561,11 +561,12 @@ function wrap(ls, boxW) {
   return out;
 }
 
-// Size is always 180; «По умолчанию» is width 60, «Настроить» takes the slider value.
+// Size is always 180; «По умолчанию» is width 60, «Настроить» takes the slider value
+const headFont = () => state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
+
 // Leaves the font set on ctx
 function layoutBlock(ls, boxW) {
-  const fam = state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
-  setFont(fam, FS);
+  setFont(headFont(), FS);
   const overflow = ls.join(' ').split(' ').some(w => ctx.measureText(w).width > boxW);
   return { rows: wrap(ls, boxW), overflow };
 }
@@ -581,7 +582,7 @@ function textBlocks() {
     const a = lines(raw.slice(0, i)), b = lines(raw.slice(i + 1));
     if ((a.length && b.length) || inline.part) return [a, b];
   }
-  const words = lines(raw.replace(/\n/g, ' ')).join(' ').split(' ').filter(Boolean);
+  const words = allWords(raw.toUpperCase());
   if (words.length < 2) return [words, []];
   const k = splitWords(words);
   return [[words.slice(0, k).join(' ')], [words.slice(k).join(' ')]];
@@ -704,7 +705,7 @@ $('nbsp').addEventListener('click', () => {
   // Replace a selected (or adjacent) regular space instead of adding a second gap
   let a = s, b = e;
   if (a === b && f.value[a - 1] === ' ') a--; else if (a === b && f.value[a] === ' ') b++;
-  f.value = f.value.slice(0, a) + ' ' + f.value.slice(b);
+  f.value = f.value.slice(0, a) + '\u00a0' + f.value.slice(b);
   f.focus(); f.selectionStart = f.selectionEnd = a + 1;
   fitText(); draw();
 });
@@ -838,9 +839,10 @@ function zoomAt(factor, p) {
   clampCase();
 }
 
-// sample: the placeholder picture; a logo's file name names the post better than it
+// sample: the placeholder picture; a logo's file name names the post better than it.
+// imgName brings the picture's name back when the logo is removed
 function setCaseImage(img, name, sample = false) {
-  caseState.img = img; caseState.name = fileSlug(name); caseState.sample = sample;
+  caseState.img = img; caseState.name = caseState.imgName = fileSlug(name); caseState.sample = sample;
   resetFrame(); clampCase();
   draw();
 }
@@ -921,7 +923,7 @@ async function loadLogoFile(file) {
   const url = URL.createObjectURL(blob);
   loadImage(url,
     img => setLogo({ img, width: w || img.naturalWidth, height: h || img.naturalHeight }, file.name, url),
-    () => { $('logoAct').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; });
+    () => { URL.revokeObjectURL(url); $('logoAct').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; });
 }
 
 function setLogo(logo, name, url) {
@@ -935,7 +937,10 @@ function setLogo(logo, name, url) {
 }
 
 function removeLogo() {
-  caseState.logo = null; $('logoFile').value = '';
+  const c = caseState;
+  c.logo = null; $('logoFile').value = '';
+  if (c.sample) c.name = c.imgName;
+  freeUrl($('logoThumb'));
   show(['logoControls', 'logoRemove', 'logoReset', 'logoThumb'], false);
   $('logoDrop').classList.add('add');
   $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'Прозрачный SVG или PNG';
@@ -1049,9 +1054,9 @@ function sandwichParts() {
 function fixSandwichSplit() {
   const raw = $('t1').value, i = raw.indexOf('\n');
   if (i >= 0 && lines(raw.slice(0, i)).length && lines(raw.slice(i + 1)).length) return;
-  const words = raw.replace(/\n/g, ' ').replace(/[ \t]+/g, ' ').replace(/ ?\u00a0+ ?/g, '\u00a0').trim().split(' ').filter(Boolean);
+  const words = allWords(raw);
   if (words.length < 2) return;
-  const k = splitWords(lines(words.join(' '))[0].split(' '));
+  const k = splitWords(words.map(w => w.toUpperCase()));
   $('t1').value = words.slice(0, k).join(' ') + '\n' + words.slice(k).join(' ');
   fitText();
 }
@@ -1079,7 +1084,7 @@ function placeInline() {
   const box = textBoxes.find(b => b.part === inline.part);
   if (!box) { stopInline(); return; }
   const k = $('frame').clientWidth / W, s = ed.style;
-  s.fontFamily = `"${state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow}"`;
+  s.fontFamily = `"${headFont()}"`;
   s.fontSize = FS * k + 'px'; s.lineHeight = LH * k + 'px';
   s.left = box.x * k + 'px'; s.width = box.w * k + 'px';
   s.top = box.atBottom ? 'auto' : PAD * k + 'px';
@@ -1113,9 +1118,11 @@ cv.addEventListener('dblclick', e => {
 });
 
 // ---- Picture cards, drag-and-drop and paste ----
+// Uploaded pictures are object URLs; the card's old one is freed when it's replaced
+const freeUrl = img => { if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src); };
 function setCard(prefix, name, src) {
   $(prefix + 'Name').textContent = name;
-  const t = $(prefix + 'Thumb'); t.src = src; t.hidden = false;
+  const t = $(prefix + 'Thumb'); if (t.src !== src) freeUrl(t); t.src = src; t.hidden = false;
   t.closest('.file').classList.remove('add');
 }
 

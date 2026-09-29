@@ -32,9 +32,10 @@ function zoomAt(factor, p) {
   clampCase();
 }
 
-// sample: the placeholder picture; a logo's file name names the post better than it
+// sample: the placeholder picture; a logo's file name names the post better than it.
+// imgName brings the picture's name back when the logo is removed
 function setCaseImage(img, name, sample = false) {
-  caseState.img = img; caseState.name = fileSlug(name); caseState.sample = sample;
+  caseState.img = img; caseState.name = caseState.imgName = fileSlug(name); caseState.sample = sample;
   resetFrame(); clampCase();
   draw();
 }
@@ -115,7 +116,7 @@ async function loadLogoFile(file) {
   const url = URL.createObjectURL(blob);
   loadImage(url,
     img => setLogo({ img, width: w || img.naturalWidth, height: h || img.naturalHeight }, file.name, url),
-    () => { $('logoAct').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; });
+    () => { URL.revokeObjectURL(url); $('logoAct').textContent = 'Не получилось открыть логотип. Попробуйте PNG или другой SVG.'; });
 }
 
 function setLogo(logo, name, url) {
@@ -129,7 +130,10 @@ function setLogo(logo, name, url) {
 }
 
 function removeLogo() {
-  caseState.logo = null; $('logoFile').value = '';
+  const c = caseState;
+  c.logo = null; $('logoFile').value = '';
+  if (c.sample) c.name = c.imgName;
+  freeUrl($('logoThumb'));
   show(['logoControls', 'logoRemove', 'logoReset', 'logoThumb'], false);
   $('logoDrop').classList.add('add');
   $('logoName').textContent = 'Добавить логотип'; $('logoAct').textContent = 'Прозрачный SVG или PNG';

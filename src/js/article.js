@@ -20,9 +20,10 @@ const posChanged = () => state.size !== LAYOUTS[state.layout].size || !!state.dx
 
 // ---- Headline text ----
 // Regular spaces are break points; U+00A0 keeps words together
-function lines(txt) {
-  return txt.split('\n').map(s => s.replace(/[ \t]+/g, ' ').replace(/ ? + ?/g, ' ').replace(/^[  ]+|[  ]+$/g, '').toUpperCase()).filter(Boolean);
-}
+const tidy = s => s.replace(/[ \t]+/g, ' ').replace(/ ?\u00a0+ ?/g, '\u00a0').replace(/^[ \u00a0]+|[ \u00a0]+$/g, '');
+const lines = txt => txt.split('\n').map(s => tidy(s).toUpperCase()).filter(Boolean);
+// The whole text as one run of words, ignoring Enters
+const allWords = txt => tidy(txt.replace(/\n/g, ' ')).split(' ').filter(Boolean);
 
 function setFont(family, size) {
   ctx.font = `${size}px "${family}"`;
@@ -52,11 +53,12 @@ function wrap(ls, boxW) {
   return out;
 }
 
-// Size is always 180; «По умолчанию» is width 60, «Настроить» takes the slider value.
+// Size is always 180; «По умолчанию» is width 60, «Настроить» takes the slider value
+const headFont = () => state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
+
 // Leaves the font set on ctx
 function layoutBlock(ls, boxW) {
-  const fam = state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow;
-  setFont(fam, FS);
+  setFont(headFont(), FS);
   const overflow = ls.join(' ').split(' ').some(w => ctx.measureText(w).width > boxW);
   return { rows: wrap(ls, boxW), overflow };
 }
@@ -72,7 +74,7 @@ function textBlocks() {
     const a = lines(raw.slice(0, i)), b = lines(raw.slice(i + 1));
     if ((a.length && b.length) || inline.part) return [a, b];
   }
-  const words = lines(raw.replace(/\n/g, ' ')).join(' ').split(' ').filter(Boolean);
+  const words = allWords(raw.toUpperCase());
   if (words.length < 2) return [words, []];
   const k = splitWords(words);
   return [[words.slice(0, k).join(' ')], [words.slice(k).join(' ')]];
@@ -195,7 +197,7 @@ $('nbsp').addEventListener('click', () => {
   // Replace a selected (or adjacent) regular space instead of adding a second gap
   let a = s, b = e;
   if (a === b && f.value[a - 1] === ' ') a--; else if (a === b && f.value[a] === ' ') b++;
-  f.value = f.value.slice(0, a) + ' ' + f.value.slice(b);
+  f.value = f.value.slice(0, a) + '\u00a0' + f.value.slice(b);
   f.focus(); f.selectionStart = f.selectionEnd = a + 1;
   fitText(); draw();
 });

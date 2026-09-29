@@ -18,9 +18,9 @@ function sandwichParts() {
 function fixSandwichSplit() {
   const raw = $('t1').value, i = raw.indexOf('\n');
   if (i >= 0 && lines(raw.slice(0, i)).length && lines(raw.slice(i + 1)).length) return;
-  const words = raw.replace(/\n/g, ' ').replace(/[ \t]+/g, ' ').replace(/ ?\u00a0+ ?/g, '\u00a0').trim().split(' ').filter(Boolean);
+  const words = allWords(raw);
   if (words.length < 2) return;
-  const k = splitWords(lines(words.join(' '))[0].split(' '));
+  const k = splitWords(words.map(w => w.toUpperCase()));
   $('t1').value = words.slice(0, k).join(' ') + '\n' + words.slice(k).join(' ');
   fitText();
 }
@@ -48,7 +48,7 @@ function placeInline() {
   const box = textBoxes.find(b => b.part === inline.part);
   if (!box) { stopInline(); return; }
   const k = $('frame').clientWidth / W, s = ed.style;
-  s.fontFamily = `"${state.wd === 'auto' ? 'RF60' : 'RF' + state.narrow}"`;
+  s.fontFamily = `"${headFont()}"`;
   s.fontSize = FS * k + 'px'; s.lineHeight = LH * k + 'px';
   s.left = box.x * k + 'px'; s.width = box.w * k + 'px';
   s.top = box.atBottom ? 'auto' : PAD * k + 'px';

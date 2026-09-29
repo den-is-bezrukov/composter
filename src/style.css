@@ -69,7 +69,6 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .alert .tip{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;padding:8px;border-radius:var(--radius);background:var(--inverse);color:var(--bg);box-shadow:var(--elev);opacity:0;visibility:hidden;transition:opacity .12s}
 .alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
-.note{padding:4px 16px;color:var(--text2)}
 
 /* Segmented control */
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}

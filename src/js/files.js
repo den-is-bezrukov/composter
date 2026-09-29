@@ -1,7 +1,9 @@
 // ---- Picture cards, drag-and-drop and paste ----
+// Uploaded pictures are object URLs; the card's old one is freed when it's replaced
+const freeUrl = img => { if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src); };
 function setCard(prefix, name, src) {
   $(prefix + 'Name').textContent = name;
-  const t = $(prefix + 'Thumb'); t.src = src; t.hidden = false;
+  const t = $(prefix + 'Thumb'); if (t.src !== src) freeUrl(t); t.src = src; t.hidden = false;
   t.closest('.file').classList.remove('add');
 }
 
