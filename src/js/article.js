@@ -175,7 +175,18 @@ onRange('narrow', v => { state.narrow = v; applyWidth(); });
 $('posReset').addEventListener('click', () => { resetPos(); draw(); });
 
 // One line by default, grows with the text (field-sizing isn't everywhere yet)
-function fitText() { const t = $('t1'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; t.style.overflowY = t.scrollHeight > 160 ? 'auto' : 'hidden'; }
+function fitText() { const t = $('t1'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; t.style.overflowY = t.scrollHeight > 160 ? 'auto' : 'hidden'; paintNbsp(); }
+
+// Non-breaking spaces get a tie ‿ in the field only (a layer under the transparent textarea)
+function paintNbsp() {
+  const t = $('t1'), bg = $('t1bg');
+  const esc = t.value.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  // A trailing space keeps the last empty line after an Enter at the end
+  bg.innerHTML = esc.replace(/\u00a0/g, '<span class="nb">\u00a0</span>') + ' ';
+  bg.style.paddingRight = 8 + t.offsetWidth - t.clientWidth + 'px';
+  bg.scrollTop = t.scrollTop;
+}
+$('t1').addEventListener('scroll', () => { $('t1bg').scrollTop = $('t1').scrollTop; });
 $('t1').addEventListener('input', () => { fitText(); draw(); });
 
 $('nbsp').addEventListener('mousedown', e => e.preventDefault());

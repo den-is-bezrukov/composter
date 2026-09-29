@@ -92,6 +92,12 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 textarea,.fname{background:var(--bg2);border:0;border-radius:var(--radius)}
 textarea{display:block;width:100%;padding:8px;resize:none;height:32px;min-height:32px;max-height:160px;overflow-y:hidden;outline:none}
 textarea:focus,.fname input:focus{outline:1px solid var(--focus);outline-offset:-1px}
+/* Headline field: a layer under the transparent textarea draws a tie ‿ under each non-breaking space */
+.tfield{position:relative;border-radius:var(--radius);background:var(--bg2)}
+.tfield textarea{position:relative;background:transparent}
+.tfield-bg{position:absolute;inset:0;padding:8px;white-space:pre-wrap;overflow-wrap:break-word;overflow:hidden;color:transparent;pointer-events:none;border-radius:var(--radius)}
+.tfield-bg .nb{position:relative}
+.tfield-bg .nb::after{content:'';position:absolute;left:-2px;right:-2px;bottom:1px;height:3px;border:1px solid var(--accent);border-top:0;border-radius:0 0 4px 4px}
 .fname{display:flex;gap:1px;background:transparent;overflow:hidden}
 .fname input,.fname .ext{background:var(--bg2);border:0;padding:8px}
 .fname input{flex:1;min-width:0;padding-right:4px;border-radius:var(--radius) 0 0 var(--radius)}
