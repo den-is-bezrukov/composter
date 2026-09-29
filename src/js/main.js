@@ -9,7 +9,7 @@ function paintRanges() {
     r.style.setProperty('--fs', at(Math.min(p, o)));
     r.style.setProperty('--fe', at(Math.max(p, o)));
     r.style.setProperty('--fc', moved ? 'var(--accent)' : 'transparent');
-    r.style.setProperty('--kd', moved ? 'var(--accent)' : '#fff');
+    r.style.setProperty('--kd', moved ? 'var(--accent)' : 'var(--on-accent)');
   });
 }
 
