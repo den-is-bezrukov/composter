@@ -15,7 +15,7 @@
 /* Tokens from the Figma Post-Builder file (UI3 panels) */
 :root{
   --bg:#FFFFFF; --bg2:#F5F5F5; --canvas:#F5F5F5; --seg-on:#FFFFFF;
-  --line:#E6E6E6; --line-t:rgba(0,0,0,.1);
+  --line:rgba(0,0,0,.1); --line-t:rgba(0,0,0,.1);
   --text-strong:rgba(0,0,0,.9); --text:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
   --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --accent:#FF5C16; --accent-hover:#E84F0C; --on-accent:#FFFFFF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
@@ -24,7 +24,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
-    --line:#444444; --line-t:rgba(255,255,255,.1);
+    --line:rgba(255,255,255,.1); --line-t:rgba(255,255,255,.1);
     --text-strong:rgba(255,255,255,.9); --text:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
     --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
     color-scheme:dark;
@@ -32,7 +32,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
-  --line:#444444; --line-t:rgba(255,255,255,.1);
+  --line:rgba(255,255,255,.1); --line-t:rgba(255,255,255,.1);
   --text-strong:rgba(255,255,255,.9); --text:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
   --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
   color-scheme:dark;
