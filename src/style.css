@@ -3,7 +3,7 @@
 :root{
   --bg:#FFFFFF; --bg2:#F5F5F5; --canvas:#F5F5F5; --seg-on:#FFFFFF;
   --line:#E6E6E6; --line-t:rgba(0,0,0,.1);
-  --text:rgba(0,0,0,.9); --text2:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
+  --text-strong:rgba(0,0,0,.9); --text:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
   --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --accent:#FF5C16; --accent-hover:#E84F0C; --on-accent:#FFFFFF; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
   --radius:5px; --radius-panel:13px;
@@ -12,7 +12,7 @@
   :root:not([data-theme="light"]){
     --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
     --line:#444444; --line-t:rgba(255,255,255,.1);
-    --text:rgba(255,255,255,.9); --text2:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
+    --text-strong:rgba(255,255,255,.9); --text:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
     --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
     color-scheme:dark;
   }
@@ -20,14 +20,14 @@
 :root[data-theme="dark"]{
   --bg:#2C2C2C; --bg2:#383838; --canvas:#1E1E1E; --seg-on:#4A4A4A;
   --line:#444444; --line-t:rgba(255,255,255,.1);
-  --text:rgba(255,255,255,.9); --text2:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
+  --text-strong:rgba(255,255,255,.9); --text:rgba(255,255,255,.5); --text3:rgba(255,255,255,.3);
   --inverse:#E6E6E6; --warn-bg:#3A1F18; --warn-ink:#FFB39F;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{background:var(--canvas);color:var(--text);font:450 11px/16px "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em;margin:0;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--canvas);color:var(--text-strong);font:450 11px/16px "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em;margin:0;overflow:hidden;-webkit-font-smoothing:antialiased}
 button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 
 /* Three columns: controls 240 · preview · picture 240 */
@@ -46,7 +46,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 
 .apphead{padding:8px 16px 12px}
 .apphead .title{font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em;height:24px;display:flex;align-items:center}
-.apphead .sub{color:var(--text2)}
+.apphead .sub{color:var(--text)}
 
 /* Section: 40 px header, 4 px rows, 12 px bottom padding. The line is on top, as in Figma:
    it separates a block from the one above, and there is none under the last block */
@@ -58,9 +58,9 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .row{display:flex;gap:8px;align-items:center;padding:4px 16px}
 .row > *{flex:1 1 0;min-width:0}
 .prop{display:flex;flex-direction:column;gap:8px;padding:8px 16px}
-.prop .lbl{display:flex;color:var(--text2)}
+.prop .lbl{display:flex;color:var(--text)}
 .prop .lbl > span:not(.alert){flex:1}
-.prop .lbl output{color:var(--text);font-variant-numeric:lining-nums tabular-nums}
+.prop .lbl output{color:var(--text-strong);font-variant-numeric:lining-nums tabular-nums}
 .prop div.lbl{position:relative;align-items:center;gap:4px}
 .prop div.lbl label{flex:none}
 /* Warning next to the control it's about: «!» with the text in a tooltip, so nothing below moves */
@@ -74,8 +74,8 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
 .seg label{flex:1 1 0;min-width:0;display:flex}
 .seg input{position:absolute;opacity:0;pointer-events:none}
-.seg span{flex:1;min-width:0;height:32px;display:flex;align-items:center;justify-content:center;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);color:var(--text2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.seg input:checked+span{background:var(--seg-on);border-color:var(--line);color:var(--text)}
+.seg span{flex:1;min-width:0;height:32px;display:flex;align-items:center;justify-content:center;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg input:checked+span{background:var(--seg-on);border-color:var(--line);color:var(--text-strong)}
 .seg input:focus-visible+span{outline:1px solid var(--focus);outline-offset:-1px}
 .seg svg{width:24px;height:24px;flex:none;fill:currentColor}
 
@@ -126,18 +126,18 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 /* Empty card (no logo yet): outlined, «+» instead of a thumbnail */
 .file.add{background:transparent;box-shadow:inset 0 0 0 1px var(--line-t)}
 .file.add .thumb{background:var(--bg2);border:0;display:flex;align-items:center;justify-content:center}
-.file .plus{width:24px;height:24px;fill:var(--text2)}
+.file .plus{width:24px;height:24px;fill:var(--text)}
 /* Loaded logo: a trash button sits inside the card, outside the file label */
 .filewrap{position:relative;flex:1 1 0;min-width:0;display:flex}
 .filewrap .file{flex:1;min-width:0}
 .filewrap:has(.trash:not([hidden])) .file{padding-right:40px}
 .filewrap .trash{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
-.filewrap .trash svg{fill:var(--text2)}
+.filewrap .trash svg{fill:var(--text)}
 .filewrap .trash:hover{background:var(--line-t)}
 .file:not(.add) .plus{display:none}
 .file .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .file .name{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file .act{color:var(--text2)}
+.file .act{color:var(--text)}
 
 .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px}
 
@@ -150,7 +150,7 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .toolbelt{position:relative;flex:none;display:flex;height:48px;border-radius:var(--radius-panel);background:var(--bg);box-shadow:var(--elev)}
 .tb-part{display:flex;align-items:center;gap:8px;padding:8px}
 .tb-part + .tb-part{border-left:1px solid var(--line)}
-.tb-btn{flex:none;width:32px;height:32px;padding:4px;border:0;border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;display:flex}
+.tb-btn{flex:none;width:32px;height:32px;padding:4px;border:0;border-radius:var(--radius);background:transparent;color:var(--text-strong);cursor:pointer;display:flex}
 .tb-btn:hover{background:var(--bg2)}
 .tb-btn svg{width:24px;height:24px;fill:currentColor}
 /* File name hugs its text (up to 192 px, then «…»); .png is a fixed tail */
@@ -178,14 +178,14 @@ canvas.pannable.over-text:not(.dragging){cursor:text}
     linear-gradient(to bottom,transparent calc(33.333% - .5px),var(--g) calc(33.333% - .5px),var(--g) calc(33.333% + .5px),transparent calc(33.333% + .5px),transparent calc(66.667% - .5px),var(--g) calc(66.667% - .5px),var(--g) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
 
 /* «?» in the corner and the help popup */
-.helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text-strong);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .themebtn svg{width:24px;height:24px}
 /* Help popover (Figma 44:10536): over the preview, 12 px from the top, 8 px above the toolbelt */
-dialog.help{position:absolute;inset:12px 0 68px;z-index:6;width:min(570px,calc(100% - 32px));height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:var(--radius-panel);background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15);overflow:hidden}
+dialog.help{position:absolute;inset:12px 0 68px;z-index:6;width:min(570px,calc(100% - 32px));height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:var(--radius-panel);background:var(--bg);color:var(--text-strong);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15);overflow:hidden}
 dialog.help[open]{display:flex;flex-direction:column}
 .dlg-h{flex:none;height:40px;display:flex;align-items:center;gap:8px;padding:4px 8px 4px 16px;border-bottom:1px solid var(--line)}
 .dlg-h h2{flex:1;margin:0;font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em}
-.icon-btn{flex:none;width:32px;height:32px;padding:0;border:0;border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icon-btn{flex:none;width:32px;height:32px;padding:0;border:0;border-radius:var(--radius);background:transparent;color:var(--text-strong);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .icon-btn:hover{background:var(--bg2)}
 .dlg-h .icon-btn{width:24px}
 .icon-btn svg{width:24px;height:24px;fill:currentColor}
