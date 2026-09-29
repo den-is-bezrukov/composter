@@ -6,7 +6,7 @@
   --text:rgba(0,0,0,.9); --text2:rgba(0,0,0,.5); --text3:rgba(0,0,0,.3);
   --inverse:#2C2C2C; --focus:#0D99FF; --danger:#F24822; --accent:#FF5C16; --accent-hover:#E84F0C; --warn-bg:#FFF1EC; --warn-ink:#9A2A12;
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
-  --radius:5px;
+  --radius:5px; --radius-panel:13px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -147,7 +147,7 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .stage{flex:1;min-height:0;align-self:stretch;display:flex;align-items:center;justify-content:center}
 
 /* Toolbelt: help | file name + «Скачать» */
-.toolbelt{position:relative;flex:none;display:flex;height:48px;border-radius:13px;background:var(--bg);box-shadow:var(--elev)}
+.toolbelt{position:relative;flex:none;display:flex;height:48px;border-radius:var(--radius-panel);background:var(--bg);box-shadow:var(--elev)}
 .tb-part{display:flex;align-items:center;gap:8px;padding:8px}
 .tb-part + .tb-part{border-left:1px solid var(--line)}
 .tb-btn{flex:none;width:32px;height:32px;padding:4px;border:0;border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;display:flex}
@@ -181,7 +181,7 @@ canvas.pannable.over-text:not(.dragging){cursor:text}
 .helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .themebtn svg{width:24px;height:24px}
 /* Help popover (Figma 44:10536): over the preview, 12 px from the top, 8 px above the toolbelt */
-dialog.help{position:absolute;inset:12px 0 68px;z-index:6;width:min(570px,calc(100% - 32px));height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15);overflow:hidden}
+dialog.help{position:absolute;inset:12px 0 68px;z-index:6;width:min(570px,calc(100% - 32px));height:auto;max-height:none;margin:0 auto;padding:0;border:0;border-radius:var(--radius-panel);background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15);overflow:hidden}
 dialog.help[open]{display:flex;flex-direction:column}
 .dlg-h{flex:none;height:40px;display:flex;align-items:center;gap:8px;padding:4px 8px 4px 16px;border-bottom:1px solid var(--line)}
 .dlg-h h2{flex:1;margin:0;font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em}
