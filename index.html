@@ -57,12 +57,15 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
   .side.left .scroll{padding-bottom:12px}
 }
 
-.apphead{padding:8px 16px 12px;border-bottom:1px solid var(--line)}
+.apphead{padding:8px 16px 12px}
 .apphead .title{font-size:13px;line-height:22px;font-weight:550;letter-spacing:-.0025em;height:24px;display:flex;align-items:center}
 .apphead .sub{color:var(--text2)}
 
-/* Section: 40 px header, 4 px rows, 12 px bottom padding */
-.sec{border-bottom:1px solid var(--line);padding-bottom:12px}
+/* Section: 40 px header, 4 px rows, 12 px bottom padding. The line is on top, as in Figma:
+   it separates a block from the one above, and there is none under the last block */
+.sec{border-top:1px solid var(--line);padding-bottom:12px}
+/* …and none above the first block of the right panel (in a narrow window it moves left and keeps it) */
+.side.right #props > :not([hidden]) > .sec:first-child{border-top:0}
 .sec-h{height:40px;display:flex;align-items:center;gap:8px;padding:0 8px 0 16px;font-weight:550}
 .sec-h > span{flex:1;min-width:0}
 .row{display:flex;gap:8px;align-items:center;padding:4px 16px}
