@@ -32,8 +32,9 @@ function zoomAt(factor, p) {
   clampCase();
 }
 
-function setCaseImage(img, name) {
-  caseState.img = img; caseState.name = fileSlug(name);
+// sample: the placeholder picture; a logo's file name names the post better than it
+function setCaseImage(img, name, sample = false) {
+  caseState.img = img; caseState.name = fileSlug(name); caseState.sample = sample;
   resetFrame(); clampCase();
   draw();
 }
@@ -123,7 +124,7 @@ function setLogo(logo, name, url) {
   show(['logoControls', 'logoRemove', 'logoReset'], true);
   setCard('logo', name, url); $('logoAct').textContent = 'Заменить';
   // The post is named after the client: the logo's file name wins over the sample picture
-  if (!c.img || c.name === 'more-tv') c.name = fileSlug(name);
+  if (!c.img || c.sample) c.name = fileSlug(name);
   draw();
 }
 

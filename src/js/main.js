@@ -40,16 +40,14 @@ const narrowMQ = matchMedia('(max-width:960px)');
 function placeProps() { (narrowMQ.matches ? $('leftScroll') : $('rightSide')).appendChild($('props')); }
 narrowMQ.addEventListener('change', placeProps);
 
-// Fit the 3:4 preview into the workspace
+// Fit the 3:4 preview into the space above the toolbelt
 function fitFrame() {
-  const ws = document.querySelector('.workspace'), cs = getComputedStyle(ws);
-  const availW = ws.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  const availH = ws.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-  const w = Math.max(120, Math.floor(Math.min(availW, availH * 3 / 4)));
+  const st = $('stage');
+  const w = Math.max(120, Math.floor(Math.min(st.clientWidth, st.clientHeight * 3 / 4)));
   $('frame').style.width = w + 'px'; $('frame').style.height = Math.round(w * 4 / 3) + 'px';
   placeInline();
 }
-new ResizeObserver(fitFrame).observe(document.querySelector('.workspace'));
+new ResizeObserver(fitFrame).observe($('stage'));
 
 // ---- Start ----
 syncColorUI();
@@ -58,7 +56,7 @@ fitFrame();
 
 // Placeholders: a picture is always there, it can only be replaced
 loadImage('data:image/jpeg;base64,__CASE__', img => {
-  if (!caseState.img) { setCaseImage(img, 'more-tv'); setCard('case', 'Пример.jpg', img.src); }
+  if (!caseState.img) { setCaseImage(img, 'Пример.jpg', true); setCard('case', 'Пример.jpg', img.src); }
 });
 loadImage('data:image/webp;base64,__LIPS__', img => {
   if (!state.img) { state.img = img; setCard('file', 'Пример.webp', img.src); draw(); }

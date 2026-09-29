@@ -67,7 +67,6 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .alert:hover .tip,.alert:focus-visible .tip{opacity:1;visibility:visible}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
 .note{padding:4px 16px;color:var(--text2)}
-.export{border-top:1px solid var(--line);border-bottom:0;flex:none;padding:12px 0}
 
 /* Segmented control */
 .seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
@@ -86,22 +85,19 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .ghost{flex:none;height:24px;padding:4px 8px;border:0;border-radius:var(--radius);background:transparent;cursor:pointer;white-space:nowrap}
 .ghost:hover:not(:disabled){background:var(--bg2)}
 .ghost:disabled{color:var(--text3);cursor:default}
-.btn:focus-visible,.ghost:focus-visible,.file:focus-within,.helpbtn:focus-visible,.icon-btn:focus-visible{outline:1px solid var(--focus);outline-offset:-1px}
+.btn:focus-visible,.ghost:focus-visible,.file:focus-within,.helpbtn:focus-visible,.icon-btn:focus-visible,.tb-btn:focus-visible{outline:1px solid var(--focus);outline-offset:-1px}
 
 /* Text inputs */
-textarea,.fname{background:var(--bg2);border:0;border-radius:var(--radius)}
+textarea{background:var(--bg2);border:0;border-radius:var(--radius)}
 textarea{display:block;width:100%;padding:8px;resize:none;height:32px;min-height:32px;max-height:160px;overflow-y:hidden;outline:none}
-textarea:focus,.fname input:focus{outline:1px solid var(--focus);outline-offset:-1px}
+textarea:focus{outline:1px solid var(--focus);outline-offset:-1px}
 /* Headline field: a layer under the transparent textarea draws a tie ‿ under each non-breaking space */
 .tfield{position:relative;border-radius:var(--radius);background:var(--bg2)}
 .tfield textarea{position:relative;background:transparent}
 .tfield-bg{position:absolute;inset:0;padding:8px;white-space:pre-wrap;overflow-wrap:break-word;overflow:hidden;color:transparent;pointer-events:none;border-radius:var(--radius)}
 .tfield-bg .nb{position:relative}
 .tfield-bg .nb::after{content:'';position:absolute;left:-2px;right:-2px;bottom:1px;height:3px;border:1px solid var(--accent);border-top:0;border-radius:0 0 4px 4px}
-.fname{display:flex;gap:1px;background:transparent;overflow:hidden}
-.fname input,.fname .ext{background:var(--bg2);border:0;padding:8px}
 .fname input{flex:1;min-width:0;padding-right:4px;border-radius:var(--radius) 0 0 var(--radius)}
-.fname .ext{flex:none;padding-left:6px;color:var(--text3);user-select:none;border-radius:0 var(--radius) var(--radius) 0}
 
 /* Slider as Figma recommends: a pill from the default dot to the knob, the dot stays visible on top,
    a moved knob gets a coloured centre */
@@ -144,8 +140,25 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px}
 
 /* Preview */
-.workspace{display:flex;align-items:center;justify-content:center;padding:45px 40px;min-width:0;min-height:0;overflow:hidden;background:var(--canvas)}
-.stage{flex:none;display:flex;align-items:center;justify-content:center}
+/* Preview column: the post on top, the toolbelt 15 px under it */
+.workspace{display:flex;flex-direction:column;align-items:center;gap:15px;padding:15px 40px 12px;min-width:0;min-height:0;overflow:hidden;background:var(--canvas)}
+.stage{flex:1;min-height:0;align-self:stretch;display:flex;align-items:center;justify-content:center}
+
+/* Toolbelt: help | file name + «Скачать» */
+.toolbelt{position:relative;flex:none;display:flex;height:48px;border-radius:13px;background:var(--bg);box-shadow:var(--elev)}
+.tb-part{display:flex;align-items:center;gap:8px;padding:8px}
+.tb-part + .tb-part{border-left:1px solid var(--line)}
+.tb-btn{flex:none;width:32px;height:32px;padding:4px;border:0;border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;display:flex}
+.tb-btn:hover{background:var(--bg2)}
+.tb-btn svg{width:24px;height:24px;fill:currentColor}
+/* File name hugs its text (up to 192 px, then «…»); .png is a fixed tail */
+.fname{position:relative;flex:none;display:flex;align-items:center;height:32px;padding:8px;background:var(--bg2);border-radius:var(--radius);cursor:text}
+.fname:focus-within{outline:1px solid var(--focus);outline-offset:-1px}
+.fname input{width:24px;max-width:192px;padding:0;border:0;background:transparent;outline:none;text-transform:lowercase;text-overflow:ellipsis}
+.fname .ext{user-select:none}
+.fname-measure{position:absolute;left:0;top:0;visibility:hidden;white-space:pre;text-transform:lowercase}
+.toolbelt .btn{flex:none}
+.tb-tip{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:max-content;max-width:280px;padding:8px;border-radius:var(--radius);background:var(--inverse);color:var(--bg);box-shadow:var(--elev)}
 .frame{position:relative}
 .frame canvas{display:block;width:100%;height:100%;background:#000}
 canvas.pannable{cursor:grab;touch-action:none}
@@ -164,9 +177,6 @@ canvas.pannable.over-text:not(.dragging){cursor:text}
 
 /* «?» in the corner and the help popup */
 .helpbtn{position:fixed;right:16px;bottom:16px;z-index:5;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--bg);color:var(--text);box-shadow:var(--elev);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.helpbtn svg{width:32px;height:32px;fill:currentColor}
-/* Theme button sits left of «?»: 16 + 32 + 8 */
-.themebtn{right:56px}
 .themebtn svg{width:24px;height:24px}
 dialog.help{width:min(720px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));padding:0;border:0;border-radius:13px;background:var(--bg);color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.15),0 10px 16px rgba(0,0,0,.12),0 0 .5px rgba(0,0,0,.15)}
 dialog.help[open]{display:flex;flex-direction:column}
