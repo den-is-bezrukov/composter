@@ -30,9 +30,9 @@
   /* Size (Figma mode M; data-size="s" switches to S, see Buttons) */
   --control-height:32px; --control-pad:var(--space-4);
   /* Composter — meaning, light theme */
-  --bg:var(--white); --bg2:var(--gray-100); --canvas:var(--gray-100); --seg-on:var(--white);
+  --bg:var(--white); --bg-subtle:var(--gray-100); --canvas:var(--gray-100); --seg-on:var(--white);
   --line:var(--black-10); --line-t:var(--black-10);
-  --text-strong:var(--black-90); --text:var(--black-50); --text3:var(--black-30);
+  --text-strong:var(--black-90); --text:var(--black-50); --text-subtle:var(--black-30);
   --inverse:var(--gray-800); --focus:var(--blue-500); --danger:var(--red-500); --accent:var(--orange-500); --accent-hover:var(--orange-600); --on-accent:var(--white);
   --warn-bg:var(--orange-50); --warn-ink:var(--orange-900);
   --elev:0 1px 3px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.1),0 0 .5px rgba(0,0,0,.18);
@@ -40,17 +40,17 @@
 /* Composter — dark theme */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:var(--gray-800); --bg2:var(--gray-700); --canvas:var(--gray-900); --seg-on:var(--gray-600);
+    --bg:var(--gray-800); --bg-subtle:var(--gray-700); --canvas:var(--gray-900); --seg-on:var(--gray-600);
     --line:var(--white-10); --line-t:var(--white-10);
-    --text-strong:var(--white-90); --text:var(--white-50); --text3:var(--white-30);
+    --text-strong:var(--white-90); --text:var(--white-50); --text-subtle:var(--white-30);
     --inverse:var(--gray-200); --warn-bg:var(--orange-950); --warn-ink:var(--orange-200);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:var(--gray-800); --bg2:var(--gray-700); --canvas:var(--gray-900); --seg-on:var(--gray-600);
+  --bg:var(--gray-800); --bg-subtle:var(--gray-700); --canvas:var(--gray-900); --seg-on:var(--gray-600);
   --line:var(--white-10); --line-t:var(--white-10);
-  --text-strong:var(--white-90); --text:var(--white-50); --text3:var(--white-30);
+  --text-strong:var(--white-90); --text:var(--white-50); --text-subtle:var(--white-30);
   --inverse:var(--gray-200); --warn-bg:var(--orange-950); --warn-ink:var(--orange-200);
   color-scheme:dark;
 }
@@ -101,7 +101,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .alert:focus-visible{box-shadow:0 0 0 1px var(--focus)}
 
 /* Segmented control */
-.seg{display:flex;background:var(--bg2);border-radius:var(--radius)}
+.seg{display:flex;background:var(--bg-subtle);border-radius:var(--radius)}
 .seg label{flex:1 1 0;min-width:0;display:flex}
 .seg input{position:absolute;opacity:0;pointer-events:none}
 .seg span{flex:1;min-width:0;height:var(--control-height);display:flex;align-items:center;justify-content:center;padding:0 var(--space-8);border:1px solid transparent;border-radius:var(--radius);color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -114,7 +114,7 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
    (Figma: the Size variable mode), everything button-like inside follows --control-height / --control-pad */
 [data-size="s"]{--control-height:24px;--control-pad:0px}
 /* Each style only sets its --btn-* colours, so rules never fight over specificity */
-.btn{--btn-bg:var(--seg-on);--btn-bg-hover:var(--bg2);--btn-line:var(--line-t);--btn-fg:var(--text-strong);
+.btn{--btn-bg:var(--seg-on);--btn-bg-hover:var(--bg-subtle);--btn-line:var(--line-t);--btn-fg:var(--text-strong);
   height:var(--control-height);display:flex;align-items:center;justify-content:center;padding:0 calc(var(--control-pad) + 7px);
   border:1px solid var(--btn-line);border-radius:var(--radius);background:var(--btn-bg);color:var(--btn-fg);cursor:pointer;white-space:nowrap}
 .btn:hover:not(:disabled){background:var(--btn-bg-hover)}
@@ -124,18 +124,18 @@ button,input,textarea{font:inherit;letter-spacing:inherit;color:inherit}
 .btn.ghost{--btn-bg:transparent;--btn-line:transparent;flex:none}
 .btn.floating{--btn-bg:var(--bg);--btn-bg-hover:var(--bg);--btn-line:transparent;border-radius:var(--radius-pill);box-shadow:var(--elev)}
 .btn.icon{flex:none;width:var(--control-height);padding:0}
-.btn:disabled{--btn-bg:transparent;--btn-fg:var(--text3);cursor:default}
+.btn:disabled{--btn-bg:transparent;--btn-fg:var(--text-subtle);cursor:default}
 /* «?» in the toolbelt is lit (Primary) while the help is open */
 .toolbelt .btn[aria-expanded="true"]{--btn-bg:var(--accent);--btn-bg-hover:var(--accent-hover);--btn-fg:var(--on-accent)}
 .btn svg{flex:none;width:24px;height:24px;fill:currentColor}
 .btn:focus-visible,.file:focus-within{outline:1px solid var(--focus);outline-offset:-1px}
 
 /* Text inputs */
-textarea{background:var(--bg2);border:0;border-radius:var(--radius)}
+textarea{background:var(--bg-subtle);border:0;border-radius:var(--radius)}
 textarea{display:block;width:100%;padding:var(--space-8);resize:none;height:var(--control-height);min-height:var(--control-height);max-height:160px;overflow-y:hidden;outline:none}
 textarea:focus{outline:1px solid var(--focus);outline-offset:-1px}
 /* Headline field: a layer under the transparent textarea draws a tie ‿ under each non-breaking space */
-.tfield{position:relative;border-radius:var(--radius);background:var(--bg2)}
+.tfield{position:relative;border-radius:var(--radius);background:var(--bg-subtle)}
 .tfield textarea{position:relative;background:transparent}
 .tfield-bg{position:absolute;inset:0;padding:var(--space-8);white-space:pre-wrap;overflow-wrap:break-word;overflow:hidden;color:transparent;pointer-events:none;border-radius:var(--radius)}
 .tfield-bg .nb{position:relative}
@@ -146,11 +146,11 @@ textarea:focus{outline:1px solid var(--focus);outline-offset:-1px}
    a moved knob gets a coloured centre */
 input[type=range]{--z:0;--fs:8px;--fe:8px;--fc:transparent;--kd:var(--on-accent);-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:100px;height:16px;margin:0;border-radius:var(--radius-pill);cursor:pointer;
   background:
-    radial-gradient(circle at calc(8px + (100% - 16px) * var(--z)) 50%,var(--text3) 2px,transparent 2.5px),
+    radial-gradient(circle at calc(8px + (100% - 16px) * var(--z)) 50%,var(--text-subtle) 2px,transparent 2.5px),
     radial-gradient(circle at var(--fs) 50%,var(--fc) 7.5px,transparent 8px),
     radial-gradient(circle at var(--fe) 50%,var(--fc) 7.5px,transparent 8px),
     linear-gradient(to right,transparent var(--fs),var(--fc) var(--fs) var(--fe),transparent var(--fe)),
-    var(--bg2);
+    var(--bg-subtle);
   box-shadow:inset 0 0 0 1px var(--line-t)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,var(--kd) 3.5px,var(--on-accent) 4px);box-shadow:var(--elev)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:radial-gradient(circle,var(--kd) 3.5px,var(--on-accent) 4px);box-shadow:var(--elev)}
@@ -159,14 +159,14 @@ input[type=range]:focus-visible{outline:1px solid var(--focus);outline-offset:1p
 input[type=range]:disabled{opacity:.4;cursor:default}
 
 /* Picture card: thumbnail, file name, «Заменить» */
-.file{display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);background:var(--bg2);border-radius:var(--radius);cursor:pointer}
+.file{display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);background:var(--bg-subtle);border-radius:var(--radius);cursor:pointer}
 .file.over{outline:1px solid var(--focus);outline-offset:-1px}
 .thumb{flex:none;width:32px;height:32px;border:1px solid var(--line-t);border-radius:var(--radius-sm);overflow:hidden;
   background:repeating-conic-gradient(var(--gray-200) 0 25%,var(--white) 0 50%) 0 0/9.36px 9.36px}
 .thumb img{display:block;width:100%;height:100%;object-fit:contain}
 /* Empty card (no logo yet): outlined, «+» instead of a thumbnail */
 .file.add{background:transparent;box-shadow:inset 0 0 0 1px var(--line-t)}
-.file.add .thumb{background:var(--bg2);border:0;display:flex;align-items:center;justify-content:center}
+.file.add .thumb{background:var(--bg-subtle);border:0;display:flex;align-items:center;justify-content:center}
 .file .plus{width:24px;height:24px;fill:var(--text)}
 /* Loaded logo: a trash button sits inside the card, outside the file label */
 .filewrap{position:relative;flex:1 1 0;min-width:0;display:flex}
@@ -191,7 +191,7 @@ input[type=range]:disabled{opacity:.4;cursor:default}
 .tb-part{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8)}
 .tb-part + .tb-part{border-left:1px solid var(--line)}
 /* File name hugs its text (up to 192 px, then «…»); .png is a fixed tail */
-.fname{position:relative;flex:none;display:flex;align-items:center;height:var(--control-height);padding:var(--space-8);background:var(--bg2);border-radius:var(--radius);cursor:text}
+.fname{position:relative;flex:none;display:flex;align-items:center;height:var(--control-height);padding:var(--space-8);background:var(--bg-subtle);border-radius:var(--radius);cursor:text}
 .fname:focus-within{outline:1px solid var(--focus);outline-offset:-1px}
 .fname input{width:24px;max-width:192px;padding:0;border:0;background:transparent;outline:none;text-transform:lowercase;text-overflow:ellipsis}
 .fname .ext{user-select:none}
@@ -233,7 +233,7 @@ dialog.help[open]{display:flex;flex-direction:column}
 .rules b{display:block;font-weight:550}
 .dlg-b .btn.inverse{align-self:flex-start}
 /* Prompt: 9 lines, then «…» and «Показать полностью» */
-.prompt{display:flex;flex-direction:column;align-items:flex-start;padding:var(--space-8);background:var(--bg2);border-radius:var(--radius)}
+.prompt{display:flex;flex-direction:column;align-items:flex-start;padding:var(--space-8);background:var(--bg-subtle);border-radius:var(--radius)}
 .prompt-t{align-self:stretch;margin:var(--space-8);font-size:11px;line-height:16px;letter-spacing:.005em;white-space:pre-wrap;overflow-wrap:break-word}
 .prompt:not(.open) .prompt-t{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:9;overflow:hidden}
 .prompt .btn.ghost{--btn-bg-hover:var(--line-t)}
